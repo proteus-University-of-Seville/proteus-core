@@ -42,6 +42,7 @@ from proteus.model.properties.classlist_property import ClassListProperty
 from proteus.model.properties.trace_property import TraceProperty
 from proteus.model.properties.code_property import CodeProperty, ProteusCode
 from proteus.model.properties.tracetypelist_property import TraceTypeListProperty
+from proteus.model.properties.unit_property import UnitProperty, Measurement
 
 from proteus.model import (
     NAME_ATTRIBUTE,
@@ -56,6 +57,7 @@ from proteus.model import (
     MAX_TARGETS_NUMBER_ATTRIBUTE,
     CHOICES_ATTRIBUTE,
     VALUE_TOOLTIPS_ATTRIBUTE,
+    UNITS_ATTRIBUTE,
 )
 
 from proteus.model.properties import (
@@ -67,6 +69,8 @@ from proteus.model.properties import (
     TYPE_TAG,
     NO_TARGETS_LIMIT,
     DEFAULT_TRACE_TYPE,
+    VALUE_TAG,
+    UNIT_TAG,
 )
 
 # logging configuration
@@ -104,6 +108,7 @@ class PropertyFactory:
         CodeProperty.element_tagname: CodeProperty,
         TraceProperty.element_tagname: TraceProperty,
         TraceTypeListProperty.element_tagname: TraceTypeListProperty,
+        UnitProperty.element_tagname: UnitProperty,
     }
 
     @classmethod
@@ -178,6 +183,12 @@ class PropertyFactory:
                 traces.append(target)
 
             value = traces
+        elif property_class is UnitProperty:
+            # We need to collect its value and unit
+            value = Measurement(
+                float(element.find(VALUE_TAG).text),
+                element.find(UNIT_TAG).text,
+            )
         else:
             # Value could be empty
             value = str(element.text)
@@ -207,7 +218,7 @@ class PropertyFactory:
             )
 
         # Special case: traceProperty
-        if property_class is TraceProperty:
+        elif property_class is TraceProperty:
             # We need to collect its trace type, max targets number and accepted targets
             trace_type = element.attrib.get(TRACE_TYPE_ATTRIBUTE, DEFAULT_TRACE_TYPE)
 
@@ -242,5 +253,13 @@ class PropertyFactory:
                 max_targets_number,
             )
 
-        # Ordinary case: rest of property classes
-        return property_class(name, category, value, tooltip, required, inmutable)
+        # Special case: UnitProperty
+        elif property_class is UnitProperty:
+            units_str = element.attrib.get(UNITS_ATTRIBUTE, str())
+            units = units_str.split()
+            return UnitProperty(
+                name, category, value, tooltip, required, inmutable, units
+            )
+        else:
+            # Ordinary case: rest of property classes
+            return property_class(name, category, value, tooltip, required, inmutable)

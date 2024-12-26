@@ -11,7 +11,7 @@
 # --------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, Any
 import logging
 
 # --------------------------------------------------------------------------
@@ -115,9 +115,12 @@ class ProteusCode:
         next_number = int(self.number) + 1
         return ProteusCode(self.prefix, f"{next_number:03d}", self.suffix)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """
         Returns True if the codes are equal, False otherwise.
+
+        :param Any other: Object to compare
+        :return bool: True if the codes are equal, False otherwise
         """
         if not isinstance(other, ProteusCode):
             return False
@@ -192,4 +195,6 @@ class CodeProperty(Property):
         suffix_element = ET.SubElement(property_element, SUFFIX_TAG)
         suffix_element.text = ET.CDATA(self.value.suffix)
 
-        return str()
+        # Returning None avoid the XML to be printed in a single line
+        # https://lxml.de/FAQ.html#why-doesn-t-the-pretty-print-option-reformat-my-xml-output
+        return None

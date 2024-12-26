@@ -73,6 +73,7 @@ CLASSLIST_PROPERTY_TAG  = str('classListProperty')
 CODE_PROPERTY_TAG       = str('codeProperty')
 TRACE_PROPERTY_TAG      = str('traceProperty')
 TRACE_TYPE_LIST_PROPERTY_TAG = str('traceTypeListProperty')
+UNIT_PROPERTY_TAG       = str('unitProperty')
 
 CLASS_TAG               = str('class')
 TYPE_TAG                = str('type')
@@ -80,6 +81,8 @@ PREFIX_TAG              = str('prefix')
 NUMBER_TAG              = str('number')
 SUFFIX_TAG              = str('suffix')
 TRACE_TAG               = str('trace')
+UNIT_TAG                = str('unit')
+VALUE_TAG               = str('value')
 
 DEFAULT_NAME            = str('unnamed')
 DEFAULT_CATEGORY        = str('general')
@@ -112,3 +115,4 @@ from proteus.model.properties.classlist_property import ClassListProperty
 from proteus.model.properties.code_property import CodeProperty
 from proteus.model.properties.trace_property import TraceProperty
 from proteus.model.properties.tracetypelist_property import TraceTypeListProperty
+from proteus.model.properties.unit_property import UnitProperty

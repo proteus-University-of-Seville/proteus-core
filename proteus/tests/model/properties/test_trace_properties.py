@@ -1,6 +1,6 @@
 # ==========================================================================
-# File: test_trace.py
-# Description: pytest file for PROTEUS trace
+# File: test_trace_properties.py
+# Description: pytest file for PROTEUS trace properties
 # Date: 16/11/2023
 # Version: 0.2
 # Author: José María Delgado Sánchez
@@ -63,11 +63,11 @@ def create_trace_element(
     trace_type: str = DEFAULT_TRACE_TYPE,
     tooltip: str = None,
     max_targets: int = None,
-) -> ET.Element:
+) -> ET._Element:
     """
     Create a trace XML element with the given parameters.
     """
-    trace_element = ET.Element(TRACE_PROPERTY_TAG)
+    trace_element: ET._Element = ET.Element(TRACE_PROPERTY_TAG)
     # Add attributes
     trace_element.set(NAME_ATTRIBUTE, name)
     trace_element.set(CATEGORY_ATTRIBUTE, category)
@@ -88,7 +88,7 @@ def create_trace_element(
 
     # Add dummy subelemnts
     for dummy_target in dummy_targets:
-        target_element = ET.SubElement(trace_element, TRACE_TAG)
+        target_element: ET._Element = ET.SubElement(trace_element, TRACE_TAG)
         target_element.set(TARGET_ATTRIBUTE, dummy_target)
         target_element.set(TRACE_TYPE_ATTRIBUTE, trace_type)
 

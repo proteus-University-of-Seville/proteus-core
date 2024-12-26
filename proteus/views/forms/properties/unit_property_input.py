@@ -1,7 +1,7 @@
 # ==========================================================================
-# File: float_property_input.py
-# Description: Float property input widget for properties forms.
-# Date: 17/10/2023
+# File: unit_property_input.py
+# Description: Unit property input widget for properties forms.
+# Date: 19/12/2024
 # Version: 0.1
 # Author: José María Delgado Sánchez
 # ==========================================================================
@@ -14,49 +14,52 @@
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtWidgets import (
-    QLineEdit,
-)
 
 # --------------------------------------------------------------------------
 # Project specific imports
 # --------------------------------------------------------------------------
 
-from proteus.model.properties.float_property import FloatProperty
+from proteus.model.properties.unit_property import UnitProperty, Measurement
 from proteus.views.forms.properties.property_input import PropertyInput
-
+from proteus.views.forms.measurement_edit import MeasurementEdit
 
 # --------------------------------------------------------------------------
-# Class: FloatPropertyInput
-# Description: Float property input widget for properties forms.
-# Date: 17/10/2023
+# Class: UnitPropertyInput
+# Description: Unit property input widget for properties forms.
+# Date: 19/12/2024
 # Version: 0.1
 # Author: José María Delgado Sánchez
 # --------------------------------------------------------------------------
-class FloatPropertyInput(PropertyInput):
+class UnitPropertyInput(PropertyInput):
     """
-    Float property input widget for properties forms.
+    Unit property input widget for properties forms.
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.wrap_in_group_box = True
 
     # ----------------------------------------------------------------------
     # Method     : get_value
     # Description: Returns the value of the input widget.
-    # Date       : 04/08/2023
+    # Date       : 19/12/2024
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
-    def get_value(self) -> float:
+    def get_value(self) -> Measurement:
         """
         Returns the value of the input widget. The value is converted to a
-        float.
+        Measurement object.
         """
-        self.input: QLineEdit
-        return float(self.input.text())
-
+        self.input: MeasurementEdit
+        value, unit = self.input.measurement()
+        return Measurement(value=float(value), unit=unit)
+    
     # ----------------------------------------------------------------------
     # Method     : validate
     # Description: Validates the input widget.
-    # Date       : 17/10/2023
+    # Date       : 19/12/2024
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
@@ -66,31 +69,33 @@ class FloatPropertyInput(PropertyInput):
         has errors, None otherwise.
         """
         # Perform validation to prevent non-numeric values
-        text = self.input.text()
+        value, _ = self.input.measurement()
         try:
-            float(text)
+            float(value)
         except ValueError:
-            return "float_property_input.validator.error"
+            return "unit_property_input.validator.value.error"
 
         # Check required
-        if self.property.required and (text is None or text == ""):
+        if self.property.required and (value is None or value == ""):
             return "property_input.validator.error.required"
 
         # Return None if the input is valid
         return None
-
+    
     # ----------------------------------------------------------------------
     # Method     : create_input
     # Description: Creates the input widget.
-    # Date       : 17/10/2023
+    # Date       : 19/12/2024
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
     @staticmethod
-    def create_input(property: FloatProperty, *args, **kwargs) -> QLineEdit:
+    def create_input(property: UnitProperty, *args, **kwargs) -> MeasurementEdit:
         """
-        Creates the input widget based on QLineEdit.
+        Creates the input widget based on MeasurementEdit custom widget.
         """
-        input: QLineEdit = QLineEdit()
-        input.setText(str(property.value))
+        input: MeasurementEdit = MeasurementEdit(property.units)
+        input.setMeasurement(property.value.value, property.value.unit)
         return input
+        
+

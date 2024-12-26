@@ -41,6 +41,7 @@ integer_property_input.validator.error: "This field must be an integer number"
 code_property_input.validator.error.prefix: "The prefix cannot be an empty string"
 code_property_input.validator.error.number_type: "The number must be a positive integer"
 code_property_input.validator.error.number_value: "The number must be greater than 0"
+unit_property_input.validator.value.error: "The value must be a float number"
 
 # Warning dialog
 property_input.inmutable_property_warning.title: "Warning, inmutable property"
@@ -51,6 +52,12 @@ property_input.inmutable_property_warning.text: "This property is marked as inmu
 # ---------------------------------------------------------------------------
 markdown_edit.preview: "Show preview"
 markdown_edit.edit: "Edit text"
+
+# ---------------------------------------------------------------------------
+# Unit Edit
+# ---------------------------------------------------------------------------
+measurement_edit.value: "Value"
+measurement_edit.unit: "Unit"
 
 # ---------------------------------------------------------------------------
 # Clipboard

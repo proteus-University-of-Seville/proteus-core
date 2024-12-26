@@ -46,6 +46,7 @@ from proteus.model.properties.classlist_property import ClassListProperty
 from proteus.model.properties.code_property import CodeProperty
 from proteus.model.properties.trace_property import TraceProperty
 from proteus.model.properties.tracetypelist_property import TraceTypeListProperty
+from proteus.model.properties.unit_property import UnitProperty
 
 # Property input imports
 from proteus.views.forms.properties.trace_input import TraceInput
@@ -77,6 +78,7 @@ from proteus.views.forms.properties.classlist_property_input import (
 from proteus.views.forms.properties.tracetypelist_property_input import (
     TraceTypeListPropertyInput,
 )
+from proteus.views.forms.properties.unit_property_input import UnitPropertyInput
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
@@ -112,6 +114,7 @@ class PropertyInputFactory:
         CodeProperty: CodePropertyInput,
         ClassListProperty: ClassListPropertyInput,
         TraceTypeListProperty: TraceTypeListPropertyInput,
+        UnitProperty: UnitPropertyInput,
     }
 
     # ----------------------------------------------------------------------

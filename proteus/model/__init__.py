@@ -55,6 +55,7 @@ TRACE_TYPE_ATTRIBUTE           = str('traceType')
 MAX_TARGETS_NUMBER_ATTRIBUTE   = str('maxTargetsNumber')
 VALUE_TOOLTIPS_ATTRIBUTE       = str('valueTooltips')
 CHOICES_ATTRIBUTE              = str('choices')
+UNITS_ATTRIBUTE                = str('units')
 
 # Type for Class tags in Proteus
 ProteusClassTag = NewType('ProteusClassTag', str)

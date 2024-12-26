@@ -19,7 +19,6 @@ from typing import Tuple
 from PyQt6.QtGui import QFontMetrics
 from PyQt6.QtCore import (
     Qt,
-    QSize,
 )
 from PyQt6.QtWidgets import (
     QWidget,
@@ -68,7 +67,7 @@ class CodeEdit(QWidget):
         self.suffix_input: QLineEdit = None
 
         # Create input widget
-        self.create_input()
+        self._create_input()
 
 
     # ----------------------------------------------------------------------
@@ -78,7 +77,7 @@ class CodeEdit(QWidget):
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
-    def create_input(self) -> None:
+    def _create_input(self) -> None:
         """
         Create the widgets and configure the layout.
         """
