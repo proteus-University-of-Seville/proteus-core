@@ -68,10 +68,10 @@ class TraceProperty(Property):
 
     # dataclass instance attributes
     element_tagname: ClassVar[str] = TRACE_PROPERTY_TAG
+    value: List[ProteusID] = field(default_factory=list)  # targets
     acceptedTargets: List[ProteusClassTag] = field(default_factory=list)
     excludedTargets: List[ProteusClassTag] = field(default_factory=list)
     traceType: str = str(DEFAULT_TRACE_TYPE)
-    value: List[ProteusID] = field(default_factory=list)  # targets
     maxTargetsNumber: int = NO_TARGETS_LIMIT
 
     # --------------------------------------------------------------------------

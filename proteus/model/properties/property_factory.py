@@ -176,7 +176,13 @@ class PropertyFactory:
 
                 if target is None:
                     log.warning(
-                        f"PROTEUS trace '{name}' has a trace without a target -> ignoring it"
+                        f"PROTEUS trace '{name}' has a trace without a target attribute -> ignoring it"
+                    )
+                    continue
+
+                if target.strip() == "":
+                    log.warning(
+                        f"PROTEUS trace '{name}' has a trace with an empty target attribute -> ignoring it"
                     )
                     continue
 

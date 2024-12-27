@@ -145,10 +145,15 @@ class Property(ABC):
 
     def compare(self, other: "Property") -> bool:
         """
-        It compares two properties to check if they are equal.
+        It compares two properties to check if they are equal. If a non-property
+        object is provided, it returns False.
+        
         :param other: the other property to compare.
         :return: True if both properties are equal comparing their attributes.
         """
+        if not isinstance(other, Property):
+            return False
+
         return (
             self.name == other.name
             and self.category == other.category

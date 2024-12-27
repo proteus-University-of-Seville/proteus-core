@@ -27,14 +27,16 @@ from proteus.model.properties import (
     VALUE_TAG,
     UNIT_TAG,
     UNIT_PROPERTY_TAG,
-    DEFAULT_CATEGORY,
     DEFAULT_NAME,
+    DEFAULT_CATEGORY,
 )
-from proteus.model import (
-    NAME_ATTRIBUTE,
-    CATEGORY_ATTRIBUTE,
-    UNITS_ATTRIBUTE,
-)
+from proteus.model import UNITS_ATTRIBUTE
+
+# --------------------------------------------------------------------------
+# Test specific imports
+# --------------------------------------------------------------------------
+
+import proteus.tests.fixtures as fixtures
 
 # --------------------------------------------------------------------------
 # Fixtures
@@ -42,9 +44,16 @@ from proteus.model import (
 
 
 def create_unit_property_element(
+    # Specific unit property attributes
     units: str,
     value: float,
     unit: str,
+    # General property attributes
+    name: str = DEFAULT_NAME,
+    category: str = DEFAULT_CATEGORY,
+    tooltip: str = str(),
+    required: bool | str = False,
+    inmutable: bool | str = False,
 ) -> ET._Element:
     """
     Create an unit property XML element with the given parameters.
@@ -52,14 +61,24 @@ def create_unit_property_element(
     :param units: Space-separated list of units.
     :param value: Value of the measurement.
     :param unit: Unit of the measurement.
+    :param name: Name of the property. Default is DEFAULT_NAME.
+    :param category: Category of the property. Default is DEFAULT_CATEGORY.
+    :param tooltip: Tooltip of the property. Default is empty string.
+    :param required: Required attribute of the property. Default is False.
+    :param inmutable: Inmutable attribute of the property. Default is False.
     :return: The created XML element.
     """
-    unit_property_element: ET._Element = ET.Element(UNIT_PROPERTY_TAG)
+    unit_property_element: ET._Element = fixtures.create_property_element(
+        property_tag=UNIT_PROPERTY_TAG,
+        name=name,
+        category=category,
+        tooltip=tooltip,
+        required=required,
+        inmutable=inmutable,
+    )
 
-    unit_property_element.set(NAME_ATTRIBUTE, DEFAULT_NAME)
-    unit_property_element.set(CATEGORY_ATTRIBUTE, DEFAULT_CATEGORY)
-    # Tooltip, required and inmutable attributes are not tested here
-    unit_property_element.set(UNITS_ATTRIBUTE, units)
+    if units:
+        unit_property_element.set(UNITS_ATTRIBUTE, units)
 
     value_element: ET._Element = ET.SubElement(unit_property_element, VALUE_TAG)
     value_element.text = str(value)
@@ -132,51 +151,75 @@ def test_measurement_creation_negative(value, unit, expected_exception) -> None:
 # --------------------------------------------------------------------------
 
 
-def test_unit_property_creation_from_xml_element() -> None:
+@pytest.mark.parametrize(
+    "units, expected_units",
+    [
+        ("years days hours", ["years", "days", "hours"]),
+        (None, []),
+    ],
+)
+def test_unit_property_factory(mocker, units, expected_units) -> None:
     """
-    It tests the creation of a unit property from an XML element.
+    It tests the creation of a unit property from an XML element using the
+    PropertyFactory. It is important to check every attribute of the unit
+    property in order to ensure that the constructor is being called correctly.
     """
     # Arrange -------------------------
-    units: str = "years days hours"
+    name: str = "test_name"
+    category: str = "test_category"
     value: float = 1.0
     unit: str = "years"
+    tooltip: str = "test_tooltip"
+    required: bool = True
+    inmutable: bool = True
+
+    # Mock the UnitProperty constructor in order to check its parameters
+    mocker.patch(
+        "proteus.model.properties.unit_property.UnitProperty.__init__",
+        return_value=None,
+    )
+
+    expected_measurement: Measurement = Measurement(value=value, unit=unit)
 
     # Create XML element for unit property
     unit_property_element: ET._Element = create_unit_property_element(
-        units, value, unit
+        units,
+        value,
+        unit,
+        name=name,
+        category=category,
+        tooltip=tooltip,
+        required=required,
+        inmutable=inmutable,
     )
 
     # Act -----------------------------
     # Create unit property from XML element
-    unit_property: UnitProperty = PropertyFactory.create(unit_property_element)
+    PropertyFactory.create(unit_property_element)
 
     # Assert --------------------------
-    assert (
-        unit_property.name == DEFAULT_NAME
-    ), f"Unit property name '{unit_property.name}' does not match expected name '{DEFAULT_NAME}'"
-    assert (
-        unit_property.category == DEFAULT_CATEGORY
-    ), f"Unit property category '{unit_property.category}' does not match expected category '{DEFAULT_CATEGORY}'"
-    assert (
-        unit_property.units == units.split()
-    ), f"Unit property units '{unit_property.units}' do not match expected units '{units}'"
-
-    measurement: Measurement = Measurement(value=value, unit=unit)
-    assert (
-        unit_property.value == measurement
-    ), f"Unit property value '{unit_property.value}' does not match expected value '{measurement}'"
+    # Check that the constructor was called with the expected parameters
+    UnitProperty.__init__.assert_called_once_with(
+        name,
+        category,
+        expected_measurement,
+        tooltip,
+        required,
+        inmutable,
+        expected_units,
+    )
 
 
 @pytest.mark.parametrize(
-    "units, value, unit, expected_units, expected_value, expected_unit",
+    "units, expected_units, expected_value, value, unit, expected_unit",
     [
-        ("years days hours", 1.0, "years", ["years", "days", "hours"], 1.0, "years"),
-        ("years", 1.0, "years", ["years"], 1.0, "years"),
-        ("years", 1.0, "seconds", ["years"], 1.0, "years"),  # Unit is not in units
-        ("years days", 1.0, "seconds", ["years", "days"], 1.0, "years"),
+        ("years days hours", ["years", "days", "hours"], 1.0, 1.0, "years", "years"),
+        ("years", ["years"], 1.0, 1.0, "years", "years"),
+        ("years", ["years"], 1.0, 1.0, "seconds", "years"),  # Unit is not in units
+        ("years days", ["years", "days"], 1.0, 1.0, "seconds", "years"),
     ],
 )
-def test_trace_creation(
+def test_unit_property_creation(
     units, value, unit, expected_units, expected_value, expected_unit
 ) -> None:
     """
@@ -197,14 +240,14 @@ def test_trace_creation(
     # Assert --------------------------
     assert (
         unit_property.units == expected_units
-    ), f"Unit property units '{unit_property.units}' do not match expected units '{expected_units}'"
+    ), f"Unit property units '{unit_property.units}' does not match expected units '{expected_units}'"
 
     assert (
         unit_property.value == expected_measurement
     ), f"Unit property value '{unit_property.value}' does not match expected value '{expected_measurement}'"
 
 
-def test_trace_creation_unit_not_in_units() -> None:
+def test_unit_property_creation_unit_not_in_units() -> None:
     """
     Test the creation of an unit property using its constructor with a unit
     that is not in the units list. It should assign the first unit in the list.
@@ -228,7 +271,7 @@ def test_trace_creation_unit_not_in_units() -> None:
     ), f"Unit property value '{unit_property.value}' does not match expected value '{expected_measurement}'"
 
 
-def test_trace_creation_wrong_value_type() -> None:
+def test_unit_property_creation_wrong_value_type() -> None:
     """
     Test the creation of an unit property using its constructor with a wrong
     value type. It should assign the default value.
@@ -267,4 +310,4 @@ def test_generate_xml() -> None:
     # Assert --------------------------
     assert ET.tostring(generated_element) == ET.tostring(
         unit_property_element
-    ), "Generated XML element does not match the expected XML element"
+    ), f"Generated XML element '{ET.tostring(generated_element)}' does not match expected XML element '{ET.tostring(unit_property_element)}"
