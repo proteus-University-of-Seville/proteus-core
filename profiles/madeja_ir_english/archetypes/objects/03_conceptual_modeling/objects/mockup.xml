@@ -18,7 +18,7 @@
     <markdownProperty name="description" category="detail"><![CDATA[]]></markdownProperty>
     <fileProperty name="diagram" category="detail" tooltip="file-info"><![CDATA[]]></fileProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">98</integerProperty>
-    <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object business-requirement software-requirement" traceType=":Proteus-dependency"/>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object business-requirement software-requirement model-element" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 
