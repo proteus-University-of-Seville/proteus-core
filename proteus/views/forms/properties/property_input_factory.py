@@ -45,6 +45,8 @@ from proteus.model.properties.url_property import UrlProperty
 from proteus.model.properties.classlist_property import ClassListProperty
 from proteus.model.properties.code_property import CodeProperty
 from proteus.model.properties.trace_property import TraceProperty
+from proteus.model.properties.tracetypelist_property import TraceTypeListProperty
+from proteus.model.properties.unit_property import UnitProperty
 
 # Property input imports
 from proteus.views.forms.properties.trace_input import TraceInput
@@ -70,9 +72,13 @@ from proteus.views.forms.properties.enum_property_input import EnumPropertyInput
 from proteus.views.forms.properties.file_property_input import FilePropertyInput
 from proteus.views.forms.properties.url_property_input import UrlPropertyInput
 from proteus.views.forms.properties.code_property_input import CodePropertyInput
-from proteus.views.forms.properties.class_list_property_input import (
+from proteus.views.forms.properties.classlist_property_input import (
     ClassListPropertyInput,
 )
+from proteus.views.forms.properties.tracetypelist_property_input import (
+    TraceTypeListPropertyInput,
+)
+from proteus.views.forms.properties.unit_property_input import UnitPropertyInput
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
@@ -107,6 +113,8 @@ class PropertyInputFactory:
         UrlProperty: UrlPropertyInput,
         CodeProperty: CodePropertyInput,
         ClassListProperty: ClassListPropertyInput,
+        TraceTypeListProperty: TraceTypeListPropertyInput,
+        UnitProperty: UnitPropertyInput,
     }
 
     # ----------------------------------------------------------------------
@@ -167,26 +175,15 @@ class PropertyInputFactory:
         label.setMaximumHeight(font_metrics.height())
 
         # Check if the property is required
-    
+
         if isinstance(property, TraceProperty):
-            if property.max_targets_number != NO_TARGETS_LIMIT:
+            if property.maxTargetsNumber != NO_TARGETS_LIMIT:
                 max_label = _("property_input.max_targets_label")
-                name = f"{name} ( {max_label} {property.max_targets_number} )"
+                name = f"{name} ( {max_label} {property.maxTargetsNumber} )"
         else:
             if property.required:
-
-                # Add the * to the name
-                name = f"{name}*"
-
-                # Bold the text
-                font = label.font()
-                font.setBold(True)
-                label.setFont(font)
-
-                # Set the tooltip
                 label.setToolTip(_("property_input.required_tooltip"))
 
         # Set the label text
         label.setText(name)
-
         return label

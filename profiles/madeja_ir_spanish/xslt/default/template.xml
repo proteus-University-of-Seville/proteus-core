@@ -5,7 +5,7 @@
         <entryPoint language="es_ES" file="PROTEUS_lang_es_ES.xsl"/>
     </entryPoints>
     <dependencies>
-        <pluginDependency name="remus"/>
+        <pluginDependency name="madeja"/>
         <pluginDependency name="basics"/>
     </dependencies>
 </template>

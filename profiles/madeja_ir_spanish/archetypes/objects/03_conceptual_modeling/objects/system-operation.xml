@@ -11,7 +11,7 @@
     <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
-    <markdownProperty name="result-type" category="detail" tooltip="archetype.tooltip.result-type"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="result-type" category="detail" tooltip="result-type"><![CDATA[]]></markdownProperty>
     <markdownProperty name="description" category="detail"><![CDATA[Esta operación del sistema _[descripción de la operación del sistema]_]]></markdownProperty>
     <markdownProperty name="precondition" category="pre-post"><![CDATA[condición sobre los parámetros y/o el estado del sistema]]></markdownProperty>
     <markdownProperty name="postcondition" category="pre-post"><![CDATA[condición sobre el resultado y/o el estado del sistema]]></markdownProperty>

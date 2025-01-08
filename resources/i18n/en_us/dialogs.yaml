@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------------------
 # Common
 # ---------------------------------------------------------------------------
-dialog.accept_button: "Accept"
+dialog.accept_button: "Ok"
 dialog.create_button: "Create"
 dialog.save_button: "Save"
 dialog.export_button: "Export"
@@ -116,8 +116,11 @@ settings_dialog.profile_settings.group: "Profile specific settings"
 settings_dialog.default_view.label: "Default view:"
 settings_dialog.default_repository.label: "Archetype repository:"
 
-settings_dialog.startup.group: "Startup"
+settings_dialog.app.group: "App"
 settings_dialog.open_project_on_startup.checkbox: "Open last project on startup"
+settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project when the application starts"
+settings_dialog.edit_on_clone.checkbox: "Edit on object archetype clone"
+settings_dialog.edit_on_clone.tooltip: "When creating a new object from an archetype, open the new object for editing. If edit dialog is canceled, the clone operation will be undone."
 
 settings_dialog.info.label: "The changes will be applied once the application is restarted"
 
@@ -168,12 +171,13 @@ without warranty of any kind, use it at your own risk. The authors are not respo
 Seville, September 2024."
 
 # ---------------------------------------------------------------------------
-# Trace edit dialog
+# Items dialog
 # ---------------------------------------------------------------------------
-trace_edit_dialog.title: "Select an element"
-trace_edit_dialog.name_filter_widget.placeholder_text: "Enter name to filter"
-trace_edit_dialog.error_label.no_objects: "No elements found, create new elements of one of the following classes: {}"
-trace_edit_dialog.any_document: "Any document"
+items_edit_dialog.title: "Select an element"
+items_edit_dialog.name_filter_widget.placeholder_text: "Enter name to filter"
+items_edit_dialog.error_label.no_objects: "No elements found, create new elements of one of the following classes: {}"
+items_edit_dialog.any_document: "Any document"
+items_edit_dialog.no_items_found: "No elements found"
 
 # ---------------------------------------------------------------------------
 # Delete dialog
@@ -189,6 +193,21 @@ delete_dialog.tree.header: Click in each item to see the elements that will be u
 asset_edit.file_dialog.title: "Select image"
 asset_edit.file_dialog.filter: "Images"
 
+
+# ---------------------------------------------------------------------------
+# Impact analysis dialog
+# ---------------------------------------------------------------------------
+impact_analysis_dialog.title: "Impact analysis"
+impact_analysis_dialog.label.analyzed_objects: "Directly affected objects:"
+impact_analysis_dialog.label.trace_types: "Trace types:"
+impact_analysis_dialog.label.affected_objects: "Indirectly affected objects:"
+impact_analysis_dialog.items_edit_dialog.show_only_traced: "Show only traced elements"
+
+impact_analysis_dialog.message.error.impact_analyzer.title: "Error initializing plugin"
+impact_analysis_dialog.message.error.impact_analyzer.text: "There was an error initializing the impact analyzer plugin. Check the log file for more information."
+
+impact_analysis_dialog.button.navigate.tooltip: "Navigate to the selected element"
+impact_analysis_dialog.button.edit.tooltip: "Edit the selected element"
 
 # ---------------------------------------------------------------------------
 # Developer features

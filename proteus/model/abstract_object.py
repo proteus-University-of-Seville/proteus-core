@@ -281,6 +281,36 @@ class AbstractObject(ABC):
         return ids
 
     # ----------------------------------------------------------------------
+    # Method     : get_descendants_recursively
+    # Description: It returns a list with all the descendants of an object
+    # including the object itself.
+    # Date       : 29/10/2024
+    # Version    : 0.1
+    # Author     : José María Delgado Sánchez
+    # ----------------------------------------------------------------------
+    def get_descendants_recursively(
+        self, ignore_dead_children: bool = False
+    ) -> Set["AbstractObject"]:
+        """
+        It returns a list with all the descendants of an object/project including itself.
+
+        :param ignore_dead_children: If True, dead children branches are not included in the set.
+        :return: Set with all the descendants of an object/project including itself.
+        """
+        descendants = set()
+        descendants.add(self)
+        for child in self.get_descendants():
+            if ignore_dead_children and child.state == ProteusState.DEAD:
+                continue
+
+            descendants.update(
+                child.get_descendants_recursively(
+                    ignore_dead_children=ignore_dead_children
+                )
+            )
+        return descendants
+
+    # ----------------------------------------------------------------------
     # Method     : get_descendants
     # Description: It returns a list with all the descendants of an object.
     # Date       : 23/05/2023
@@ -288,7 +318,7 @@ class AbstractObject(ABC):
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
     @abstractmethod
-    def get_descendants(self) -> List:
+    def get_descendants(self) -> List["AbstractObject"]:
         """
         It returns a list with all the descendants of an object.
 

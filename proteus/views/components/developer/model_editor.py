@@ -169,7 +169,6 @@ class RawObjectEditor(ProteusDialog):
         self.add_button.clicked.connect(self.add_button_clicked)
         self.edit_button.clicked.connect(self.edit_button_clicked)
 
-        self.accept_button.setText(_("dialog.save_button"))
         self.accept_button.clicked.connect(self.save_button_clicked)
         self.properties_list.doubleClicked.connect(self.edit_button_clicked)
 

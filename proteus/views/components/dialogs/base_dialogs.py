@@ -65,6 +65,14 @@ class ProteusDialog(QDialog, ProteusComponent):
 
     Content layout is included in a QWidget named "dialog_content_widget". This allows
     to apply styles to the content background and border.
+
+    NOTE about Modal and Non-Modal Dialogs:
+    - Modal dialogs may be triggered using the exec() method. They just need a
+      controller instance (controller=controller) in order to work. They block the
+      application until the dialog is closed.
+    - Non-Modal dialogs may be triggered using the show() method. They need a parent
+      widget (parent=parent) and a controller instance (controller=controller) in order
+      to work. They do not block the application until the dialog is closed.
     """
 
     # --------------------------------------------------------------------------

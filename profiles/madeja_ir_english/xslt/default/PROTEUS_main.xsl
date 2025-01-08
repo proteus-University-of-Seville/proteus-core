@@ -80,6 +80,10 @@
         <label key="place"><xsl:value-of select="$proteus:lang_place"/></label>
         <label key="priority"><xsl:value-of select="$proteus:lang_priority"/></label>
         <label key="results"><xsl:value-of select="$proteus:lang_results"/></label>
+        <label key="directly-affected-objects"><xsl:value-of select="$proteus:lang_directly_affected_objects"/></label>
+        <label key="analysis"><xsl:value-of select="$proteus:lang_analysis"/></label>
+        <label key="trace-type"><xsl:value-of select="$proteus:lang_trace_type"/></label>
+        <label key="solution"><xsl:value-of select="$proteus:lang_solution"/></label>
     </xsl:variable>
 
     <!-- This is needed because of limitations of XSLT 1.0 -->
@@ -113,6 +117,19 @@
     <!-- This is needed because of limitations of XSLT 1.0 -->
     <!-- Note the use of the node-set() extension function -->
     <xsl:variable name="enum_labels" select="exsl:node-set($enum_labels_dictionary)"/>
+
+    <!-- PROTEUS trace types dictionary -->
+    <xsl:variable name="trace_types_dictionary">
+        <label key=":Proteus-dependency"><xsl:value-of select="$proteus:lang_trace_type_proteus_dependency"/></label>
+        <label key=":Proteus-author"><xsl:value-of select="$proteus:lang_trace_type_proteus_author"/></label>
+        <label key=":Proteus-affected"><xsl:value-of select="$proteus:lang_trace_type_proteus_affected"/></label>
+        <label key=":Proteus-information-source"><xsl:value-of select="$proteus:lang_trace_type_proteus_information_source"/></label>
+        <label key=":Proteus-works-for"><xsl:value-of select="$proteus:lang_trace_type_proteus_works_for"/></label>
+    </xsl:variable>
+
+    <!-- This is needed because of limitations of XSLT 1.0 -->
+    <!-- Note the use of the node-set() extension function -->
+    <xsl:variable name="trace_types" select="exsl:node-set($trace_types_dictionary)"/>
 
     <!-- Define the key for enum labels                           -->
     <!-- WARINIG: it is useless, always returns nothing           -->
@@ -152,7 +169,6 @@
     <xsl:include href="archetypes/requirements/business_rule.xsl" />
     <xsl:include href="archetypes/requirements/functional_requirement.xsl" />
     <xsl:include href="archetypes/requirements/nonfunctional_requirement.xsl" />
-    <xsl:include href="archetypes/requirements/traceability_matrix.xsl" />
 
     <xsl:include href="archetypes/conceptual_modeling/entity_class.xsl" />
     <xsl:include href="archetypes/conceptual_modeling/enumeration.xsl" />
@@ -160,6 +176,11 @@
     <xsl:include href="archetypes/conceptual_modeling/constraint.xsl" />
     <xsl:include href="archetypes/conceptual_modeling/system_operation.xsl" />
     <xsl:include href="archetypes/conceptual_modeling/mockup.xsl" />
+
+    <xsl:include href="archetypes/req_management/traceability_matrix.xsl" />
+    <xsl:include href="archetypes/req_management/change_request.xsl" />
+    <xsl:include href="archetypes/req_management/defect.xsl" />
+    <xsl:include href="archetypes/req_management/conflict.xsl" />
 
     <xsl:include href="archetypes/PROTEUS_default.xsl" />
 

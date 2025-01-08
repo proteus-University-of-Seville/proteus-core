@@ -34,6 +34,7 @@ log = logging.getLogger(__name__)
 FUNCTION_NAMESPACE = "http://proteus.us.es/utils"
 NAMESPACE_PREFIX = "proteus-utils"
 
+
 # --------------------------------------------------------------------------
 # Class: RenderService
 # Description: Class for render service
@@ -164,7 +165,23 @@ class RenderService:
                 entrypoint = template.default_entrypoint
 
             # Create the transformer from the xsl file
-            transform = ET.XSLT(ET.parse(entrypoint.as_posix()))
+            try:
+                transform = ET.XSLT(ET.parse(entrypoint.as_posix()))
+            except Exception as e:
+                log.critical(
+                    f"Error creating XSLT transformation object for template '{template_name}'. Error: {e}"
+                )
+                error_element_str = f'<xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"> \
+                                      <xsl:output method="html" doctype-public="XSLT-compat" omit-xml-declaration="yes" encoding="UTF-8" indent="yes" /> \
+                                      <xsl:template match="/"> \
+                                      <hmtl> \
+                                          <body> \
+                                          <p>{e}</p> \
+                                          </body> \
+                                      </hmtl> \
+                                      </xsl:template> \
+                                      </xsl:transform>'
+                return ET.XSLT(ET.XML(error_element_str))
 
             # Store the transformation object for future use
             if Config().app_settings.xslt_debug_mode is False:
@@ -186,7 +203,7 @@ class RenderService:
         transform = self._get_xslt(template_name)
         try:
             result_tree = transform(xml)
-        except:
+        except Exception:
             # Print the errors found while rendering and create an error tree to return
             result_tree = ET.Element("errors")
             for error in transform.error_log:

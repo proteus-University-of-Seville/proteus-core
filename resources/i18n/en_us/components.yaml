@@ -21,6 +21,7 @@ main_menu.button_group.project: "Project"
 main_menu.button_group.document: "Document"
 main_menu.button_group.clipboard: "Clipboard"
 main_menu.button_group.action: "Action"
+main_menu.button_group.analysis: "Analysis"
 main_menu.button_group.application: "Application"
 
 # Fixed buttons
@@ -79,6 +80,10 @@ copy_button.text: "Copy"
 paste_button.statustip: "Paste object from clipboard"
 paste_button.tooltip: "Paste object from clipboard"
 paste_button.text: "Paste"
+ 
+impact_analysis.text: "Impact"
+impact_analysis.statustip: "Analyze the impact of changes"
+impact_analysis.tooltip: "Analyze the impact of changes"
 
 
 # ---------------------------------------------------------------------------

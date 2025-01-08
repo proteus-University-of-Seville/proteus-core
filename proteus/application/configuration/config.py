@@ -49,8 +49,6 @@ from proteus.application.utils.abstract_meta import SingletonMeta
 from proteus import PROTEUS_LOGGER_NAME, PROTEUS_TEMP_DIR, PROTEUS_MAX_LOG_FILES
 from proteus.application import (
     RESOURCES_SEARCH_PATH,
-    TEMPLATE_DUMMY_SEARCH_PATH,
-    ASSETS_DUMMY_SEARCH_PATH,
 )
 
 # logging configuration
@@ -122,7 +120,7 @@ class Config(metaclass=SingletonMeta):
         )
 
         # If the selected profile is not available, use the first listed profile
-        if not self.app_settings.selected_profile in self.listed_profiles.keys():
+        if self.app_settings.selected_profile not in self.listed_profiles.keys():
             log.error(
                 f"Selected profile '{self.app_settings.selected_profile}' is not available in the profiles directory. Using listed profiles instead."
             )
@@ -168,9 +166,16 @@ class Config(metaclass=SingletonMeta):
                 f"Selected default view '{self.app_settings.default_view}' is not available in the profile. Using profile preferred view instead."
             )
 
-            self.app_settings.default_view = (
-                self.profile_settings.preferred_default_view
-            )
+            # Use the preferred default view in case it is provided, otherwise use the first listed template
+            if self.profile_settings.preferred_default_view is not None:
+                self.app_settings.default_view = (
+                    self.profile_settings.preferred_default_view
+                )
+            else:
+                log.error(
+                    "No preferred default view available in the profile. Using the first listed template instead."
+                )
+                self.app_settings.default_view = self.profile_settings.listed_templates[0]
 
         # Create a copy of the app settings to store user changes
         self.app_settings_copy = replace(self.app_settings)

@@ -32,7 +32,7 @@ from proteus.model.properties.property import Property
 from proteus.model import (
     ProteusID,
     ProteusClassTag,
-    NAME_ATTRIBUTE,
+    VALUE_ATTRIBUTE,
     TARGET_ATTRIBUTE,
     ACCEPTED_TARGETS_ATTRIBUTE,
     EXCLUDED_TARGETS_ATTRIBUTE,
@@ -45,8 +45,6 @@ from proteus.model.properties import (
     TRACE_TAG,
     NO_TARGETS_LIMIT,
     DEFAULT_TRACE_TYPE,
-    DEFAULT_TRACE_NAME,
-    DEFAULT_TRACE_CATEGORY,
 )
 
 # logging configuration
@@ -70,11 +68,11 @@ class TraceProperty(Property):
 
     # dataclass instance attributes
     element_tagname: ClassVar[str] = TRACE_PROPERTY_TAG
+    value: List[ProteusID] = field(default_factory=list)  # targets
     acceptedTargets: List[ProteusClassTag] = field(default_factory=list)
     excludedTargets: List[ProteusClassTag] = field(default_factory=list)
-    type: str = str(DEFAULT_TRACE_TYPE)
-    value: List[ProteusID] = field(default_factory=list)  # targets
-    max_targets_number: int = NO_TARGETS_LIMIT
+    traceType: str = str(DEFAULT_TRACE_TYPE)
+    maxTargetsNumber: int = NO_TARGETS_LIMIT
 
     # --------------------------------------------------------------------------
     # Method: __post_init__
@@ -87,19 +85,8 @@ class TraceProperty(Property):
         """
         It validates name, category, acceptedTargets and value of an PROTEUS trace.
         """
-        # Name validation
-        if not self.name:
-            log.warning(
-                f"PROTEUS trace must have a '{NAME_ATTRIBUTE}' attribute -> assigning '{DEFAULT_TRACE_NAME}' as name"
-            )
-            # self.name = DEFAULT_NAME cannot be used when frozen=True
-            # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
-            object.__setattr__(self, "name", DEFAULT_TRACE_NAME)
-
-        # Category validation
-        if not self.category:
-            # self.category = DEFAULT_CATEGORY cannot be used when frozen=True
-            object.__setattr__(self, "category", DEFAULT_TRACE_CATEGORY)
+        # Superclass validation
+        super().__post_init__()
 
         # Accepted targets validation
         if not isinstance(self.acceptedTargets, list) or len(self.acceptedTargets) == 0:
@@ -107,55 +94,50 @@ class TraceProperty(Property):
                 f"PROTEUS trace '{self.name}' must have a list of accepted targets -> assigning :Proteus-any as accepted targets"
             )
             # self.acceptedTargets = list() cannot be used when frozen=True
-            object.__setattr__(self, "acceptedTargets", [PROTEUS_ANY])
+            object.__setattr__(self, ACCEPTED_TARGETS_ATTRIBUTE, [PROTEUS_ANY])
 
         if not isinstance(self.excludedTargets, list):
             log.debug(
                 f"PROTEUS trace '{self.name}' must have a list of excluded targets -> assigning an empty list"
             )
             # self.excludedTargets = list() cannot be used when frozen=True
-            object.__setattr__(self, "excludedTargets", list())
-
-        # Tooltip validation
-        if not self.tooltip:
-            # self.tooltip = str() cannot be used when frozen=True
-            object.__setattr__(self, "tooltip", str())
+            object.__setattr__(self, EXCLUDED_TARGETS_ATTRIBUTE, list())
 
         # Type validation
-        if not self.type:
-            # self.type = DEFAULT_TYPE cannot be used when frozen=True
-            object.__setattr__(self, "type", DEFAULT_TRACE_TYPE)
+        if not self.traceType:
+            # self.traceType = DEFAULT_TYPE cannot be used when frozen=True
+            object.__setattr__(self, TRACE_TYPE_ATTRIBUTE, DEFAULT_TRACE_TYPE)
 
         # Value validation
         if not isinstance(self.value, list):
             log.warning(
                 f"PROTEUS trace '{self.name}' must have a list of targets (value) -> assigning an empty list"
             )
-            # self.targets = list() cannot be used when frozen=True
-            object.__setattr__(self, "targets", list())
+            # self.value = list() cannot be used when frozen=True
+            object.__setattr__(self, VALUE_ATTRIBUTE, list())
 
         # Max targets number validation
-        if not isinstance(self.max_targets_number, int) or (
-            self.max_targets_number <= 0 and self.max_targets_number != NO_TARGETS_LIMIT
+        if not isinstance(self.maxTargetsNumber, int) or (
+            self.maxTargetsNumber <= 0 and self.maxTargetsNumber != NO_TARGETS_LIMIT
         ):
             # Log warning omitted to avoid excessive logging so the user do not have to be excessively verbose when creating an archetype
             log.warning(
                 f"PROTEUS trace '{self.name}' must have a max targets number -> assigning NO_TARGETS_LIMIT=-1 as max targets number"
             )
 
-            # self.max_targets_number = NO_TARGETS_LIMIT cannot be used when frozen=True
-            object.__setattr__(self, "max_targets_number", NO_TARGETS_LIMIT)
+            # self.maxTargetsNumber = NO_TARGETS_LIMIT cannot be used when frozen=True
+            object.__setattr__(self, MAX_TARGETS_NUMBER_ATTRIBUTE, NO_TARGETS_LIMIT)
 
         # Ignore targets if max targets number is NO_TARGETS_LIMIT
         if (
-            self.max_targets_number != NO_TARGETS_LIMIT
-            and len(self.value) > self.max_targets_number
+            self.maxTargetsNumber != NO_TARGETS_LIMIT
+            and len(self.value) > self.maxTargetsNumber
         ):
             log.warning(
                 f"PROTEUS trace '{self.name}' has more targets than the max targets number -> ignoring leftover targets"
             )
-            # self.targets = self.targets[:self.max_targets_number] cannot be used when frozen=True
-            object.__setattr__(self, "value", self.value[: self.max_targets_number])
+            # self.targets = self.targets[:self.maxTargetsNumber] cannot be used when frozen=True
+            object.__setattr__(self, VALUE_ATTRIBUTE, self.value[: self.maxTargetsNumber])
 
     # --------------------------------------------------------------------------
     # Method: generate_xml
@@ -180,12 +162,12 @@ class TraceProperty(Property):
                 EXCLUDED_TARGETS_ATTRIBUTE, " ".join(self.excludedTargets)
             )
 
-        trace_property_element.set(TRACE_TYPE_ATTRIBUTE, self.type)
+        trace_property_element.set(TRACE_TYPE_ATTRIBUTE, self.traceType)
 
         # Create max targets number attribute if it is not NO_TARGETS_LIMIT
-        if self.max_targets_number != NO_TARGETS_LIMIT:
+        if self.maxTargetsNumber != NO_TARGETS_LIMIT:
             trace_property_element.set(
-                MAX_TARGETS_NUMBER_ATTRIBUTE, str(self.max_targets_number)
+                MAX_TARGETS_NUMBER_ATTRIBUTE, str(self.maxTargetsNumber)
             )
 
         return trace_property_element
@@ -207,7 +189,7 @@ class TraceProperty(Property):
         for target in self.value:
             trace_element: ET._Element = ET.SubElement(property_element, TRACE_TAG)
             trace_element.set(TARGET_ATTRIBUTE, target)
-            trace_element.set(TRACE_TYPE_ATTRIBUTE, self.type)
+            trace_element.set(TRACE_TYPE_ATTRIBUTE, self.traceType)
 
         # Returning None avoid the XML to be printed in a single line
         # https://lxml.de/FAQ.html#why-doesn-t-the-pretty-print-option-reformat-my-xml-output
@@ -224,6 +206,6 @@ class TraceProperty(Property):
             base_attributes
             and self.acceptedTargets == other.acceptedTargets
             and self.excludedTargets == other.excludedTargets
-            and self.type == other.type
-            and self.max_targets_number == other.max_targets_number
+            and self.traceType == other.traceType
+            and self.maxTargetsNumber == other.maxTargetsNumber
         )

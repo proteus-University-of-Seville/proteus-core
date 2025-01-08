@@ -89,7 +89,7 @@ def test_delete_document_command_redo(
     # NOTE: Document should not be traced so this is necessary only for its children
     sources_ids = set()
     for target_id, sources in sample_project_service.traces_index.items():
-        for source_id in sources:
+        for source_id, _ in sources:
             # Add sources that point the object or its children but exclude
             # the object and its children themselves
             if (
@@ -200,7 +200,7 @@ def test_delete_document_command_undo(
     # Find objects that are tracing the object or its children (sources)
     sources_ids = set()
     for target_id, sources in sample_project_service.traces_index.items():
-        for source_id in sources:
+        for source_id, _ in sources:
             # Add sources that point the object or its children but exclude
             # the object and its children themselves
             if (

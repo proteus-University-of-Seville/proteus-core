@@ -28,6 +28,7 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.model import VALUE_ATTRIBUTE
 from proteus.model.properties.property import Property
 from proteus.model.properties import FILE_PROPERTY_TAG
 
@@ -77,7 +78,7 @@ class FileProperty(Property):
         finally:
             # self.value = _value cannot be used when frozen=True
             # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
-            object.__setattr__(self, "value", _value)
+            object.__setattr__(self, VALUE_ATTRIBUTE, _value)
 
         # NOTE: value validation is not performed since it stores
         # the file name and extension. Full path cannot be validated.

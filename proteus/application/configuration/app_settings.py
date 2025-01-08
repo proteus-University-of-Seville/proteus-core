@@ -33,12 +33,12 @@ from proteus.application.spellcheck import SpellCheckerWrapper
 CONFIG_FILE: str = "proteus.ini"
 DEFAULT_CONFIG_FILE: str = "proteus.default.ini"
 
-# Directories
-DIRECTORIES: str = "directories"
-RESOURCES_DIRECTORY: str = "resources_directory"
-ICONS_DIRECTORY: str = "icons_directory"
-I18N_DIRECTORY: str = "i18n_directory"
-PROFILES_DIRECTORY: str = "profiles_directory"
+# Directories (convention)
+RESOURCES_DIRECTORY: str = "resources"
+ICONS_DIRECTORY: str = "icons"
+I18N_DIRECTORY: str = "i18n"
+PLUGINS_DIRECTORY: str = "plugins"
+PROFILES_DIRECTORY: str = "profiles"
 
 # User editable settings
 SETTINGS: str = "settings"
@@ -49,6 +49,7 @@ SETTING_SELECTED_PROFILE: str = "selected_profile"
 SETTING_USING_DEFAULT_PROFILE: str = "using_default_profile"
 SETTING_CUSTOM_PROFILE_PATH: str = "custom_profile_path"
 SETTING_OPEN_PROJECT_ON_STARTUP: str = "open_project_on_startup"
+SETTING_EDIT_ON_CLONE: str = "edit_on_clone"
 # Special advanced settings
 SETTING_XSLT_DEBUG_MODE: str = "xslt_debug_mode"
 SETTING_DEVELOPER_FEATURES: str = "developer_features"
@@ -78,6 +79,7 @@ class AppSettings:
     icons_directory: Path = None
     i18n_directory: Path = None
     profiles_directory: Path = None
+    plugins_directory: Path = None
 
     # Application settings (User editable settings)
     language: str = None
@@ -87,6 +89,7 @@ class AppSettings:
     using_default_profile: bool = None
     custom_profile_path: Path = None
     open_project_on_startup: bool = None
+    edit_on_clone: bool = False
     # Special advanced settings (not editable by the user)
     # These settings must be set manually in the configuration file
     xslt_debug_mode: bool = False
@@ -111,14 +114,14 @@ class AppSettings:
 
         assert (
             config_file_path.exists()
-        ), f"PROTEUS default configuration file {CONFIG_FILE} does not exist in {app_path}!"
+        ), f"PROTEUS default configuration file '{CONFIG_FILE}' does not exist in '{app_path}'!"
 
         # Check for proteus.ini file where the application is executed
         # NOTE: This allows to change config in single executable app version
         config_file_exec_path: Path = Path.cwd() / CONFIG_FILE
         if not config_file_exec_path.exists():
             log.warning(
-                f"PROTEUS configuration file {CONFIG_FILE} does not exist in the execution path. Copying configuration file to execution path..."
+                f"PROTEUS configuration file '{CONFIG_FILE}' does not exist in the execution path. Copying configuration file to execution path..."
             )
 
             # Copy proteus.ini file to execution path
@@ -129,7 +132,7 @@ class AppSettings:
             config_parser.read(config_file_exec_path, encoding="utf-8")
         except Exception as e:
             log.error(
-                f"Error loading configuration file {config_file_exec_path}: {e}"
+                f"Error loading configuration file '{config_file_exec_path}': {e}"
                 "Configuration file will be deleted and copied again from the default configuration file."
             )
 
@@ -138,7 +141,7 @@ class AppSettings:
 
             # Copy proteus.ini file to execution path
             shutil.copy(config_file_path, config_file_exec_path)
-            
+
             # Load the configuration file again
             config_parser: ConfigParser = ConfigParser()
             config_parser.read(config_file_exec_path, encoding="utf-8")
@@ -147,7 +150,7 @@ class AppSettings:
         # This is required to avoid loosing track if cwd changes
         settings_file_path: Path = config_file_exec_path
 
-        log.info(f"Loading settings from {settings_file_path}...")
+        log.info(f"Loading settings from '{settings_file_path}'...")
 
         app_settings = AppSettings(
             app_path=app_path,
@@ -169,34 +172,38 @@ class AppSettings:
     # --------------------------------------------------------------------------
     def _load_directories(self) -> None:
         """
-        Load directory settings from the configuration file.
+        Load directory settings from the configuration file. Directories are
+        defined by convention and are not editable by the user.
         """
         # Directories section
-        directories = self.config_parser[DIRECTORIES]
-
-        self.resources_directory = self.app_path / directories[RESOURCES_DIRECTORY]
-        self.icons_directory = self.resources_directory / directories[ICONS_DIRECTORY]
-        self.i18n_directory = self.resources_directory / directories[I18N_DIRECTORY]
-        self.profiles_directory = self.app_path / directories[PROFILES_DIRECTORY]
-
+        self.resources_directory = self.app_path / RESOURCES_DIRECTORY
+        self.profiles_directory = self.app_path / PROFILES_DIRECTORY
+        self.icons_directory = self.resources_directory / ICONS_DIRECTORY
+        self.i18n_directory = self.resources_directory / I18N_DIRECTORY
+        self.plugins_directory = self.resources_directory / PLUGINS_DIRECTORY
+        
         assert (
             self.resources_directory.exists()
-        ), f"PROTEUS resources directory {self.resources_directory} does not exist!"
+        ), f"PROTEUS resources directory '{self.resources_directory}' does not exist!"
         assert (
             self.icons_directory.exists()
-        ), f"PROTEUS icons directory {self.icons_directory} does not exist!"
+        ), f"PROTEUS icons directory '{self.icons_directory}' does not exist!"
         assert (
             self.i18n_directory.exists()
-        ), f"PROTEUS i18n directory {self.i18n_directory} does not exist!"
+        ), f"PROTEUS i18n directory '{self.i18n_directory}' does not exist!"
         assert (
             self.profiles_directory.exists()
-        ), f"PROTEUS profiles directory {self.profiles_directory} does not exist!"
+        ), f"PROTEUS profiles directory '{self.profiles_directory}' does not exist!"
+        assert (
+            self.plugins_directory.exists()
+        ), f"PROTEUS plugins directory '{self.plugins_directory}' does not exist!"
 
-        log.info(f"Directories loaded from {self.settings_file_path}.")
+        log.info(f"Directories loaded from '{self.settings_file_path}'.")
+        log.info(f"{self.profiles_directory = }")
         log.info(f"{self.resources_directory = }")
         log.info(f"{self.icons_directory = }")
         log.info(f"{self.i18n_directory = }")
-        log.info(f"{self.profiles_directory = }")
+        log.info(f"{self.plugins_directory = }")
 
     # --------------------------------------------------------------------------
     # Method: _load_user_settings
@@ -215,7 +222,9 @@ class AppSettings:
         # Language -----------------------
         self.language = settings[SETTING_LANGUAGE]
 
-        log.info(f"Config file {self.settings_file_path} | Language: {self.language}")
+        log.info(
+            f"Config file '{self.settings_file_path}' | Language: '{self.language}'"
+        )
 
         # Spellchecker language -----------------------
         spellchecker_language = settings[SETTING_SPELLCHECKER_LANGUAGE]
@@ -230,14 +239,14 @@ class AppSettings:
         self.spellchecker_language = spellchecker_language
 
         log.info(
-            f"Config file {self.settings_file_path} | Spellchecker language: {self.spellchecker_language}"
+            f"Config file '{self.settings_file_path}' | Spellchecker language: '{self.spellchecker_language}'"
         )
 
         # Default view -------------------
         self.default_view = settings[SETTING_DEFAULT_VIEW]
 
         log.info(
-            f"Config file {self.settings_file_path} | Default view: {self.default_view}"
+            f"Config file '{self.settings_file_path}' | Default view: '{self.default_view}'"
         )
 
         # Profile ------------------------
@@ -258,19 +267,23 @@ class AppSettings:
             SETTING_OPEN_PROJECT_ON_STARTUP, False
         )
 
+        # Edit on clone ------------------------
+        self.edit_on_clone = settings.getboolean(SETTING_EDIT_ON_CLONE, False)
+
         # XSLT debug mode ------------------------
         self.xslt_debug_mode = settings.getboolean(SETTING_XSLT_DEBUG_MODE, False)
 
         # Raw model editor ------------------------
         self.developer_features = settings.getboolean(SETTING_DEVELOPER_FEATURES, False)
 
-        log.info(f"Loaded app user settings from {self.settings_file_path}.")
+        log.info(f"Loaded app user settings from '{self.settings_file_path}'.")
         log.info(f"{self.language = }")
         log.info(f"{self.default_view = }")
         log.info(f"{self.selected_profile = }")
         log.info(f"{self.using_default_profile = }")
         log.info(f"{self.custom_profile_path = }")
         log.info(f"{self.open_project_on_startup = }")
+        log.info(f"{self.edit_on_clone = }")
         log.info(f"{self.xslt_debug_mode = }")
         log.info(f"{self.developer_features = }")
 
@@ -290,12 +303,12 @@ class AppSettings:
         if not self.using_default_profile:
             if self.custom_profile_path is None:
                 log.error(
-                    f"Custom profile path not specified in {self.settings_file_path}. Using default profile..."
+                    f"Custom profile path not specified in '{self.settings_file_path}'. Using default profile..."
                 )
                 self.using_default_profile = True
             elif not self.custom_profile_path.exists():
                 log.error(
-                    f"Custom profile path {self.custom_profile_path} does not exist. Using default profile..."
+                    f"Custom profile path '{self.custom_profile_path}' does not exist. Using default profile..."
                 )
                 self.using_default_profile = True
 
@@ -315,6 +328,7 @@ class AppSettings:
         using_default_profile: bool = None,
         custom_profile_path: Path = None,
         open_project_on_startup: bool = None,
+        edit_on_clone: bool = None,
     ) -> "AppSettings":
         """
         Clone the current object with the new user settings (if any).
@@ -340,6 +354,9 @@ class AppSettings:
         if open_project_on_startup is None:
             open_project_on_startup = self.open_project_on_startup
 
+        if edit_on_clone is None:
+            edit_on_clone = self.edit_on_clone
+
         new_settings = replace(
             self,
             language=language,
@@ -349,6 +366,7 @@ class AppSettings:
             using_default_profile=using_default_profile,
             custom_profile_path=custom_profile_path,
             open_project_on_startup=open_project_on_startup,
+            edit_on_clone=edit_on_clone,
         )
 
         new_settings._validate_profile_path()
@@ -382,10 +400,12 @@ class AppSettings:
             self.open_project_on_startup
         )
 
+        self.config_parser[SETTINGS][SETTING_EDIT_ON_CLONE] = str(self.edit_on_clone)
+
         with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
             self.config_parser.write(config_file)
 
-        log.info(f"Settings saved to {self.settings_file_path}.")
+        log.info(f"Settings saved to '{self.settings_file_path}'.")
         log.info(f"{self.language = }")
         log.info(f"{self.spellchecker_language = }")
         log.info(f"{self.default_view = }")
@@ -393,6 +413,7 @@ class AppSettings:
         log.info(f"{self.using_default_profile = }")
         log.info(f"{self.custom_profile_path = }")
         log.info(f"{self.open_project_on_startup = }")
+        log.info(f"{self.edit_on_clone = }")
 
     # ==========================================================================
     # Session data
@@ -413,7 +434,7 @@ class AppSettings:
             return self.config_parser[SESSION][SESSION_LAST_PROJECT_OPENED]
         except KeyError:
             log.error(
-                f"Session data '{SESSION_LAST_PROJECT_OPENED}' not found in {self.settings_file_path}."
+                f"Session data '{SESSION_LAST_PROJECT_OPENED}' not found in '{self.settings_file_path}'."
             )
             return ""
 
@@ -438,6 +459,6 @@ class AppSettings:
             self.config_parser.write(config_file)
 
         log.info(
-            f"Session data '{SESSION_LAST_PROJECT_OPENED}' saved to {self.settings_file_path}."
+            f"Session data '{SESSION_LAST_PROJECT_OPENED}' saved to '{self.settings_file_path}'."
         )
         log.info(f"{last_project_opened = }")

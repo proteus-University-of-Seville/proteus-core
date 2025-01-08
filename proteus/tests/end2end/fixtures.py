@@ -147,6 +147,7 @@ def load_translations_icons_plugins():
 
     if plugin_manager._plugins == {}:
         plugin_manager.load_plugins(config.profile_settings.plugins_directory)
+        plugin_manager.load_plugins(config.app_settings.plugins_directory)
 
 
 def restore_app_singleton_instances():

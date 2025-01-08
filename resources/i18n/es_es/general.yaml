@@ -9,6 +9,17 @@
 
 
 # ---------------------------------------------------------------------------
+# Trace types
+# ---------------------------------------------------------------------------
+:proteus-dependency: "Dependencia"
+:proteus-author: "Autor"
+:proteus-information-source: "Fuente de información"
+:proteus-works-for: "Trabaja para"
+:proteus-affected: "Elemento afectado"
+:proteus-link: "Enlace"
+:proteus-constraint: "Restricción"
+
+# ---------------------------------------------------------------------------
 # Property input
 # ---------------------------------------------------------------------------
 
@@ -30,6 +41,7 @@ integer_property_input.validator.error: "Este campo debe ser un número entero"
 code_property_input.validator.error.prefix: "El prefijo no puede estar vacío"
 code_property_input.validator.error.number_type: "El número debe ser un número entero positivo"
 code_property_input.validator.error.number_value: "El número debe ser mayor que 0"
+unit_property_input.validator.value.error: "El valor debe ser un número decimal"
 
 # Warning dialog
 property_input.inmutable_property_warning.title: "Advertencia, propiedad inmutable"
@@ -40,6 +52,12 @@ property_input.inmutable_property_warning.text: "Esta propiedad ha sido definida
 # ---------------------------------------------------------------------------
 markdown_edit.preview: "Previsualizar"
 markdown_edit.edit: "Editar texto"
+
+# ---------------------------------------------------------------------------
+# Unit Edit
+# ---------------------------------------------------------------------------
+measurement_edit.value: "Valor"
+measurement_edit.unit: "Unidad"
 
 # ---------------------------------------------------------------------------
 # Clipboard

@@ -166,6 +166,34 @@
 <xsl:variable name="proteus:lang_inherits_from">Hereda de</xsl:variable>
 <xsl:variable name="proteus:lang_ordered">ordered</xsl:variable>
 
+<xsl:variable name="proteus:lang_trace_type">Tipo de traza</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type_proteus_dependency">Depencia</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type_proteus_author">Autor</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type_proteus_affected">Elemento afectado</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type_proteus_information_source">Fuente de información</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type_proteus_works_for">Trabaja para</xsl:variable>
+
+<xsl:variable name="proteus:lang_solution">Solución</xsl:variable>
+
+<xsl:variable name="proteus:lang_defect_type_ambiguity">Ambigüedad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_necessity">No necesidad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_understanding">No comprensión</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_verificability">No verificabilidad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_consistency">No consistencia</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_achievability">No alcanzabilidad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_verbosity">Verborragia</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_design_dependence">Dependencia del diseño</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_redundancy">Redundancia</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_imprecision">Imprecisión</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_completeness">No completitud</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_priority">No prioridad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_stability">No estabilidad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_wrong_lod">Nivel de detalle incorrecto</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_no_traceability">No trazabilidad</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_wrong_org">Organización incorrecta</xsl:variable>
+<xsl:variable name="proteus:lang_defect_type_other">Otro</xsl:variable>
+
+
 <!-- ==================== -->
 <!-- Patrones-L generales -->
 <!-- ==================== -->

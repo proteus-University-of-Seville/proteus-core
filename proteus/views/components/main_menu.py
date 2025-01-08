@@ -50,6 +50,7 @@ from proteus.views.components.dialogs.settings_dialog import SettingsDialog
 from proteus.views.components.dialogs.export_dialog import ExportDialog
 from proteus.views.components.dialogs.information_dialog import InformationDialog
 from proteus.views.components.dialogs.delete_dialog import DeleteDialog
+from proteus.views.components.dialogs.impact_analysis import ImpactAnalysisWindow
 from proteus.views.components.archetypes_menu_dropdown import (
     ArchetypesMenuDropdown,
 )
@@ -466,6 +467,28 @@ class MainMenu(QDockWidget, ProteusComponent):
         tab_layout.addWidget(buttons.get_separator(vertical=True))
 
         # ---------
+        # Analysis
+        # ---------
+        self.impact_analysis_button: QToolButton = buttons.main_menu_button(
+            self,
+            text="impact_analysis.text",
+            icon_key="impact-analysis",
+            tooltip="impact_analysis.tooltip",
+            statustip="impact_analysis.statustip",
+            enabled=False,
+        )
+        self.impact_analysis_button.clicked.connect(
+            lambda: ImpactAnalysisWindow.show_dialog(self, self._controller)
+        )
+
+        analysis_menu: QWidget = buttons.button_group(
+            [self.impact_analysis_button],
+            "main_menu.button_group.analysis",
+        )
+        tab_layout.addWidget(analysis_menu)
+        tab_layout.addWidget(buttons.get_separator(vertical=True))
+
+        # ---------
         # aplication
         # ---------
         # Settings action
@@ -549,8 +572,8 @@ class MainMenu(QDockWidget, ProteusComponent):
                 archetype_button.clicked.connect(
                     lambda action, archetype_id=archetype_list[
                         0
-                    ].id: self._controller.create_object(
-                        archetype_id, parent_id=self._state_manager.get_current_object()
+                    ].id: self.create_object_from_archetype(
+                        archetype_id, self._state_manager.get_current_object()
                     )
                 )
                 archetype_button.single_archetype_mode(archetype_list[0])
@@ -796,6 +819,7 @@ class MainMenu(QDockWidget, ProteusComponent):
         """
         self.project_properties_button.setEnabled(True)
         self.add_document_button.setEnabled(True)
+        self.impact_analysis_button.setEnabled(True)
 
     # ----------------------------------------------------------------------
     # Method     : update_on_current_document_changed
@@ -819,6 +843,7 @@ class MainMenu(QDockWidget, ProteusComponent):
 
         self.delete_document_button.setEnabled(is_document_open)
         self.export_document_button.setEnabled(is_document_open)
+        self.impact_analysis_button.setEnabled(is_document_open)
 
         if self.store_document_archetype_button:
             self.store_document_archetype_button.setEnabled(is_document_open)
@@ -863,6 +888,30 @@ class MainMenu(QDockWidget, ProteusComponent):
     # ======================================================================
     # Component slots methods (connected to the component signals)
     # ======================================================================
+
+    # ----------------------------------------------------------------------
+    # Method     : create_object_from_archetype
+    # Description: Create a new object from the provided archetype and parent.
+    # Date       : 11/12/2024
+    # Version    : 0.1
+    # Author     : José María Delgado Sánchez
+    # ----------------------------------------------------------------------
+    def create_object_from_archetype(self, archetype_id: ProteusID, parent_id: ProteusID) -> None:
+        """
+        Create a new object from the provided archetype and parent.
+
+        :param archetype_id: The archetype id to create the object from.
+        :param parent_id: The parent id to create the object from.
+        """
+        self._controller.create_object(archetype_id, parent_id)
+
+        if Config().app_settings.edit_on_clone:
+            if self._state_manager.last_cloned_archetype is not None:
+                PropertyDialog.create_dialog(
+                    self._controller,
+                    self._state_manager.last_cloned_archetype,
+                    True,
+                )
 
     # ----------------------------------------------------------------------
     # Method     : open_project

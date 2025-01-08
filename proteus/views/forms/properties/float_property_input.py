@@ -73,7 +73,7 @@ class FloatPropertyInput(PropertyInput):
             return "float_property_input.validator.error"
 
         # Check required
-        if self.property.required and (text == None or text == ""):
+        if self.property.required and (text is None or text == ""):
             return "property_input.validator.error.required"
 
         # Return None if the input is valid

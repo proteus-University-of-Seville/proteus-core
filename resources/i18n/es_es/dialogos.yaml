@@ -115,8 +115,11 @@ settings_dialog.profile_settings.group: "Configuración del perfil"
 settings_dialog.default_view.label: "Vista por defecto:"
 settings_dialog.default_repository.label: "Repositorio de arquetipos:"
 
-settings_dialog.startup.group: "Arranque"
+settings_dialog.app.group: "App"
 settings_dialog.open_project_on_startup.checkbox: "Abrir último proyecto al iniciar la aplicación"
+settings_dialog.open_project_on_startup.tooltip: "Preguntar si desea abrir el último proyecto al iniciar la aplicación"
+settings_dialog.edit_on_clone.checkbox: "Editar al clonar arquetipos de objeto"
+settings_dialog.edit_on_clone.tooltip: "Al crear un nuevo objeto a partir de un arquetipo, abre el nuevo objeto para editarlo. Si se cancela el diálogo de edición, la operación de clonación se deshará."
 
 settings_dialog.info.label: "Los cambios se aplicarán al reiniciar la aplicación"
 
@@ -169,12 +172,13 @@ Los autores no son responsables de ningún daño causado por el uso de este soft
 Sevilla, Septiembre de 2024."
 
 # ---------------------------------------------------------------------------
-# Trace edit dialog
+# Items edit dialog
 # ---------------------------------------------------------------------------
-trace_edit_dialog.title: "Selecciona un elemento a trazar"
-trace_edit_dialog.name_filter_widget.placeholder_text: "Introduzca un nombre para filtrar"
-trace_edit_dialog.error_label.no_objects: "No se encontraron elementos, cree nuevos elementos de una de las siguientes clases: {}"
-trace_edit_dialog.any_document: "Cualquier documento"
+items_edit_dialog.title: "Selecciona un elemento a trazar"
+items_edit_dialog.name_filter_widget.placeholder_text: "Introduzca un nombre para filtrar"
+items_edit_dialog.error_label.no_objects: "No se encontraron elementos, cree nuevos elementos de una de las siguientes clases: {}"
+items_edit_dialog.any_document: "Cualquier documento"
+items_edit_dialog.no_items_found: "No se encontraron elementos"
 
 # ---------------------------------------------------------------------------
 # Delete dialog
@@ -189,6 +193,21 @@ delete_dialog.tree.header: Haz clic en cada ítem para ver los elementos que se 
 # ---------------------------------------------------------------------------
 asset_edit.file_dialog.title: "Seleccionar imagen"
 asset_edit.file_dialog.filter: "Imágenes"
+
+# ---------------------------------------------------------------------------
+# Impact analysis dialog
+# ---------------------------------------------------------------------------
+impact_analysis_dialog.title: "Análisis de impacto"
+impact_analysis_dialog.label.analyzed_objects: "Objetos directamente afectados:"
+impact_analysis_dialog.label.trace_types: "Tipos de traza:"
+impact_analysis_dialog.label.affected_objects: "Objetos indirectamente afectados:"
+impact_analysis_dialog.items_edit_dialog.show_only_traced: "Mostrar solo elementos trazados"
+
+impact_analysis_dialog.message.error.impact_analyzer.title: "Error al inicializar plugin"
+impact_analysis_dialog.message.error.impact_analyzer.text: "No se pudo inicializar el plugin de análisis de impacto. Más información en el archivo de registro de la aplicación"
+
+impact_analysis_dialog.button.navigate.tooltip: "Navegar al elemento seleccionado"
+impact_analysis_dialog.button.edit.tooltip: "Editar el elemento seleccionado"
 
 # ---------------------------------------------------------------------------
 # Developer features

@@ -12,7 +12,7 @@
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
     <markdownProperty name="description" category="detail"><![CDATA[]]></markdownProperty>
-    <traceProperty name="constrained-elements" category="detail" tooltip="archetype.tooltip.constrained-elements" acceptedTargets="model-element" traceType=":Proteus-constrains"/>
+    <traceProperty name="constrained-elements" category="detail" tooltip="constrained-elements" acceptedTargets="model-element" traceType=":Proteus-constrains"/>
     <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object business-requirement software-requirement model-element" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>

@@ -69,6 +69,7 @@ class PropertyInput(QWidget, ABC, metaclass=AbstractObjectMeta):
         # Initialize variables
         self.controller: Controller = controller
         self.element_id: ProteusID = element_id
+        self.wrap_in_group_box: bool = False
 
         # Initialize input widget by calling the abstract method
         self.input: QWidget = self.create_input(property, controller, element_id)

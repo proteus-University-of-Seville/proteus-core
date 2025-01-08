@@ -26,6 +26,7 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.model import VALUE_ATTRIBUTE
 from proteus.model.properties.property import Property
 from proteus.model.properties import INTEGER_PROPERTY_TAG
 
@@ -84,7 +85,7 @@ class IntegerProperty(Property):
             # self.value = _value cannot be used when frozen=True
             # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
             # TODO if self.value (str) is a float (x.y), will fail. Should we allow floats? (int(float(self.value)))
-            object.__setattr__(self, "value", _value)
+            object.__setattr__(self, VALUE_ATTRIBUTE, _value)
 
     def generate_xml_value(self, _: ET._Element = None) -> str | ET.CDATA:
         """

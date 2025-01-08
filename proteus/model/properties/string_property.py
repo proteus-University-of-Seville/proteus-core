@@ -27,6 +27,7 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.model import VALUE_ATTRIBUTE
 from proteus.model.properties.property import Property
 from proteus.model.properties import STRING_PROPERTY_TAG
 
@@ -61,7 +62,7 @@ class StringProperty(Property):
 
         # self.value = str(self.value) cannot be used when frozen=True
         # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
-        object.__setattr__(self, "value", str(self.value))
+        object.__setattr__(self, VALUE_ATTRIBUTE, str(self.value))
 
     def generate_xml_value(self, _: ET._Element = None) -> str | ET.CDATA:
         """

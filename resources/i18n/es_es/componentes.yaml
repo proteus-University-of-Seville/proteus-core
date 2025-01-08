@@ -20,6 +20,7 @@ main_menu.button_group.project: "Proyecto"
 main_menu.button_group.document: "Documento"
 main_menu.button_group.clipboard: "Portapapeles"
 main_menu.button_group.action: "Acción"
+main_menu.button_group.analysis: "Análisis"
 main_menu.button_group.application: "Aplicación"
 
 # Fixed buttons
@@ -79,6 +80,9 @@ paste_button.statustip: "Pegar objeto del portapapeles"
 paste_button.tooltip: "Pegar objeto del portapapeles"
 paste_button.text: "Pegar"
 
+impact_analysis.text: "Impacto"
+impact_analysis.statustip: "Analizar el impacto de los cambios"
+impact_analysis.tooltip: "Analizar el impacto de los cambios"
 
 # ---------------------------------------------------------------------------
 # Main window

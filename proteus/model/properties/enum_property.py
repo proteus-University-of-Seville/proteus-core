@@ -26,8 +26,8 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
-from proteus.model.properties import Property
-from proteus.model.properties import ENUM_PROPERTY_TAG, CHOICES_ATTRIBUTE
+from proteus.model.properties import Property, ENUM_PROPERTY_TAG
+from proteus.model import VALUE_ATTRIBUTE, CHOICES_ATTRIBUTE, VALUE_TOOLTIPS_ATTRIBUTE
 
 # --------------------------------------------------------------------------
 # Standard library imports
@@ -47,8 +47,7 @@ class EnumProperty(Property):
     # XML element tag name for this class of property (class attribute)
     element_tagname: ClassVar[str] = ENUM_PROPERTY_TAG
     value: str
-
-    # dataclass instance attributes
+    valueTooltips: bool = False
     choices: str = str()
 
     def __post_init__(self) -> None:
@@ -57,11 +56,16 @@ class EnumProperty(Property):
         """
         # Superclass validation
         super().__post_init__()
-        object.__setattr__(self, "value", str(self.value))
+        object.__setattr__(self, VALUE_ATTRIBUTE, str(self.value))
 
         # Parse choices set
         # use split() without arguments to get an empty list if string is empty
         _choices = str(self.choices).split()
+
+        # Validate valueTooltips
+        if not isinstance(self.valueTooltips, bool):
+            # self.valueTooltips = False cannot be used when frozen=True
+            object.__setattr__(self, VALUE_TOOLTIPS_ATTRIBUTE, False)
 
         # Validate value and choices
         try:
@@ -82,7 +86,7 @@ class EnumProperty(Property):
                 f"Enum property '{self.name}': values cannot contain spaces -> replaced by underscores"
             )
             # self.value = self.value.replace(' ', '_') cannot be used when frozen=True
-            object.__setattr__(self, "value", self.value.replace(" ", "_"))
+            object.__setattr__(self, VALUE_ATTRIBUTE, self.value.replace(" ", "_"))
 
         # Validate choices (value is not empty)
         try:
@@ -93,7 +97,7 @@ class EnumProperty(Property):
                 f"Enum property '{self.name}': Empty set of choices -> using value '{self.value}' as the only choice"
             )
             # self.choices = self.value cannot be used when frozen=True
-            object.__setattr__(self, "choices", self.value)
+            object.__setattr__(self, CHOICES_ATTRIBUTE, self.value)
 
         # Validate value (choices are not empty)
         try:
@@ -105,7 +109,7 @@ class EnumProperty(Property):
             )
             # self.value = random.choice(list(_choices)) if bool(_choices) else str() cannot be used when frozen=True
             # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
-            object.__setattr__(self, "value", _choices[0])
+            object.__setattr__(self, VALUE_ATTRIBUTE, _choices[0])
 
     def get_choices_as_list(self) -> list[str]:
         """
@@ -118,9 +122,13 @@ class EnumProperty(Property):
 
     def generate_xml_value(self, property_element: ET._Element) -> str | ET.CDATA:
         """
-        It generates the value of the property for its XML element and
-        the list of choices as the 'choices' attribute of the XML element.
+        It generates the value of the property for its XML element,
+        the list of choices as the 'choices' attribute of the XML element
+        and the valueTooltips attribute if it is set to True.
         """
+        if self.valueTooltips:
+            property_element.set(VALUE_TOOLTIPS_ATTRIBUTE, str(self.valueTooltips))
+
         property_element.set(CHOICES_ATTRIBUTE, self.choices)
         return self.value
 
@@ -131,4 +139,8 @@ class EnumProperty(Property):
         :return: True if the attributes values are equal, False otherwise.
         """
         base_attributes = super().compare(other)
-        return base_attributes and self.choices == other.choices
+        return (
+            base_attributes
+            and self.choices == other.choices
+            and self.valueTooltips == other.valueTooltips
+        )

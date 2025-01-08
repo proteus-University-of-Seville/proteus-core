@@ -17,7 +17,7 @@ import sys
 import logging
 import importlib
 import pkgutil
-from typing import Callable, Dict, Union, List, Tuple
+from typing import Callable, Dict, Union, List
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -37,14 +37,15 @@ log = logging.getLogger(__name__)
 class PluginInterface:
     """
     Define the interface for modules that can be loaded as plugins.
+
+    #TODO: Implement plugins metadata (name, version, dependencies, etc.)
     """
 
     @staticmethod
     def register(
         register_xslt_function: Callable[[str, Callable], None],
         register_qwebchannel_class: Callable[[str, Callable], None],
-        register_proteus_component: Callable[[str, Callable], None],
-        register_xslt_class_and_methods: Callable[[Callable, List[str]], None],
+        register_proteus_component: Callable[[str, Callable, List[str]], None],
     ) -> None:
         """
         Register the plugin items in the corresponding registries.
@@ -52,7 +53,6 @@ class PluginInterface:
         :param register_xslt_function: Function to register XSLT functions.
         :param register_qwebchannel_class: Function to register QWebChannel classes.
         :param register_proteus_component: Function to register ProteusComponent classes.
-        :param register_xslt_class_and_methods: Function to register XSLT methods from a class.
         """
 
 
@@ -130,13 +130,13 @@ class Plugins(metaclass=SingletonMeta):
 
         :param plugins_directory: Path to the plugins directory.
         """
+        if plugins_directory is None:
+            log.warning("Plugins directory is None")
+            return
+        
         log.info(
             f"Loading PROTEUS plugins from plugins directory '{plugins_directory.as_posix()}'"
         )
-
-        if plugins_directory is None:
-            log.error("Plugins directory is None")
-            return
 
         # Import the package
         if not plugins_directory.exists():
