@@ -17,7 +17,7 @@ import sys
 import logging
 import importlib
 import pkgutil
-from typing import Callable, Dict, Union, List
+from typing import Callable, Dict, List
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -46,6 +46,7 @@ class PluginInterface:
         register_xslt_function: Callable[[str, Callable], None],
         register_qwebchannel_class: Callable[[str, Callable], None],
         register_proteus_component: Callable[[str, Callable, List[str]], None],
+        register_export_strategy: Callable[[str, Callable], None],
     ) -> None:
         """
         Register the plugin items in the corresponding registries.
@@ -53,6 +54,7 @@ class PluginInterface:
         :param register_xslt_function: Function to register XSLT functions.
         :param register_qwebchannel_class: Function to register QWebChannel classes.
         :param register_proteus_component: Function to register ProteusComponent classes.
+        :param register_export_strategy: Function to register export strategies.
         """
 
 
@@ -66,7 +68,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: __init__
-    # Description: Constructor for Plugins class.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -93,19 +94,22 @@ class Plugins(metaclass=SingletonMeta):
         # ProteusComponent methods that will be registered in the XSLT engine (k: class name, v: methods)
         self._proteus_components_methods: Dict[str, List[str]] = {}
 
+        # Export strategies (k: strategy name, v: strategy)
+        self._export_strategies: Dict[str, Callable] = {}
+
     # --------------------------------------------------------------------------
     # Method: _import_plugin
-    # Description: Import a module given a module name.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
-    def _import_plugin(self, module_name: str) -> Union[PluginInterface, None]:
+    def _import_plugin(self, module_name: str) -> PluginInterface | None:
         """
         Import a plugin given a module name. If the module is not found, it
         returns None.
 
         :param module_name: Name of the plugin to import.
+        :return: The imported module or None if the module is not found or an error occurs.
         """
         log.info(f"Importing plugin '{module_name}'")
         try:
@@ -116,7 +120,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: load_plugins
-    # Description: Load the plugins from a plugins directory.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -179,6 +182,7 @@ class Plugins(metaclass=SingletonMeta):
                     self.register_xslt_function,
                     self.register_qwebchannel_class,
                     self.register_proteus_component,
+                    self.register_export_strategy,
                 )
 
                 # Save the plugin
@@ -192,7 +196,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: get_xslt_functions
-    # Description: Get the XSLT functions registered in the plugin manager.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -205,7 +208,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: get_qwebchannel_classes
-    # Description: Get the QWebChannel classes registered in the plugin manager.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -218,7 +220,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: get_proteus_components
-    # Description: Get the ProteusComponent classes registered in the plugin manager.
     # Date: 09/01/2024
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -230,8 +231,19 @@ class Plugins(metaclass=SingletonMeta):
         return self._proteus_components
 
     # --------------------------------------------------------------------------
+    # Method: get_export_strategies
+    # Date: 10/01/2025
+    # Version: 0.1
+    # Author: José María Delgado Sánchez
+    # --------------------------------------------------------------------------
+    def get_export_strategies(self) -> Dict[str, Callable]:
+        """
+        Get the export strategies registered in the plugin manager.
+        """
+        return self._export_strategies
+
+    # --------------------------------------------------------------------------
     # Method: get_plugins
-    # Description: Get the plugins loaded in the plugin manager.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -248,7 +260,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: register_xslt_function
-    # Description: Register an XSLT function in the plugin manager.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -278,7 +289,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: register_qwebchannel_class
-    # Description: Register a QWebChannel class in the plugin manager.
     # Date: 03/01/2023
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -308,7 +318,6 @@ class Plugins(metaclass=SingletonMeta):
 
     # --------------------------------------------------------------------------
     # Method: register_proteus_component
-    # Description: Register a ProteusComponent class in the plugin manager.
     # Date: 09/01/2024
     # Version: 0.1
     # Author: José María Delgado Sánchez
@@ -364,3 +373,32 @@ class Plugins(metaclass=SingletonMeta):
                 self._proteus_components_methods[name].extend(valid_methods)
             else:
                 self._proteus_components_methods[name] = valid_methods
+
+    # --------------------------------------------------------------------------
+    # Method: register_export_strategy
+    # Date: 10/01/2025
+    # Version: 0.1
+    # Author: José María Delgado Sánchez
+    # --------------------------------------------------------------------------
+    def register_export_strategy(self, name: str, strategy: Callable) -> None:
+        """
+        Register an export strategy in the plugin manager. If there is already a
+        strategy registered with the same name, it will be ignored.
+
+        It validates if the strategy is callable.
+
+        :param name: Name of the export strategy.
+        :param strategy: Strategy to register.
+        """
+        # Validate the strategy
+        if not callable(strategy):
+            log.error(f"Export strategy '{name}' is not callable, ignoring it")
+            return
+
+        # Register the strategy
+        if name in self._export_strategies:
+            log.error(f"Export strategy '{name}' already registered, ignoring it")
+            return
+
+        log.info(f"Registering export strategy '{name}'")
+        self._export_strategies[name] = strategy

@@ -132,22 +132,22 @@ settings_dialog_warning.text: "The changes will be applied once the application 
 # ---------------------------------------------------------------------------
 # Export dialog
 # ---------------------------------------------------------------------------
-export_dialog.title: "Export current view"
-export_dialog.export_format.label: "Select export format:"
+export_dialog.title: "Export current view: {}"
+export_dialog.export_strategy.label: "Select export format:"
 export_dialog.finished.dialog.title: "Export finished"
 export_dialog.finished.dialog.text: "Current view has been exported successfully in path {}"
 export_dialog.finished.dialog.error.title: "Error exporting"
 export_dialog.finished.dialog.error.text: "Current view could not be exported. For more information, check the log file."
 
 # Export PDF
-export_dialog.export_format.pdf: "PDF file"
+export_dialog.export_strategy.pdf: "PDF file"
 export_dialog.export_pdf.filename.label: "Enter file name and path:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'The file name cannot contain the following characters: / \ : * ? \" < > |'
 export_dialog.export_pdf.filename.error.empty: "The file name cannot be empty"
 export_dialog.export_pdf.filename.error.folder_not_found: "Selected path does not exist"
 
 # Export HTML
-export_dialog.export_format.html: "HTML (with resources folder)"
+export_dialog.export_strategy.html: "HTML (with resources folder)"
 export_dialog.export_html.filepath.label: "Select destination directory:"
 export_dialog.export_html.folder_name.label: "Enter folder name:"
 export_dialog.export_html.error.empty: "The directory name cannot be empty"

@@ -18,7 +18,7 @@
 from madeja.glossary_handler import GlossaryHandler
 from madeja.traceability_matrix_helper import TraceabilityMatrixHelper
 
-def register(register_xslt_function, register_qwebchannel_class, register_proteus_component):
+def register(register_xslt_function, register_qwebchannel_class, register_proteus_component, _):
 
     # Glossary
     register_xslt_function("glossary_highlight", GlossaryHandler.highlight_glossary_items)

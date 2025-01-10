@@ -124,7 +124,7 @@ class MainMenu(QDockWidget, ProteusComponent):
         self.add_document_button: QToolButton = None
         self.delete_document_button: QToolButton = None
         self.settings_button: QToolButton = None
-        self.export_document_button: QToolButton = None
+        self.export_view_button: QToolButton = None
         self.information_button: QToolButton = None
         # Developer buttons
         # NOTE: This buttons will not be created if developer features are disabled
@@ -363,7 +363,7 @@ class MainMenu(QDockWidget, ProteusComponent):
         self.delete_document_button.clicked.connect(self.delete_current_document)
 
         # Export document action
-        self.export_document_button: QToolButton = buttons.main_menu_button(
+        self.export_view_button: QToolButton = buttons.main_menu_button(
             self,
             text="export_button.text",
             icon_key="export",
@@ -371,7 +371,7 @@ class MainMenu(QDockWidget, ProteusComponent):
             statustip="export_button.statustip",
             enabled=False,
         )
-        self.export_document_button.clicked.connect(
+        self.export_view_button.clicked.connect(
             lambda: ExportDialog.create_dialog(self._controller)
         )
 
@@ -380,7 +380,7 @@ class MainMenu(QDockWidget, ProteusComponent):
             [
                 self.add_document_button,
                 self.delete_document_button,
-                self.export_document_button,
+                self.export_view_button,
             ],
             "main_menu.button_group.document",
         )
@@ -842,7 +842,7 @@ class MainMenu(QDockWidget, ProteusComponent):
         is_document_open: bool = document_id is not None and document_id != ""
 
         self.delete_document_button.setEnabled(is_document_open)
-        self.export_document_button.setEnabled(is_document_open)
+        self.export_view_button.setEnabled(is_document_open)
         self.impact_analysis_button.setEnabled(is_document_open)
 
         if self.store_document_archetype_button:

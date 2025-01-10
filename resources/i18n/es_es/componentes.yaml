@@ -56,8 +56,8 @@ delete_document_button.statustip: "Eliminar documento del proyecto."
 delete_document_button.tooltip: "Eliminar documento actual"
 delete_document_button.text: "Eliminar"
 
-export_button.statustip: "Exportar documento actual a un archivo pdf."
-export_button.tooltip: "Exportar documento actual a un archivo pdf"
+export_button.statustip: "Exportar la vista actual utilizando diferentes estrategias de exportación."
+export_button.tooltip: "Exportar la vista actual utilizando diferentes estrategias de exportación."
 export_button.text: "Exportar"
 
 settings_button.statustip: "Editar configuración de la aplicación"
@@ -83,6 +83,8 @@ paste_button.text: "Pegar"
 impact_analysis.text: "Impacto"
 impact_analysis.statustip: "Analizar el impacto de los cambios"
 impact_analysis.tooltip: "Analizar el impacto de los cambios"
+
+add_view_button.tooltip: "Agregar nueva vista desde las plantillas disponibles en el perfil."
 
 # ---------------------------------------------------------------------------
 # Main window

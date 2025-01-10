@@ -24,6 +24,7 @@ from PyQt6.QtWebChannel import QWebChannel
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtWidgets import (
     QWidget,
+    QHBoxLayout,
     QPushButton,
     QTabWidget,
     QMessageBox,
@@ -55,6 +56,7 @@ from proteus.application.events import (
 from proteus.views.components.dialogs.base_dialogs import MessageBox
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.dialogs.new_view_dialog import NewViewDialog
+from proteus.views.components.dialogs.export_dialog import ExportDialog
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
@@ -107,6 +109,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         self.tabs: Dict[str, QWebEngineView] = {}
 
         self.add_view_button: QPushButton
+        self.export_view_button: QPushButton
 
         # Create the component
         self.create_component()
@@ -146,15 +149,34 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         ), "Project selected templates and default template were not found in XSLT directory, there is no views to display!"
 
         # Create a button to add new views
-        button_icon = Icons().icon(ProteusIconType.App, "add_view_icon")
+        add_view_button_icon = Icons().icon(ProteusIconType.App, "add_view_icon")
         self.add_view_button: QPushButton = QPushButton()
-        self.add_view_button.setIcon(button_icon)
+        self.add_view_button.setIcon(add_view_button_icon)
+        self.add_view_button.setToolTip(_("add_view_button.tooltip"))
 
-        # Connect to new view dialog
+        # Create a button to export views (duplicated from main menu)
+        export_view_button_icon = Icons().icon(ProteusIconType.MainMenu, "export")
+        self.export_view_button: QPushButton = QPushButton()
+        self.export_view_button.setIcon(export_view_button_icon)
+        self.export_view_button.setToolTip(_("export_button.tooltip"))
+
+        wrapper = QWidget()
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 10, 8)
+        layout.addWidget(self.export_view_button)
+        layout.addWidget(self.add_view_button)
+        wrapper.setLayout(layout)
+        
+
         self.add_view_button.clicked.connect(
             lambda: NewViewDialog.create_dialog(self._controller)
         )
-        self.setCornerWidget(self.add_view_button, Qt.Corner.TopRightCorner)
+
+        self.export_view_button.clicked.connect(
+            lambda: ExportDialog.create_dialog(self._controller)
+        )
+
+        self.setCornerWidget(wrapper, Qt.Corner.TopRightCorner)
 
         # Hide the close button on the main view tab
         try:

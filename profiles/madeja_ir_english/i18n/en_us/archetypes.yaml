@@ -84,6 +84,9 @@ archetype.class.mockup: "Mockup"
 
 archetype.class.traceability-matrix: "Traceability\nmatrix"
 archetype.class.change-request: "Change\nrequest"
+archetype.class.defect: "Defect"
+archetype.class.conflict: "Conflict"
+
 
 # -----------------------------------------------------------------------
 # Archetype property categories

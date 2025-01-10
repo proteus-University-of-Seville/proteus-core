@@ -57,8 +57,8 @@ delete_document_button.statustip: "Delete document from project."
 delete_document_button.tooltip: "Delete current document"
 delete_document_button.text: "Delete"
 
-export_button.statustip: "Export current document to pdf file."
-export_button.tooltip: "Export current document to pdf file"
+export_button.statustip: "Export current view using different export strategies."
+export_button.tooltip: "Export current view using different export strategies."
 export_button.text: "Export"
 
 settings_button.statustip: "Edit application settings"
@@ -84,6 +84,8 @@ paste_button.text: "Paste"
 impact_analysis.text: "Impact"
 impact_analysis.statustip: "Analyze the impact of changes"
 impact_analysis.tooltip: "Analyze the impact of changes"
+
+add_view_button.tooltip: "Add new view from the available templates in the profile."
 
 
 # ---------------------------------------------------------------------------

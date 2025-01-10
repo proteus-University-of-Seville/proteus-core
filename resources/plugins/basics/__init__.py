@@ -11,9 +11,11 @@ from basics.proteus_xslt_basics import generate_markdown, image_to_base64, curre
 from basics.proteus_xslt_basics import ProteusBasicMethods
 from basics.document_interactions import DocumentInteractions
 from basics.impact_analyzer import ImpactAnalyzer
+from basics.export.export_html import ExportHTML
+from basics.export.export_pdf import ExportPDF
 
 
-def register(register_xslt_function, register_qwebchannel_class, register_proteus_component):
+def register(register_xslt_function, register_qwebchannel_class, register_proteus_component, register_export_strategy):
 
     # Document Interactions
     register_qwebchannel_class("documentInteractions", DocumentInteractions)
@@ -28,3 +30,6 @@ def register(register_xslt_function, register_qwebchannel_class, register_proteu
 
     register_qwebchannel_class("proteusBasics", ProteusBasicMethods)
 
+    # Export strategies
+    register_export_strategy("pdf", ExportPDF)
+    register_export_strategy("html", ExportHTML)

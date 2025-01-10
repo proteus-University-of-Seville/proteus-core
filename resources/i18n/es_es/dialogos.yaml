@@ -131,8 +131,8 @@ settings_dialog_warning.text: "Los cambios se aplicarán al reiniciar la aplicac
 # ---------------------------------------------------------------------------
 # Export dialog
 # ---------------------------------------------------------------------------
-export_dialog.title: "Exportar vista"
-export_dialog.export_format.label: "Formato de exportación:"
+export_dialog.title: "Exportar vista: {}"
+export_dialog.export_strategy.label: "Formato de exportación:"
 export_dialog.export_html.filepath.label: "Seleccione una carpeta de destino:"
 export_dialog.finished.dialog.title: "Exportación finalizada"
 export_dialog.finished.dialog.text: "El documento se ha exportado correctamente en la ruta {}"
@@ -140,14 +140,14 @@ export_dialog.finished.dialog.error.title: "Error al exportar"
 export_dialog.finished.dialog.error.text: "No se pudo exportar la vista actual. Para más información, consulte el archivo de registro de la aplicación"
 
 # Export PDF
-export_dialog.export_format.pdf: "Archivo PDF"
+export_dialog.export_strategy.pdf: "Archivo PDF"
 export_dialog.export_pdf.filename.label: "Introduzca un nombre de archivo:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'El nombre del archivo no puede contener los siguientes caracteres: / \ : * ? " < > |'
 export_dialog.export_pdf.filename.error.empty: "El nombre del archivo no puede estar vacío"
 export_dialog.export_pdf.filename.error.folder_not_found: "La ruta seleccionada no existe"
 
 # Export HTML
-export_dialog.export_format.html: "HTML (con carpeta de recursos)"
+export_dialog.export_strategy.html: "HTML (con carpeta de recursos)"
 export_dialog.export_html.filename.label: "Seleccione una carpeta de destino:"
 export_dialog.export_html.folder_name.label: "Introduzca un nombre de carpeta:"
 export_dialog.export_html.error.empty: "El nombre de la carpeta no puede estar vacío"
