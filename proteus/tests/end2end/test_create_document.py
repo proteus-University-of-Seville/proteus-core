@@ -67,7 +67,7 @@ def test_create_document(app):
     # Buttons that should change state when document is created in an empty project
     save_button_state = main_window.main_menu.save_button.isEnabled()
     delete_doc_button_state = main_window.main_menu.delete_document_button.isEnabled()
-    export_doc_button_state = main_window.main_menu.export_document_button.isEnabled()
+    export_doc_button_state = main_window.main_menu.export_view_button.isEnabled()
     undo_button_state = main_window.main_menu.undo_button.isEnabled()
 
     # --------------------------------------------
@@ -97,10 +97,10 @@ def test_create_document(app):
     )
     assert (
         export_doc_button_state
-        != main_window.main_menu.export_document_button.isEnabled()
+        != main_window.main_menu.export_view_button.isEnabled()
     ), (
         "Export document button state should change from DISABLED to ENABLED when a document is created in an empty project"
-        f"Current state: {main_window.main_menu.export_document_button.isEnabled()}"
+        f"Current state: {main_window.main_menu.export_view_button.isEnabled()}"
     )
     assert (
         undo_button_state != main_window.main_menu.undo_button.isEnabled()

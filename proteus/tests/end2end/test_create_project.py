@@ -130,7 +130,7 @@ def test_create_project(app):
         main_window.main_menu.delete_document_button.isEnabled()
     ), "Delete document button is not enabled after project creation"
     assert (
-        main_window.main_menu.export_document_button.isEnabled()
+        main_window.main_menu.export_view_button.isEnabled()
     ), "Export document button is not enabled after project creation"
 
     # Check documents container
