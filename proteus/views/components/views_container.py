@@ -157,8 +157,11 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         # Create a button to export views (duplicated from main menu)
         export_view_button_icon = Icons().icon(ProteusIconType.MainMenu, "export")
         self.export_view_button: QPushButton = QPushButton()
+        self.export_view_button.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
         self.export_view_button.setIcon(export_view_button_icon)
         self.export_view_button.setToolTip(_("export_button.tooltip"))
+        self.export_view_button.setText(_("export_button.text"))
+
 
         wrapper = QWidget()
         layout = QHBoxLayout()
