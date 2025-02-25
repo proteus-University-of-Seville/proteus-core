@@ -36,7 +36,10 @@
         <xsl:variable name="excluded_properties">,:Proteus-code,:Proteus-name,:Proteus-date,version,dependencies,</xsl:variable>
 
         <!-- List of mandatory properties (shown even if they are empty)-->
-        <xsl:variable name="mandatory_properties">description</xsl:variable>
+        <xsl:variable name="mandatory_properties">,description,</xsl:variable>
+
+        <!-- List of properties that will be marked as verifiable -->
+        <xsl:variable name="verifiable_properties">,description,</xsl:variable>
 
         <div id="{@id}" data-proteus-id="{@id}">
             <table class="nonfunctional_requirement remus_table">
@@ -54,6 +57,7 @@
                 <xsl:for-each select="properties/*[not(contains($excluded_properties,concat(',', @name, ',')))]">
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="contains($mandatory_properties,concat(',', current()/@name, ','))"/>
+                        <xsl:with-param name="verifiable" select="contains($verifiable_properties,concat(',', current()/@name, ','))"/>
                     </xsl:call-template>
                 </xsl:for-each>
             </table>

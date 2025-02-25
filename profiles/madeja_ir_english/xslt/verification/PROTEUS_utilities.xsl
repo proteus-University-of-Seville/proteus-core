@@ -31,7 +31,7 @@
     extension-element-prefixes="exsl"
 >
     <!-- Base URL for icons -->
-    <xsl:variable name="base_url_icons">templates:///default/resources/images/</xsl:variable>
+    <xsl:variable name="base_url_icons">templates:///verification/resources/images/</xsl:variable>
 
     <!-- ============================================= -->
     <!-- pagebreak template                            -->
@@ -72,12 +72,20 @@
         <xsl:param name="label" select="$property_labels/label[@key=current()/@name]"/>
         <!-- <xsl:param name="content" select="current()//text()"/> -->
         <xsl:param name="mandatory" select="false()"/>
+        <xsl:param name="verifiable" select="false()"/>
         <xsl:param name="alternative"/>
         <xsl:param name="span" select="1"/>
         <xsl:param name="diagram" select="@name='diagram'"/>
 
         <xsl:variable name="hasContent"  select="(string-length(current()//text()) > 0) and (normalize-space(current()) != 'tbd')"/>
         <xsl:variable name="hasChildren" select="boolean(current()/*)"/>
+
+        <xsl:variable name="verifiableClass">
+            <xsl:choose>
+                <xsl:when test="$verifiable">verifiable-property</xsl:when>
+                <xsl:otherwise>no-verifiable</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
         <xsl:if test="$hasContent or $hasChildren or $mandatory">
             <tr>
@@ -92,7 +100,7 @@
                         <th>
                             <xsl:value-of select="$label"/>
                         </th>
-                        <td colspan="{$span}" class="{$label}-property">
+                        <td colspan="{$span}" class="{$verifiableClass}">
                             <xsl:choose>
                                 <xsl:when test="(not($hasContent) and not($hasChildren)) or normalize-space(current()) = 'tbd'">
                                     <span class="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></span>

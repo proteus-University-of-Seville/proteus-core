@@ -38,10 +38,10 @@
                 <meta name="generatedBy" content="PROTEUS"/>
 
                 <!-- Remus stylesheets -->
-                <link rel="stylesheet" href="templates:///default/resources/css/remus.css"/>
+                <link rel="stylesheet" href="templates:///verification/resources/css/remus.css"/>
 
                 <!-- Custom stylesheets -->
-                <link rel="stylesheet" href="templates:///default/resources/css/codehilite.css"/>
+                <link rel="stylesheet" href="templates:///verification/resources/css/codehilite.css"/>
 
                 <title>
                     <xsl:value-of select="$proteus:lang_project"/>
@@ -70,7 +70,7 @@
                 <xsl:apply-templates select="children/object"/>
 
                 <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
-                <script src="templates:///default/resources/javascript/proteus.js"></script>
+                <script src="templates:///verification/resources/javascript/proteus.js"></script>
 
             </body>
         </html>

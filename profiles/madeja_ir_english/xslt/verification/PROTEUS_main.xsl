@@ -145,14 +145,14 @@
 
     <xsl:include href="archetypes/general/section.xsl" />
     <xsl:include href="archetypes/general/appendix.xsl" />
-    <xsl:include href="archetypes/general/information.xsl" />
-    <xsl:include href="archetypes/general/paragraph.xsl" />
-    <xsl:include href="archetypes/general/glossary_item.xsl" />
-    <xsl:include href="archetypes/general/figure.xsl" />
-    <xsl:include href="archetypes/general/organization.xsl" />
-    <xsl:include href="archetypes/general/stakeholder.xsl" />
-    <xsl:include href="archetypes/general/meeting.xsl" />
-    <xsl:include href="archetypes/general/symbolic_link.xsl" />
+    <!-- <xsl:include href="archetypes/general/information.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/paragraph.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/glossary_item.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/figure.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/organization.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/stakeholder.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/meeting.xsl" /> -->
+    <!-- <xsl:include href="archetypes/general/symbolic_link.xsl" /> -->
 
     <xsl:include href="archetypes/business_analysis/strength.xsl" />
     <xsl:include href="archetypes/business_analysis/weakness.xsl" />
@@ -170,17 +170,17 @@
     <xsl:include href="archetypes/requirements/functional_requirement.xsl" />
     <xsl:include href="archetypes/requirements/nonfunctional_requirement.xsl" />
 
-    <xsl:include href="archetypes/conceptual_modeling/entity_class.xsl" />
-    <xsl:include href="archetypes/conceptual_modeling/enumeration.xsl" />
-    <xsl:include href="archetypes/conceptual_modeling/association.xsl" />
-    <xsl:include href="archetypes/conceptual_modeling/constraint.xsl" />
-    <xsl:include href="archetypes/conceptual_modeling/system_operation.xsl" />
-    <xsl:include href="archetypes/conceptual_modeling/mockup.xsl" />
+    <!-- <xsl:include href="archetypes/conceptual_modeling/entity_class.xsl" /> -->
+    <!-- <xsl:include href="archetypes/conceptual_modeling/enumeration.xsl" /> -->
+    <!-- <xsl:include href="archetypes/conceptual_modeling/association.xsl" /> -->
+    <!-- <xsl:include href="archetypes/conceptual_modeling/constraint.xsl" /> -->
+    <!-- <xsl:include href="archetypes/conceptual_modeling/system_operation.xsl" /> -->
+    <!-- <xsl:include href="archetypes/conceptual_modeling/mockup.xsl" /> -->
 
-    <xsl:include href="archetypes/req_management/traceability_matrix.xsl" />
-    <xsl:include href="archetypes/req_management/change_request.xsl" />
-    <xsl:include href="archetypes/req_management/defect.xsl" />
-    <xsl:include href="archetypes/req_management/conflict.xsl" />
+    <!-- <xsl:include href="archetypes/req_management/traceability_matrix.xsl" /> -->
+    <!-- <xsl:include href="archetypes/req_management/change_request.xsl" /> -->
+    <!-- <xsl:include href="archetypes/req_management/defect.xsl" /> -->
+    <!-- <xsl:include href="archetypes/req_management/conflict.xsl" /> -->
 
     <xsl:include href="archetypes/PROTEUS_default.xsl" />
 

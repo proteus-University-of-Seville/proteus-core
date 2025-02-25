@@ -31,7 +31,7 @@
                 </div>
 
                 <div id="document_logo">
-                    <img alt="Universidad de Sevilla" src="templates:///default/resources/images/logo_us.gif"/>
+                    <img alt="Universidad de Sevilla" src="templates:///verification/resources/images/logo_us.gif"/>
                 </div>
 
                 <div id="document_name">

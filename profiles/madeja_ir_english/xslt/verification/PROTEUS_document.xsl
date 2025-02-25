@@ -38,10 +38,10 @@
                 <meta name="generatedBy" content="PROTEUS"/>
 
                 <!-- Remus stylesheets -->
-                <link rel="stylesheet" href="templates:///default/resources/css/remus.css"/>
+                <link rel="stylesheet" href="templates:///verification/resources/css/remus.css"/>
 
                 <!-- Custom stylesheets -->
-                <link rel="stylesheet" href="templates:///default/resources/css/codehilite.css"/>
+                <link rel="stylesheet" href="templates:///verification/resources/css/codehilite.css"/>
 
                 <title>
                     <xsl:value-of select="$proteus:lang_project"/>

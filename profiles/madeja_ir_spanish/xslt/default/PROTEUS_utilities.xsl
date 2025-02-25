@@ -31,7 +31,7 @@
     extension-element-prefixes="exsl"
 >
     <!-- Base URL for icons -->
-    <xsl:variable name="base_url_icons">templates:///default/resources/images/</xsl:variable>
+    <xsl:variable name="base_url_icons">templates:///verification/resources/images/</xsl:variable>
 
     <!-- ============================================= -->
     <!-- pagebreak template                            -->
