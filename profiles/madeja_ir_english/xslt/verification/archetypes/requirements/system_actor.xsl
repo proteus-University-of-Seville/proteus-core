@@ -54,11 +54,15 @@
                 <!-- List of mandatory properties (shown even if they are empty)-->
                 <xsl:variable name="mandatory_properties">,description,</xsl:variable>
 
+                <!-- List of properties that will be marked as verifiable -->
+                <xsl:variable name="verifiable_properties">,description,</xsl:variable>
+
                 <!-- Generate rows for all ordinary properties                         -->
                 <!-- Each property can be accessed as current() in the called template -->
                 <xsl:for-each select="properties/*[not(contains($excluded_properties,concat(',', @name, ',')))]">
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="contains($mandatory_properties,concat(',', current()/@name, ','))"/>
+                        <xsl:with-param name="verifiable" select="contains($verifiable_properties,concat(',', current()/@name, ','))"/>
                     </xsl:call-template>
                 </xsl:for-each>
             </table>

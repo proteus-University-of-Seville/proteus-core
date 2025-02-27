@@ -57,12 +57,14 @@
                 <xsl:for-each select="properties/*[@name='description']">
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="true()"/>
+                        <xsl:with-param name="verifiable" select="true()"/>
                     </xsl:call-template>
                 </xsl:for-each>
 
                 <!-- Child requirements row -->
                 <xsl:call-template name="generate_children_row">
                     <xsl:with-param name="label" select="$proteus:lang_specific_data"/>
+                    <xsl:with-param name="verifiable" select="true()"/>
                 </xsl:call-template>
 
                 <!-- Generate rows for all other properties                           -->

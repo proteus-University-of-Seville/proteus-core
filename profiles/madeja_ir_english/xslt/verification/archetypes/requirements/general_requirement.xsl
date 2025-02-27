@@ -40,6 +40,7 @@
 
         <!-- List of mandatory properties (shown even if they are empty)-->
         <xsl:variable name="mandatory_properties">,importance,priority,</xsl:variable>
+        
 
         <div id="{@id}" data-proteus-id="{@id}">
             <table class="general_requirement remus_table">
@@ -61,12 +62,14 @@
                 <xsl:for-each select="properties/*[@name='description']">
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="true()"/>
+                        <xsl:with-param name="verifiable" select="true()"/>
                     </xsl:call-template>
                 </xsl:for-each>
 
                 <!-- Child requirements row -->
                 <xsl:call-template name="generate_children_row">
                     <xsl:with-param name="label" select="$proteus:lang_child_requirements"/>
+                    <xsl:with-param name="verifiable" select="true()"/>
                 </xsl:call-template>
 
                 <!-- Generate rows for all other properties                           -->

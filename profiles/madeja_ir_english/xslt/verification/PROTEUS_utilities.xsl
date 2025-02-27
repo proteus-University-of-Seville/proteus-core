@@ -83,7 +83,7 @@
         <xsl:variable name="verifiableClass">
             <xsl:choose>
                 <xsl:when test="$verifiable">verifiable-property</xsl:when>
-                <xsl:otherwise>no-verifiable</xsl:otherwise>
+                <xsl:otherwise></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
 
@@ -129,6 +129,14 @@
     <xsl:template name="generate_children_row">
         <xsl:param name="label"/>
         <xsl:param name="span" select="1"/>
+        <xsl:param name="verifiable" select="false()"/>
+
+        <xsl:variable name="verifiableClass">
+            <xsl:choose>
+                <xsl:when test="$verifiable">verifiable-property</xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
         <xsl:variable name="hasChildren" select="children/object"/>
 
@@ -137,7 +145,7 @@
                 <th>
                     <xsl:value-of select="$label"/>
                 </th>
-                <td colspan="{$span}">
+                <td colspan="{$span}" class="{$verifiableClass}">
                     <ul class="children">
                         <!-- for each children -->
                         <xsl:for-each select="children/object">

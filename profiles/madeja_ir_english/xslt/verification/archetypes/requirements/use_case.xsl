@@ -68,6 +68,7 @@
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="true()"/>
                         <xsl:with-param name="span" select="$span" />
+                        <xsl:with-param name="verifiable" select="true()"/>
                     </xsl:call-template>
                 </xsl:for-each>
 
@@ -76,6 +77,7 @@
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="true()"/>
                         <xsl:with-param name="span" select="$span" />
+                        <xsl:with-param name="verifiable" select="true()"/>
                     </xsl:call-template>
                 </xsl:for-each>
 
@@ -106,6 +108,7 @@
                     <xsl:call-template name="generate_property_row">
                         <xsl:with-param name="mandatory" select="true()"/>
                         <xsl:with-param name="span" select="$span" />
+                        <xsl:with-param name="verifiable" select="true()"/>
                     </xsl:call-template>
                 </xsl:for-each>
 
@@ -141,7 +144,7 @@
             <th class="step_number">
                 <xsl:value-of select="$label_number"/>
             </th>
-            <td colspan="1">
+            <td colspan="1" class="verifiable-property">
                 <xsl:choose>
                     <xsl:when test="not(string-length(normalize-space($description)) > 0)">
                         <span class="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></span>

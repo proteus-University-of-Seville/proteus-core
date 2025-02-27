@@ -1,13 +1,38 @@
+// LLM requirements verification script
+// Version: 1.0
+// Date: 27-02-2025
+// 
+// This script is used to modify the HTML in order to add verification buttons to each requirement type.
+// The verification buttons will call the LLM model to verify the requirement text.
+// The script will look for tables with class defined in the SPECIFIC_VERIFICATION_CONTEXT_DICT
+// A general verification context is provided to the LLM along with the specific context for each requirement type.
+// A button is added in a new row at the end of the table to verify all the text in the table.
+// When the button is clicked, the script will gather all the text in rows with class 'verifiable-property' and send it to the LLM model.
+// XSLT is responsible for setting up the 'verifiable-property' class in the HTML
+// The script will display the response from the LLM model in the same row as the button.
+
+// In order to add new verifiable requirements or other elements, make sure it is displayed in a table marking the rows with the
+// 'verifiable-property' class and it is added to the SPECIFIC_VERIFICATION_CONTEXT_DICT with the corresponding context.
+
+// This is based on LM Studio server API, the LLM can be changed to a different model by changing the LLM constant.
+// The API call can be modified if necessary in the 'createCompletionRequest' function.
+
+// This script works outside PROTEUS when exported as HTML as long as the LLM server is accessible.
+
 // -----------------------------------------------------------------------
 // Constants
 // -----------------------------------------------------------------------
 
 const LLM = "lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF";
-const GENERAL_VERIFICATION_CONTEXT = "Please verify the following requirement making sure it is concise and do not lead to misinterpretation. Do not change the meaning of the requirement";
+const GENERAL_VERIFICATION_CONTEXT = "Please verify the following requirement making sure it is concise and do not lead to misinterpretation. Do not change the meaning of the requirement.";
 const SPECIFIC_VERIFICATION_CONTEXT_DICT = {
-    "functional_requirement": "You are a software engineer (Quality Assurance) verifying a functional requirement.",
-    "nonfunctional_requirement": "You are a software engineer (Quality Assurance) verifying a non-functional requirement.",
-    "business_rule": "You are a software engineer (Quality Assurance) verifying a business rule.",
+    "general_requirement": "You are a software engineer (Quality Assurance) verifying a general requirement. The description will be provided.",
+    "system_actor": "You are a software engineer (Quality Assurance) verifying a system actor. The description will be provided.",
+    "information_requirement": "You are a software engineer (Quality Assurance) verifying an information requirement. The description and the specific data will be provided.",
+    "use_case": "You are a software engineer (Quality Assurance) verifying a use case. The precondition, description, use case steps, and postcondition will be provided.",
+    "functional_requirement": "You are a software engineer (Quality Assurance) verifying a functional requirement. The description will be provided.",
+    "nonfunctional_requirement": "You are a software engineer (Quality Assurance) verifying a non-functional requirement. The description will be provided.",
+    "business_rule": "You are a software engineer (Quality Assurance) verifying a business rule. The description will be provided.",
 };
 
 
@@ -19,11 +44,11 @@ const SPECIFIC_VERIFICATION_CONTEXT_DICT = {
 // listed in the SPECIFIC_VERIFICATION_CONTEXT_DICT
 function setupRequirementVerification() {
     for (const [req_class, specific_context] of Object.entries(SPECIFIC_VERIFICATION_CONTEXT_DICT)) {
-        const requirementTables = Array.from(document.querySelectorAll("table")).filter(table => 
+        const requirementTables = Array.from(document.querySelectorAll("table")).filter(table =>
             table.classList.contains(req_class)
         );
         setupVerifyButton(requirementTables, specific_context + GENERAL_VERIFICATION_CONTEXT);
-    }    
+    }
 }
 
 
@@ -33,68 +58,62 @@ function setupVerifyButton(tables, context) {
     tables.forEach(table => {
         const descriptionCells = table.querySelectorAll('td.verifiable-property');
 
-        descriptionCells.forEach(td => {
-            const verifyButton = document.createElement('button');
-            verifyButton.textContent = 'Verify';
-            verifyButton.style.cssText = `
-                padding: 5px 10px;
-                margin: 5px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                display: inline-block;
-            `;
+        // Create a row at the end of the table for the verification output and button
+        const outputRow = document.createElement('tr');
+        const outputCell = document.createElement('td');
+        outputCell.colSpan = descriptionCells.length;
+        outputCell.style.cssText = `
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-top: 2px solid #ccc;
+            text-align: left;
+        `;
 
-            verifyButton.onclick = async () => {
-                try {
-                    verifyButton.disabled = true;
-                    verifyButton.textContent = 'Verifying...';
+        const buttonCell = document.createElement('td');
+        buttonCell.style.textAlign = 'center';
 
-                    // Extract only the text content, ignoring buttons or other elements
-                    const originalText = Array.from(td.childNodes)
-                        .filter(node => node.nodeType === Node.TEXT_NODE) // Only text nodes
-                        .map(node => node.textContent.trim())
-                        .join(" ")
-                        .replace(/\s+/g, ' '); // Clean up spaces
+        outputRow.appendChild(buttonCell);
+        outputRow.appendChild(outputCell);
+        table.appendChild(outputRow);
 
-                    const response = await createCompletionRequest(originalText, context);
+        // Create a button to verify all fields
+        const verifyAllButton = document.createElement('button');
+        verifyAllButton.textContent = 'Verify using AI';
+        verifyAllButton.style.cssText = `
+            padding: 8px 15px;
+            margin: 10px 0;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        `;
 
-                    // Remove any existing response divs
-                    td.querySelectorAll('.response-div').forEach(div => div.remove());
+        verifyAllButton.onclick = async () => {
+            try {
+                verifyAllButton.disabled = true;
+                verifyAllButton.textContent = 'Verifying...';
 
-                    // Remove any previous status messages
-                    td.querySelectorAll('div').forEach(div => {
-                        if (div.textContent.includes('Processing...') || div.textContent.includes('Error:')) {
-                            td.removeChild(div);
-                        }
-                    });
+                // Gather all verifiable text
+                const allText = Array.from(descriptionCells)
+                    .map(td => td.textContent.trim().replace(/\s+/g, ' ')) // Extract all visible text
+                    .join(' | ');
 
-                    // Add the new response
-                    const resultDiv = document.createElement('div');
-                    resultDiv.className = 'response-div';
-                    resultDiv.style.cssText = `
-                        margin-top: 10px;
-                        padding: 10px;
-                        background-color: #f8f9fa;
-                        border-left: 4px solid #28a745;
-                        color: #2c5282;
-                        line-height: 1.5;
-                    `;
-                    resultDiv.textContent = response;
-                    td.appendChild(resultDiv);
+                const response = await createCompletionRequest(allText, context);
 
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    verifyButton.disabled = false;
-                    verifyButton.textContent = 'Verify';
-                }
-            };
+                // Display the response in the output row
+                outputCell.textContent = response;
+            } catch (error) {
+                console.error('Error:', error);
+                outputCell.textContent = 'Error verifying data';
+            } finally {
+                verifyAllButton.disabled = false;
+                verifyAllButton.textContent = 'Verify using AI';
+            }
+        };
 
-            td.appendChild(verifyButton);
-        });
+        // Append the button to the same row where the response will be displayed
+        buttonCell.appendChild(verifyAllButton);
     });
 }
 
