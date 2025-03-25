@@ -133,7 +133,7 @@ archetype.enum_choices.bag: "Bag"
 
 archetype.enum_choices.draft: "Draft"
 archetype.enum_choices.awaiting-qa: "Awaiting quality verification"
-archetype.enum_choices.awaiting-validation: "Awaiting validation"
+archetype.enum_choices.awaiting-validation: "Verified, awaiting validation"
 archetype.enum_choices.validated: "Validated"
 
 # Defect types
