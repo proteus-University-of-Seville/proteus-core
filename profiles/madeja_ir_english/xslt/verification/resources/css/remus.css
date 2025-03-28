@@ -14,6 +14,16 @@
 /* IE 7 does not support :last-child and :nth-child in CSS */
 /* ======================================================= */
 
+.ai-verify-button {
+  padding: 8px 15px;
+  margin: 10px 0;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 /* Default tables */
 table {
   width: 98%;
@@ -30,9 +40,7 @@ td {
 }
 
 /* Symlinked objects */
-.linked-object {
-
-}
+.linked-object {}
 
 .symbolic-link {
   outline: 2px dashed black;
@@ -258,7 +266,7 @@ span.matrix_caption_label {
 
 .reduce_font:active,
 .increase_font:active {
-    background-color: darkgray;
+  background-color: darkgray;
 }
 
 /* REMUS tables - general styles */
@@ -295,7 +303,7 @@ table.remus_table>thead>tr>th:first-child {
   padding-right: 12px;
   padding-bottom: 4px;
   min-width: 8em;
-  white-space: nowrap;
+  white-space: nowrap;
 }
 
 /* any row, first column */

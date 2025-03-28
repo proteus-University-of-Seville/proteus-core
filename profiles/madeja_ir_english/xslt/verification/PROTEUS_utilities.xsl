@@ -23,32 +23,32 @@
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:proteus="http://proteus.us.es"
-    xmlns:proteus-utils="http://proteus.us.es/utils"
-    exclude-result-prefixes="proteus proteus-utils"
-    xmlns:exsl="http://exslt.org/common"
-    extension-element-prefixes="exsl"
->
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:proteus="http://proteus.us.es"
+                xmlns:proteus-utils="http://proteus.us.es/utils"
+                exclude-result-prefixes="proteus proteus-utils"
+                xmlns:exsl="http://exslt.org/common"
+                extension-element-prefixes="exsl"
+    >
     <!-- Base URL for icons -->
     <xsl:variable name="base_url_icons">templates:///verification/resources/images/</xsl:variable>
-
+    
     <!-- ============================================= -->
     <!-- pagebreak template                            -->
     <!-- ============================================= -->
-
+    
     <xsl:template name="pagebreak">
         <div class="page-break"></div>
     </xsl:template>
-
+    
     <!-- ============================================= -->
     <!-- generate_markdown template                    -->
     <!-- ============================================= -->
-
+    
     <xsl:template name="generate_markdown">
         <xsl:param name="content" select="string(.)"/>
         <xsl:param name="glossary-items-highlight" select="true()"/>
-
+        
         <xsl:choose>
             <xsl:when test="$glossary-items-highlight">
                 <xsl:value-of select="proteus-utils:glossary_highlight(proteus-utils:generate_markdown($content))" disable-output-escaping="yes"/>
@@ -57,17 +57,17 @@
                 <xsl:value-of select="proteus-utils:generate_markdown($content)" disable-output-escaping="yes"/>
             </xsl:otherwise>
         </xsl:choose>
-
+        
     </xsl:template>
-
+    
     <!-- ============================================= -->
     <!-- generate_property_row template                -->
     <!-- ============================================= -->
-
+    
     <!-- current() is the property element being processed. -->
     <!-- 'tbd' is considered as having no content, it shown -->
     <!-- only if it mandatory.                              -->
-
+    
     <xsl:template name="generate_property_row">
         <xsl:param name="label" select="$property_labels/label[@key=current()/@name]"/>
         <!-- <xsl:param name="content" select="current()//text()"/> -->
@@ -76,17 +76,17 @@
         <xsl:param name="alternative"/>
         <xsl:param name="span" select="1"/>
         <xsl:param name="diagram" select="@name='diagram'"/>
-
+        
         <xsl:variable name="hasContent"  select="(string-length(current()//text()) > 0) and (normalize-space(current()) != 'tbd')"/>
         <xsl:variable name="hasChildren" select="boolean(current()/*)"/>
-
+        
         <xsl:variable name="verifiableClass">
             <xsl:choose>
                 <xsl:when test="$verifiable">verifiable-property</xsl:when>
                 <xsl:otherwise></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:if test="$hasContent or $hasChildren or $mandatory">
             <tr>
                 <xsl:choose>
@@ -118,28 +118,28 @@
             </tr>
         </xsl:if>
     </xsl:template>
-
+    
     <!-- ============================================== -->
     <!-- generate_children_row                          -->
     <!-- ============================================== -->
-
+    
     <!-- current() is the object element being processed -->
     <!-- TODO: check CSS class names                     -->
-
+    
     <xsl:template name="generate_children_row">
         <xsl:param name="label"/>
         <xsl:param name="span" select="1"/>
         <xsl:param name="verifiable" select="false()"/>
-
+        
         <xsl:variable name="verifiableClass">
             <xsl:choose>
                 <xsl:when test="$verifiable">verifiable-property</xsl:when>
                 <xsl:otherwise></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-
+        
         <xsl:variable name="hasChildren" select="children/object"/>
-
+        
         <xsl:if test="$hasChildren">
             <tr>
                 <th>
@@ -158,19 +158,19 @@
             </tr>
         </xsl:if>
     </xsl:template>
-
+    
     <!-- ============================================== -->
     <!-- generate_object_basic_information              -->
     <!-- ============================================== -->
-
+    
     <!-- current() is the object element being processed -->
     <!-- TODO: check CSS class names                     -->
-
+    
     <xsl:template name="generate_object_basic_information">
         <xsl:variable name="code"        select="properties/*[@name=':Proteus-code']" />
         <xsl:variable name="name"        select="properties/*[@name=':Proteus-name']" />
         <xsl:variable name="description" select="properties/*[@name='description']" />
-
+        
         <span id="{@id}">
             <strong>
                 <xsl:if test="$code">
@@ -184,7 +184,7 @@
                 <!-- <xsl:value-of select="$description"/> -->
                 <xsl:apply-templates select="$description"/>
             </xsl:if>
-
+            
             <!-- Does it have children? -->
             <xsl:if test="children/object">
                 <ul class="children">
@@ -194,21 +194,21 @@
                 </ul>
             </xsl:if>
         </span>
-
+        
     </xsl:template>
-
+    
     <!-- ============================================= -->
     <!-- generate_trace_row template                   -->
     <!-- ============================================= -->
-
+    
     <!-- Check for use, probably unused -->
-
+    
     <xsl:template name="generate_trace_row">
         <xsl:param name="label" />
         <xsl:param name="content" />
         <xsl:param name="mandatory" select="false()"/>
         <xsl:param name="span">1</xsl:param>
-
+        
         <xsl:if test="$content/trace or $mandatory">
             <tr>
                 <th><xsl:value-of select="$label"/></th>
@@ -225,13 +225,13 @@
             </tr>
         </xsl:if>
     </xsl:template>
-
+    
     <!-- ============================================= -->
     <!-- generate_header template                      -->
     <!-- ============================================= -->
-
+    
     <!-- current() is the property element being processed -->
-
+    
     <xsl:template name="generate_header">
         <xsl:param name="label"/>
         <xsl:param name="class" select="default"/>
@@ -239,7 +239,7 @@
         <xsl:param name="icon"  select="concat($class,'.png')"/>
         <xsl:param name="postfix"/>
         <xsl:param name="span"  select="1"/>
-
+        
         <thead>
             <tr>
                 <th>
@@ -254,28 +254,28 @@
             </tr>
         </thead>
     </xsl:template>
-
+    
     <!-- ================================= -->
     <!-- generate_expanded_header template -->
     <!-- ================================= -->
-
+    
     <!-- Check for use, probably unused -->
-
+    
     <!-- current() is the property element being processed -->
-
+    
     <xsl:template name="generate_expanded_header">
         <xsl:param name="class" select="default"/>
         <xsl:param name="name"  select="properties/*[@name=':Proteus-name']"/>
         <xsl:param name="icon"  select="concat($class,'.png')"/>
         <xsl:param name="postfix"/>
         <xsl:param name="span"  select="1"/>
-
+        
         <xsl:variable name="label">
             <xsl:value-of select="properties/*[@name = ':Proteus-code']/prefix" />
             <xsl:value-of select="properties/*[@name = ':Proteus-code']/number" />
             <xsl:value-of select="properties/*[@name = ':Proteus-code']/suffix" />
         </xsl:variable>
-
+        
         <xsl:call-template name="generate_header">
             <xsl:with-param name="class"   select="$class"/>
             <xsl:with-param name="name"    select="$name"/>
@@ -284,41 +284,41 @@
             <xsl:with-param name="postfix" select="$postfix"/>
             <xsl:with-param name="span"    select="$span"/>
         </xsl:call-template>
-
+        
         <!--
-        <xsl:call-template name="generate_version_row">
-            <xsl:with-param name="span"    select="$span"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="generate_trace_row">
-            <xsl:with-param name="label"   select="$proteus:lang_authors"/>
-            <xsl:with-param name="content" select="properties/traceProperty[@name='authors']"/>
-            <xsl:with-param name="span"    select="$span"/>
-        </xsl:call-template>
-
-        <xsl:call-template name="generate_trace_row">
-            <xsl:with-param name="label"   select="$proteus:lang_sources"/>
-            <xsl:with-param name="content" select="properties/traceProperty[@name='source']"/>
-            <xsl:with-param name="span"    select="$span"/>
-        </xsl:call-template>
+             <xsl:call-template name="generate_version_row">
+             <xsl:with-param name="span"    select="$span"/>
+             </xsl:call-template>
+             
+             <xsl:call-template name="generate_trace_row">
+             <xsl:with-param name="label"   select="$proteus:lang_authors"/>
+             <xsl:with-param name="content" select="properties/traceProperty[@name='authors']"/>
+             <xsl:with-param name="span"    select="$span"/>
+             </xsl:call-template>
+             
+             <xsl:call-template name="generate_trace_row">
+             <xsl:with-param name="label"   select="$proteus:lang_sources"/>
+             <xsl:with-param name="content" select="properties/traceProperty[@name='source']"/>
+             <xsl:with-param name="span"    select="$span"/>
+             </xsl:call-template>
         -->
     </xsl:template>
-
-
+    
+    
     <!-- =============================================================== -->
     <!-- Special rows templates                                          -->
     <!-- =============================================================== -->
-
+    
     <!-- ============================================= -->
     <!-- generate_version_row template                 -->
     <!-- ============================================= -->
-
+    
     <!-- current() is the object element being processed -->
-
+    
     <xsl:template name="generate_version_row">
         <xsl:param name="label" select="$proteus:lang_version"/>
         <xsl:param name="span"  select="1"/>
-
+        
         <tr>
             <th><xsl:value-of select="$label"/></th>
             <td colspan="{$span}">
@@ -328,16 +328,16 @@
                 <xsl:text>)</xsl:text>
             </td>
         </tr>
-
+        
     </xsl:template>
-
+    
     <!-- ============================================= -->
     <!-- generate_priority_rows template               -->
     <!-- ============================================= -->
-
+    
     <xsl:template name="generate_priority_rows">
         <xsl:param name="span" select="1"/>
-
+        
         <xsl:if test="properties/enumProperty[@name='importance'] != 'nd'">
             <xsl:call-template name="generate_property_row">
                 <xsl:with-param name="label"   select="$proteus:lang_importance"/>
@@ -345,7 +345,7 @@
                 <xsl:with-param name="span"    select="$span"/>
             </xsl:call-template>
         </xsl:if>
-
+        
         <xsl:if test="properties/enumProperty[@name='urgency'] != 'nd'">
             <xsl:call-template name="generate_property_row">
                 <xsl:with-param name="label"   select="$proteus:lang_urgency"/>
@@ -353,7 +353,7 @@
                 <xsl:with-param name="span"    select="$span"/>
             </xsl:call-template>
         </xsl:if>
-
+        
         <xsl:if test="properties/enumProperty[@name='status'] != 'nd'">
             <xsl:call-template name="generate_property_row">
                 <xsl:with-param name="label"   select="$proteus:lang_status"/>
@@ -361,7 +361,7 @@
                 <xsl:with-param name="span"    select="$span"/>
             </xsl:call-template>
         </xsl:if>
-
+        
         <xsl:if test="properties/enumProperty[@name='stability'] != 'nd'">
             <xsl:call-template name="generate_property_row">
                 <xsl:with-param name="label"   select="$proteus:lang_stability"/>
@@ -369,7 +369,42 @@
                 <xsl:with-param name="span"    select="$span"/>
             </xsl:call-template>
         </xsl:if>
-
+        
     </xsl:template>
-
+    
+    <!-- ============================================= -->
+    <!-- generate_verification_rows template           -->
+    <!-- ============================================= -->
+    
+    <xsl:template name="generate_ai_verification_row">
+        <tr class="ai-verification">
+            <th>
+                <button type="button" class="ai-verify-button">
+                    Verify using AI
+                </button>
+                <!-- If there is a previous verification, display its date and time -->
+                <xsl:if test="properties/*[@name='ai_verification_date'] or properties/*[@name='ai_verification_time']">
+                    <div class="verification-info">
+                        <span class="verification-date">
+                            <xsl:value-of select="properties/*[@name='ai_verification_date']"/>
+                        </span>
+                        <xsl:text> </xsl:text>
+                        <span class="verification-time">
+                            <xsl:value-of select="properties/*[@name='ai_verification_time']"/>
+                        </span>
+                    </div>
+                </xsl:if>
+            </th>
+            <td>
+                <div class="verification-output">
+                    <xsl:if test="properties/*[@name='ai_verification_output']">
+                        <xsl:call-template name="generate_markdown">
+                            <xsl:with-param name="content" select="properties/*[@name='ai_verification_output']"/>
+                        </xsl:call-template>
+                    </xsl:if>
+                </div>
+            </td>
+        </tr>
+    </xsl:template>
+    
 </xsl:stylesheet>

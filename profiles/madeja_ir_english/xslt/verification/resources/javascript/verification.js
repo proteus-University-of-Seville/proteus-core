@@ -56,64 +56,58 @@ function setupRequirementVerification() {
 // It calls the createCompletionRequest function to ask the LLM model to verify the property.
 function setupVerifyButton(tables, context) {
     tables.forEach(table => {
+        // Gather the cells with verifiable content (e.g., description cells)
         const descriptionCells = table.querySelectorAll('td.verifiable-property');
 
-        // Create a row at the end of the table for the verification output and button
-        const outputRow = document.createElement('tr');
-        const outputCell = document.createElement('td');
-        outputCell.colSpan = descriptionCells.length;
-        outputCell.style.cssText = `
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-top: 2px solid #ccc;
-            text-align: left;
-        `;
 
-        const buttonCell = document.createElement('td');
-        buttonCell.style.textAlign = 'center';
+        // Get the AI verification components (created in XSLT)
+        const aiVerificationRow = table.querySelector('tr.ai-verification');
+        if (!aiVerificationRow) {
+            log("AI verification row not found for table", table);
+            return;
+        }
 
-        outputRow.appendChild(buttonCell);
-        outputRow.appendChild(outputCell);
-        table.appendChild(outputRow);
+        const verifyButton = aiVerificationRow.querySelector('button.ai-verify-button');
+        if (!verifyButton) {
+            log("Verify button not found in AI verification row", aiVerificationRow);
+            return;
+        }
 
-        // Create a button to verify all fields
-        const verifyAllButton = document.createElement('button');
-        verifyAllButton.textContent = 'Verify using AI';
-        verifyAllButton.style.cssText = `
-            padding: 8px 15px;
-            margin: 10px 0;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        `;
+        const outputDiv = aiVerificationRow.querySelector('div.verification-output');
+        if (!outputDiv) {
+            log("Output container not found in AI verification row", aiVerificationRow);
+            return;
+        }
 
-        verifyAllButton.onclick = async () => {
+        // Set up the click event on the existing verify button
+        verifyButton.onclick = async () => {
             try {
-                verifyAllButton.disabled = true;
-                verifyAllButton.textContent = 'Verifying...';
+                verifyButton.disabled = true;
+                verifyButton.textContent = 'Verifying...';
 
                 // Gather all verifiable text
                 const allText = Array.from(descriptionCells)
-                    .map(td => td.textContent.trim().replace(/\s+/g, ' ')) // Extract all visible text
+                    .map(td => td.textContent.trim().replace(/\s+/g, ' '))
                     .join(' | ');
-
                 const response = await createCompletionRequest(allText, context);
 
-                // Display the response in the output row
-                outputCell.textContent = response;
+                // Update the output container with the AI response
+                outputDiv.textContent = response;
+
+                // Retrieve the table's id from its parent container
+                const tableId = table.parentElement.getAttribute('data-proteus-id');
+                if (tableId && window.verificationManager) {
+                    // Call your pyqtSlot function to update the verification properties
+                    verificationManager.store_verification(tableId, response);
+                }
             } catch (error) {
                 console.error('Error:', error);
-                outputCell.textContent = 'Error verifying data';
+                outputDiv.textContent = 'Error verifying data';
             } finally {
-                verifyAllButton.disabled = false;
-                verifyAllButton.textContent = 'Verify using AI';
+                verifyButton.disabled = false;
+                verifyButton.textContent = 'Verify using AI';
             }
         };
-
-        // Append the button to the same row where the response will be displayed
-        buttonCell.appendChild(verifyAllButton);
     });
 }
 

@@ -32,7 +32,7 @@
         <!-- This was suggested by Claude AI.                                     -->
 
         <!-- List of excluded properties (not shown) -->
-        <xsl:variable name="excluded_properties">,:Proteus-code,:Proteus-name,:Proteus-date,version,authors,sources,description,dependencies,</xsl:variable>
+        <xsl:variable name="excluded_properties">,:Proteus-code,:Proteus-name,:Proteus-date,version,authors,sources,description,dependencies,ai_verification_date,ai_verification_time,ai_verification_output,</xsl:variable>
 
         <!-- List of mandatory properties (shown even if they are empty)-->
         <xsl:variable name="mandatory_properties"></xsl:variable>
@@ -74,6 +74,8 @@
                         <xsl:with-param name="mandatory" select="contains($mandatory_properties,concat(',', current()/@name, ','))"/>
                     </xsl:call-template>
                 </xsl:for-each>
+
+                <xsl:call-template name="generate_ai_verification_row"/>
             </table>
         </div>
     </xsl:template>

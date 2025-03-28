@@ -17,6 +17,7 @@ const PROTEUS_XSLT_LOG_PREFIX = `${PROTEUS_XSLT_NAME}:${PROTEUS_XSLT_VERSION} - 
 // WebChannel objects
 var proteusBasics = null;
 var documentInteractions = null;
+var verificationManager = null;
 
 
 // -----------------------------------------------------------------------
@@ -38,6 +39,7 @@ function loadWebChannel() {
         new QWebChannel(qt.webChannelTransport, function (channel) {
             proteusBasics = channel.objects.proteusBasics;
             documentInteractions = channel.objects.documentInteractions;
+            verificationManager = channel.objects.verificationManager;
             log("QWebChannel loaded.")
         });
     } catch (error) {
