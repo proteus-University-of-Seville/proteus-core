@@ -11,3 +11,7 @@
 
 xslt_templates.default: "Requirements Engineering view"
 xslt_templates.description.default: "Default view for the RE course"
+
+xslt_templates.ai-verification: "Requirements verification with AI"
+xslt_templates.description.ai-verification: "Template for requirements verification with AI (requires external LLM)"
+

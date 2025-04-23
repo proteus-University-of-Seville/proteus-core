@@ -9,3 +9,6 @@
 
 xslt_templates.default: "Plantilla por defecto de IR"
 xslt_templates.description.default: "Plantilla por defecto para la asignatura IR"
+
+xslt_templates.ai-verification: "Verificación de requisitos mediante IA"
+xslt_templates.description.ai-verification: "Plantilla para la verificación de requisitos mediante IA (Requiere LLM externo)"

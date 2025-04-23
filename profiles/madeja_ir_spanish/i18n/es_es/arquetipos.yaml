@@ -103,6 +103,7 @@ archetype.prop_category.dependencies: "Dependencias"
 archetype.prop_category.impact: "Impacto"
 archetype.prop_category.analysis: "Análisis"
 archetype.prop_category.solution: "Solución"
+archetype.prop_category.ai_verification: "Verificación por IA"
 
 # -----------------------------------------------------------------------
 # Opciones de enumerados
@@ -273,3 +274,6 @@ archetype.prop_name.trace-type: "Tipo de traza"
 archetype.prop_name.directly-affected-objects: "Objetos afectados directamente"
 archetype.prop_name.solution: "Solución"
 archetype.prop_name.defect-type: "Tipo de defecto"
+archetype.prop_name.ai_verification_date: "Fecha de verificación"
+archetype.prop_name.ai_verification_time: "Hora de verificación"
+archetype.prop_name.ai_verification_output: "Resultado de verificación"

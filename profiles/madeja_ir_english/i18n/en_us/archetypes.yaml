@@ -104,6 +104,7 @@ archetype.prop_category.dependencies: "Dependencies"
 archetype.prop_category.impact: "Impact"
 archetype.prop_category.analysis: "Analysis"
 archetype.prop_category.solution: "Solution"
+archetype.prop_category.ai_verification: "AI verification"
 
 # -----------------------------------------------------------------------
 # Archetype enum choices
@@ -273,3 +274,6 @@ archetype.prop_name.trace-type: "Trace type"
 archetype.prop_name.directly-affected-objects: "Directly affected objects"
 archetype.prop_name.solution: "Solution"
 archetype.prop_name.defect-type: "Defect type"
+archetype.prop_name.ai_verification_date: "Date of verification"
+archetype.prop_name.ai_verification_time: "Time of verification"
+archetype.prop_name.ai_verification_output: "Output of verification"
