@@ -204,7 +204,7 @@ class ProteusApplication:
             try:
                 obj = comp_callable(self.main_window)
             except Exception as e:
-                log.critical(f"Error loading proteus component from plugin: {e}")
+                log.critical(f"Error loading proteus component '{comp_name}' from plugin: {e}")
 
             # Check if the component has methods that has to be registered to use in XSLT
             methods_list = self.plugin_manager._proteus_components_methods.get(

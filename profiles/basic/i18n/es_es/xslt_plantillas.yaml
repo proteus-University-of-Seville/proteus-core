@@ -1,0 +1,11 @@
+# ==========================================================================
+# File: xslt_plantillas.yaml
+# Description: Traducciones de los nombres de las plantillas XSLT de la
+#              aplicación
+# Date: 02/02/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+xslt_templates.default: "Vista básica de PROTEUS"
+xslt_templates.description.default: "Plantilla básica de PROTEUS."

@@ -1,0 +1,10 @@
+# ==========================================================================
+# File: xslt_templates.yaml
+# Description: Proteus application xslt template names translations
+# Date: 02/02/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+xslt_templates.default: "Basic PROTEUS view"
+xslt_templates.description.default: "Basic PROTEUS view template."

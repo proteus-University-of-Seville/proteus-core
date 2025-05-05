@@ -265,3 +265,9 @@ create_document_archetype_dialog.proteus_id_invalid: "ProteusID no puede contene
 create_document_archetype_dialog.proteus_id_in_use: "Un arquetipo con el mismo ProteusID ya existe"
 create_document_archetype_dialog.directory_name_missing: "El nombre del directorio no puede estar vacío"
 create_document_archetype_dialog.directory_name_in_use: "Un arquetipo de documento con el mismo nombre de directorio ya existe"
+
+# ---------------------------------------------------------------------------
+# Diálogo del plugin de interacción con documentos | WebChannel
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "El objeto seleccionado está en otro documento"
+document.navigation.request.text: "El objeto '{}' está en el documento '{}'. ¿Desea navegar al documento para ver el objeto?"

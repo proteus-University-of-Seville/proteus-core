@@ -1012,6 +1012,9 @@ class Controller:
     def get_first_level_object_archetypes(self) -> Dict[str, Dict[str, List[Object]]]:
         """
         Get object archetypes.
+
+        :return: A dict with key archetype group/category type and value
+        dict of object lists by class (its main  class).
         """
         log.info("Getting first level object archetypes")
         return self._archetype_service.get_first_level_object_archetypes()

@@ -267,3 +267,10 @@ create_document_archetype_dialog.proteus_id_invalid: "ProteusID cannot contain s
 create_document_archetype_dialog.proteus_id_in_use: "An archetype with the same ProteusID already exists"
 create_document_archetype_dialog.directory_name_missing: "Directory name cannot be empty"
 create_document_archetype_dialog.directory_name_in_use: "Already exists a document archetype with the same directory name"
+
+
+# ---------------------------------------------------------------------------
+# WebChannel document interaction plugin dialog
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "The selected item is not in the current document"
+document.navigation.request.text: "The selected item '{}'' is in the document '{}', do you want to navigate to it?"

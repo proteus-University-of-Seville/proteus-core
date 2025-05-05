@@ -80,7 +80,7 @@ def test_create_project(app):
 
     # Page 1
     page1: ArchetypePage = dialog.currentPage()
-    combo_index = page1.archetype_combo.findData("MADEJA-RE")
+    combo_index = page1.archetype_combo.findData("BASIC")
     page1.archetype_combo.setCurrentIndex(combo_index)
     dialog.next()
 
@@ -141,7 +141,7 @@ def test_create_project(app):
 
     # Check documents container tabs and tree chidlren correspond
     assert (
-        documents_container.tabs.keys().__len__() == 2
+        documents_container.tabs.keys().__len__() == 1
     ), f"Documents container must have 2 tabs, number of tabs: '{documents_container.tabs.keys().__len__()}'"
 
     # Check each document tree has at least one tree item
