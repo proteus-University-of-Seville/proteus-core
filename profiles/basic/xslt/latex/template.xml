@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template name="latex">
+    <entryPoints default="main.xsl">
+    </entryPoints>
+    <dependencies>
+        <pluginDependency name="basic"/>
+    </dependencies>
+</template>

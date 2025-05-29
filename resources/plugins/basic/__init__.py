@@ -22,6 +22,7 @@ from basic.document_interactions import DocumentInteractions
 from basic.impact_analyzer import ImpactAnalyzer
 from basic.export.export_html import ExportHTML
 from basic.export.export_pdf import ExportPDF
+from basic.export.export_latex import ExportLaTeX
 from basic.glossary_handler import GlossaryHandler
 from basic.traceability_matrix_helper import TraceabilityMatrixHelper
 
@@ -44,6 +45,7 @@ def register(register_xslt_function, register_qwebchannel_class, register_proteu
     # Export strategies
     register_export_strategy("pdf", ExportPDF)
     register_export_strategy("html", ExportHTML)
+    register_export_strategy("latex", ExportLaTeX)
 
     # Glossary
     register_xslt_function("glossary_highlight", GlossaryHandler.highlight_glossary_items)

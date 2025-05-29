@@ -156,6 +156,21 @@ export_dialog.export_html.error.not_directory: "La ruta seleccionada no es una c
 export_dialog.export_html.error.invalid_folder_name: "Nombre de carpeta no válido"
 export_dialog.export_html.error.folder_exists: "Ya existe una carpeta con ese nombre en el directorio seleccionado"
 
+# Export LaTeX
+export_dialog.export_strategy.latex: "LaTeX (con carpeta de recursos)"
+export_dialog.export_latex.filepath.label: "Seleccione una carpeta de destino:"
+export_dialog.export_latex.folder_name.label: "Introduzca un nombre de carpeta:"
+export_dialog.export_latex.error.empty: "El nombre de la carpeta no puede estar vacío"
+export_dialog.export_latex.error.not_found: "La ruta seleccionada no existe"
+export_dialog.export_latex.error.not_directory: "La ruta seleccionada no es una carpeta"
+export_dialog.export_latex.error.invalid_folder_name: "Nombre de carpeta no válido"
+export_dialog.export_latex.error.folder_exists: "Ya existe una carpeta con ese nombre en el directorio seleccionado"
+export_dialog.export_latex.generate_pdf.label: "Compilar LaTeX en PDF (pdflatex debe estar instalado)"
+
+export_dialog.export_latex.error.log.title: "Error al generar el archivo PDF a partir del archivo LaTeX usando pdflatex"
+export_dialog.export_latex.error.log.info: "Hubo un error al generar el archivo PDF a partir del archivo LaTeX. El archivo de registro completo está disponible en el directorio de exportación en 'compile'."
+
+
 # ---------------------------------------------------------------------------
 # Information dialog
 # ---------------------------------------------------------------------------

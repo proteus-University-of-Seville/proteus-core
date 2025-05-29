@@ -156,6 +156,20 @@ export_dialog.export_html.error.not_directory: "The path is not a directory"
 export_dialog.export_html.error.invalid_folder_name: "The folder name is invalid"
 export_dialog.export_html.error.folder_exists: "The folder already exists, select another name"
 
+# Export LaTeX
+export_dialog.export_strategy.latex: "LaTeX (with resources folder)"
+export_dialog.export_latex.filepath.label: "Select destination directory:"
+export_dialog.export_latex.folder_name.label: "Enter folder name:"
+export_dialog.export_latex.error.empty: "The directory name cannot be empty"
+export_dialog.export_latex.error.not_found: "The directory does not exist"
+export_dialog.export_latex.error.not_directory: "The path is not a directory"
+export_dialog.export_latex.error.invalid_folder_name: "The folder name is invalid"
+export_dialog.export_latex.error.folder_exists: "The folder already exists, select another name"
+export_dialog.export_latex.generate_pdf.label: "Compile LaTeX into PDF (pdflatex must be installed)"
+
+export_dialog.export_latex.error.log.title: "Error generating PDF from LaTeX file using pdflatex"
+export_dialog.export_latex.error.log.info: "There was an error generating the PDF file from the LaTeX file. The full log file is available in the export directory at 'compile'."
+
 # ---------------------------------------------------------------------------
 # Information dialog
 # ---------------------------------------------------------------------------
