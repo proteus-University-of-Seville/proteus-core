@@ -137,6 +137,7 @@ class ProteusApplication:
         )
         self.translator.load_translations(self.config.app_settings.i18n_directory)
         self.dynamic_icons.load_icons(self.config.app_settings.icons_directory)
+        self.plugin_manager.load_plugins(self.config.app_settings.plugins_directory)
 
         # Profile resources -----------------------------------
         self.translator.load_translations(self.config.profile_settings.i18n_directory)
@@ -203,7 +204,7 @@ class ProteusApplication:
             try:
                 obj = comp_callable(self.main_window)
             except Exception as e:
-                log.critical(f"Error loading proteus component from plugin: {e}")
+                log.critical(f"Error loading proteus component '{comp_name}' from plugin: {e}")
 
             # Check if the component has methods that has to be registered to use in XSLT
             methods_list = self.plugin_manager._proteus_components_methods.get(
@@ -254,7 +255,7 @@ class ProteusApplication:
             open_project_on_startup = self.config.app_settings.open_project_on_startup
 
             last_project = self.config.app_settings.get_last_project_opened()
-            if last_project != "" and last_project != None and open_project_on_startup:
+            if last_project != "" and last_project is not None and open_project_on_startup:
                 confirmation_dialog = MessageBox.question(
                     _("app.open_last_project.title"),
                     _("app.open_last_project.text"),

@@ -49,7 +49,7 @@ def test_export_dialog(app):
 
     load_project(main_window=main_window)
 
-    export_button = main_window.main_menu.export_document_button
+    export_button = main_window.main_menu.export_view_button
 
     # --------------------------------------------
     # Act

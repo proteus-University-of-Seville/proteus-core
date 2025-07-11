@@ -1,0 +1,100 @@
+# ==========================================================================
+# File: es_es.yaml
+# Description: Traducciones de los arquetipos del repositorio
+# Date: 02/02/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+# --------------------------------------------------------------------------
+# Update: 04/09/2024 (Amador Durán)
+# Check before release for RE course
+# --------------------------------------------------------------------------
+# Update: 07/11/2024 (Amador Durán)
+# New conceptual modeling classes added
+# --------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------
+# Categorías de arquetipos (pestañas de la barra de herramientas)
+# -----------------------------------------------------------------------
+
+archetype.category.general: "General"
+
+# -----------------------------------------------------------------------
+# Clases de arquetipos
+# -----------------------------------------------------------------------
+
+# Categoría general
+
+archetype.class.general-traceable-object: "Objeto general"
+archetype.class.section: "Sección"
+archetype.class.appendix: "Apéndice"
+archetype.class.paragraph: "Párrafo"
+archetype.class.glossary-item: "Elemento\nde glosario"
+archetype.class.figure: "Figura"
+archetype.class.organization: "Organización"
+archetype.class.stakeholder: "Participante"
+archetype.class.symbolic-link: "Enlace\nsimbólico"
+
+# -----------------------------------------------------------------------
+# Categorías de propiedades de arquetipos
+# -----------------------------------------------------------------------
+
+archetype.prop_category.general: "General"
+archetype.prop_category.detail: "Detalle"
+archetype.prop_category.comments: "Comentarios"
+archetype.prop_category.dependencies: "Dependencias"
+
+# -----------------------------------------------------------------------
+# Opciones de enumerados de arquetipos
+# -----------------------------------------------------------------------
+
+archetype.enum_choices.tbd: "Por determinar"
+archetype.enum_choices.developer: "Desarrollador"
+archetype.enum_choices.user: "Usuario"
+archetype.enum_choices.customer: "Cliente"
+
+# -----------------------------------------------------------------------
+# Mensajes de ayuda de arquetipos
+# -----------------------------------------------------------------------
+
+archetype.tooltip.file-info: "Seleccione un archivo gráfico de su sistema para copiarlo en la carpeta de recursos 'assets' del proyecto."
+archetype.tooltip.width-info: "Porcentaje del ancho de la página que ocupará el recurso."
+
+# -----------------------------------------------------------------------
+# Nombre de propiedades de arquetipos
+# -----------------------------------------------------------------------
+
+archetype.prop_name.name:  "Nombre"
+archetype.prop_name.version: "Versión"
+archetype.prop_name.role: "Rol"
+archetype.prop_name.date: "Fecha"
+archetype.prop_name.author: "Autor"
+archetype.prop_name.comments: "Comentarios"
+archetype.prop_name.description: "Descripción"
+archetype.prop_name.specificdata: "Datos específicos"
+archetype.prop_name.precondition: "Precondición"
+archetype.prop_name.postcondition: "Postcondición"
+archetype.prop_name.text: "Texto"
+archetype.prop_name.url: "URL"
+archetype.prop_name.file: "Archivo"
+archetype.prop_name.authors: "Autores"
+archetype.prop_name.created-by: "Autores"
+archetype.prop_name.dependencies: "Dependencias"
+archetype.prop_name.is-appendix: "Apéndice"
+archetype.prop_name.is-glossary: "Elemento de glosario"
+archetype.prop_name.address: "Dirección"
+archetype.prop_name.phone-number: "Teléfono"
+archetype.prop_name.category: "Categoría"
+archetype.prop_name.organization: "Organización"
+archetype.prop_name.sources: "Fuentes"
+archetype.prop_name.works-for: "Trabaja para"
+archetype.prop_name.prepared-by: "Preparado por"
+archetype.prop_name.prepared-for: "Preparado para"
+archetype.prop_name.width: "Ancho (%)"
+archetype.prop_name.link: "Enlace"
+archetype.prop_name.plural-form: "Forma plural"
+archetype.prop_name.synonyms: "Sinónimos"
+archetype.prop_name.web: "Sitio web"
+archetype.prop_name.image: "Imagen"
+archetype.prop_name.email: "Correo-e"

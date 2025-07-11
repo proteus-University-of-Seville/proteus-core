@@ -115,8 +115,11 @@ settings_dialog.profile_settings.group: "Configuración del perfil"
 settings_dialog.default_view.label: "Vista por defecto:"
 settings_dialog.default_repository.label: "Repositorio de arquetipos:"
 
-settings_dialog.startup.group: "Arranque"
+settings_dialog.app.group: "App"
 settings_dialog.open_project_on_startup.checkbox: "Abrir último proyecto al iniciar la aplicación"
+settings_dialog.open_project_on_startup.tooltip: "Preguntar si desea abrir el último proyecto al iniciar la aplicación"
+settings_dialog.edit_on_clone.checkbox: "Editar al clonar arquetipos de objeto"
+settings_dialog.edit_on_clone.tooltip: "Al crear un nuevo objeto a partir de un arquetipo, abre el nuevo objeto para editarlo. Si se cancela el diálogo de edición, la operación de clonación se deshará."
 
 settings_dialog.info.label: "Los cambios se aplicarán al reiniciar la aplicación"
 
@@ -128,8 +131,8 @@ settings_dialog_warning.text: "Los cambios se aplicarán al reiniciar la aplicac
 # ---------------------------------------------------------------------------
 # Export dialog
 # ---------------------------------------------------------------------------
-export_dialog.title: "Exportar vista"
-export_dialog.export_format.label: "Formato de exportación:"
+export_dialog.title: "Exportar vista: {}"
+export_dialog.export_strategy.label: "Formato de exportación:"
 export_dialog.export_html.filepath.label: "Seleccione una carpeta de destino:"
 export_dialog.finished.dialog.title: "Exportación finalizada"
 export_dialog.finished.dialog.text: "El documento se ha exportado correctamente en la ruta {}"
@@ -137,14 +140,14 @@ export_dialog.finished.dialog.error.title: "Error al exportar"
 export_dialog.finished.dialog.error.text: "No se pudo exportar la vista actual. Para más información, consulte el archivo de registro de la aplicación"
 
 # Export PDF
-export_dialog.export_format.pdf: "Archivo PDF"
+export_dialog.export_strategy.pdf: "Archivo PDF"
 export_dialog.export_pdf.filename.label: "Introduzca un nombre de archivo:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'El nombre del archivo no puede contener los siguientes caracteres: / \ : * ? " < > |'
 export_dialog.export_pdf.filename.error.empty: "El nombre del archivo no puede estar vacío"
 export_dialog.export_pdf.filename.error.folder_not_found: "La ruta seleccionada no existe"
 
 # Export HTML
-export_dialog.export_format.html: "HTML (con carpeta de recursos)"
+export_dialog.export_strategy.html: "HTML (con carpeta de recursos)"
 export_dialog.export_html.filename.label: "Seleccione una carpeta de destino:"
 export_dialog.export_html.folder_name.label: "Introduzca un nombre de carpeta:"
 export_dialog.export_html.error.empty: "El nombre de la carpeta no puede estar vacío"
@@ -169,12 +172,13 @@ Los autores no son responsables de ningún daño causado por el uso de este soft
 Sevilla, Septiembre de 2024."
 
 # ---------------------------------------------------------------------------
-# Trace edit dialog
+# Items edit dialog
 # ---------------------------------------------------------------------------
-trace_edit_dialog.title: "Selecciona un elemento a trazar"
-trace_edit_dialog.name_filter_widget.placeholder_text: "Introduzca un nombre para filtrar"
-trace_edit_dialog.error_label.no_objects: "No se encontraron elementos, cree nuevos elementos de una de las siguientes clases: {}"
-trace_edit_dialog.any_document: "Cualquier documento"
+items_edit_dialog.title: "Selecciona un elemento a trazar"
+items_edit_dialog.name_filter_widget.placeholder_text: "Introduzca un nombre para filtrar"
+items_edit_dialog.error_label.no_objects: "No se encontraron elementos, cree nuevos elementos de una de las siguientes clases: {}"
+items_edit_dialog.any_document: "Cualquier documento"
+items_edit_dialog.no_items_found: "No se encontraron elementos"
 
 # ---------------------------------------------------------------------------
 # Delete dialog
@@ -189,6 +193,21 @@ delete_dialog.tree.header: Haz clic en cada ítem para ver los elementos que se 
 # ---------------------------------------------------------------------------
 asset_edit.file_dialog.title: "Seleccionar imagen"
 asset_edit.file_dialog.filter: "Imágenes"
+
+# ---------------------------------------------------------------------------
+# Impact analysis dialog
+# ---------------------------------------------------------------------------
+impact_analysis_dialog.title: "Análisis de impacto"
+impact_analysis_dialog.label.analyzed_objects: "Objetos directamente afectados:"
+impact_analysis_dialog.label.trace_types: "Tipos de traza:"
+impact_analysis_dialog.label.affected_objects: "Objetos indirectamente afectados:"
+impact_analysis_dialog.items_edit_dialog.show_only_traced: "Mostrar solo elementos trazados"
+
+impact_analysis_dialog.message.error.impact_analyzer.title: "Error al inicializar plugin"
+impact_analysis_dialog.message.error.impact_analyzer.text: "No se pudo inicializar el plugin de análisis de impacto. Más información en el archivo de registro de la aplicación"
+
+impact_analysis_dialog.button.navigate.tooltip: "Navegar al elemento seleccionado"
+impact_analysis_dialog.button.edit.tooltip: "Editar el elemento seleccionado"
 
 # ---------------------------------------------------------------------------
 # Developer features
@@ -246,3 +265,9 @@ create_document_archetype_dialog.proteus_id_invalid: "ProteusID no puede contene
 create_document_archetype_dialog.proteus_id_in_use: "Un arquetipo con el mismo ProteusID ya existe"
 create_document_archetype_dialog.directory_name_missing: "El nombre del directorio no puede estar vacío"
 create_document_archetype_dialog.directory_name_in_use: "Un arquetipo de documento con el mismo nombre de directorio ya existe"
+
+# ---------------------------------------------------------------------------
+# Diálogo del plugin de interacción con documentos | WebChannel
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "El objeto seleccionado está en otro documento"
+document.navigation.request.text: "El objeto '{}' está en el documento '{}'. ¿Desea navegar al documento para ver el objeto?"

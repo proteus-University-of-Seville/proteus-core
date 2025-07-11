@@ -643,7 +643,7 @@ class AvailableArchetypesMenu(QMenu, ProteusComponent):
             icon = Icons().icon(ProteusIconType.Archetype, archetype.classes[-1])
             action.setIcon(icon)
             action.triggered.connect(
-                lambda: self._controller.create_object(archetype.id, self.parent_id)
+                lambda: self.create_object_from_archetype(archetype.id, self.parent_id)
             )
 
             # Store the action button
@@ -652,3 +652,20 @@ class AvailableArchetypesMenu(QMenu, ProteusComponent):
         # Add the actions to the context menu
         for action in self.action_buttons.values():
             self.addAction(action)
+
+
+    def create_object_from_archetype(self, archetype_id: ProteusID, parent_id: ProteusID) -> None:
+        """
+        Create a new object from the provided archetype and parent.
+
+        :param archetype_id: The archetype id to create the object from.
+        :param parent_id: The parent id to create the object from.
+        """
+        self._controller.create_object(archetype_id, parent_id)
+
+        if self._state_manager.last_cloned_archetype is not None:
+            PropertyDialog.create_dialog(
+                self._controller,
+                self._state_manager.last_cloned_archetype,
+                True,
+            )

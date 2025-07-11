@@ -11,7 +11,7 @@
 # --------------------------------------------------------------------------
 
 import logging
-from typing import Union, List, Dict, Set
+from typing import Union, List, Dict, Set, Tuple
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -34,6 +34,10 @@ from proteus.model import (
     PROTEUS_DOCUMENT,
     PROTEUS_NAME,
     PROTEUS_CODE,
+    PROTEUS_DEPENDENCY,
+    PROTEUS_AUTHOR,
+    PROTEUS_WORKS_FOR,
+    PROTEUS_INFORMATION_SOURCE,
 )
 from proteus.model.project import Project
 from proteus.model.object import Object
@@ -77,13 +81,13 @@ class ProjectService:
         called via _populate_index method.
 
         - traces_index: Dictionary with the traces with the following
-        structure: {key: target, value: set of sources}. It is initialized
+        structure: {key: target, value: set of tuples[source, trace type]}. It is initialized
         when the project is loaded via _load_traces_index method.
         """
         # Instance variables
         self.project: Project = None
         self.project_index: Dict[ProteusID, Union[Object, Project]] = {}
-        self.traces_index: Dict[ProteusID, Set[ProteusID]] = {}
+        self.traces_index: Dict[ProteusID, Set[Tuple[ProteusID, str]]] = {}
 
         log.info("ProjectService initialized.")
 
@@ -211,37 +215,33 @@ class ProjectService:
 
         # Iterate over all objects in the project using the project index
         for object in self.project_index.values():
-            # Store all non DEAD targeted objects by the current object
-            targets: Set[ProteusID] = set()
-
             # Skip project
             if object.id == self.project.id or object.state == ProteusState.DEAD:
                 continue
             # Iterate over object's traces
             for trace in object.get_traces():
-                targets.update(trace.value)
+                # Include object in source set of all its targets
+                for target in trace.value:
+                    # Check if the target is exists or is DEAD
+                    try:
+                        target_object: Object = self._get_element_by_id(target)
+                        assert (
+                            target_object.state != ProteusState.DEAD
+                        ), f"Target object '{target}' is DEAD."
+                    except Exception as e:
+                        log.error(
+                            f"Found a Trace in object '{object.id}' targeting a DEAD object '{target}'. "
+                            f"Target '{target}' will be ignored in load_traces_index method so it can be deleted. "
+                            "Check for project inconsistencies, this might affect the project integrity. "
+                            f"Error: {e}"
+                        )
+                        if target in self.traces_index:
+                            self.traces_index.pop(target)
 
-            # Include object in source set of all its targets
-            for target in targets:
-                # Check if the target is exists or is DEAD
-                try:
-                    target_object: Object = self._get_element_by_id(target)
-                    assert (
-                        target_object.state != ProteusState.DEAD
-                    ), f"Target object '{target}' is DEAD."
-                except:
-                    log.error(
-                        f"Found a Trace in object '{object.id}' targeting a DEAD object '{target}'. "
-                        f"Target '{target}' will be ignored in load_traces_index method so it can be deleted. "
-                        "Check for project inconsistencies, this might affect the project integrity. "
-                    )
-                    if target in self.traces_index:
-                        self.traces_index.pop(target)
-
-                # Add object to the target's source set
-                if target not in self.traces_index:
-                    self.traces_index[target] = set()
-                self.traces_index[target].add(object.id)
+                    # Add object to the target's source set
+                    if target not in self.traces_index:
+                        self.traces_index[target] = set()
+                    self.traces_index[target].add(tuple([object.id, trace.traceType]))
 
     # ----------------------------------------------------------------------
     # Method     : get_traces_dependencies
@@ -250,7 +250,9 @@ class ProjectService:
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
-    def get_traces_dependencies(self, object_id: ProteusID) -> Dict[ProteusID, Set]:
+    def get_traces_dependencies(
+        self, object_id: ProteusID
+    ) -> Dict[ProteusID, Set[ProteusID]]:
         """
         Checks if the given object and its children have traces pointing to them.
         Do not check for traces pointing to DEAD objects.
@@ -269,9 +271,8 @@ class ProjectService:
             return sources
 
         # Check if the object has traces pointing to it
-        # IMPORTANT: Copy set to avoid modifying the original set of self.traces_index
         if object_id in self.traces_index:
-            sources[object_id] = self.traces_index[object_id].copy()
+            sources[object_id] = set(t[0] for t in self.traces_index[object_id])
 
         # Check if the object has children, for each child check
         # if it has traces pointing to it calling recursively
@@ -290,7 +291,7 @@ class ProjectService:
     # ----------------------------------------------------------------------
     def get_traces_dependencies_outside(
         self, object_id: ProteusID
-    ) -> Dict[ProteusID, Set]:
+    ) -> Dict[ProteusID, Set[ProteusID]]:
         """
         Checks if the given object and its children have traces pointing to them
         only from outside the given object and its children. Do not check for
@@ -304,8 +305,8 @@ class ProjectService:
         children_ids: Set[ProteusID] = object.get_ids()
 
         # Dictionary to store the sources by object id
-        traces_dependencies: Dict[ProteusID, Set] = self.get_traces_dependencies(
-            object_id
+        traces_dependencies: Dict[ProteusID, Set[ProteusID]] = (
+            self.get_traces_dependencies(object_id)
         )
 
         # Check if sources are inside the object, if so, remove them
@@ -578,6 +579,33 @@ class ProjectService:
         classes.discard(PROTEUS_DOCUMENT)
 
         return sorted(classes)
+
+    # ----------------------------------------------------------------------
+    # Method     : get_project_available_trace_types
+    # Description: Returns the available trace types in the project.
+    # Date       : 18/11/2024
+    # Version    : 0.1
+    # Author     : José María Delgado Sánchez
+    # ----------------------------------------------------------------------
+    def get_project_available_trace_types(self) -> Set[str]:
+        """
+        Get all the available trace types currently in the project.
+
+        :return: Set of available trace types.
+        """
+        # Initialize an empty set for the trace types
+        trace_types: Set[str] = set()
+
+        for traces in self.traces_index.values():
+            for _, type in traces:
+                trace_types.add(type)
+
+        # Add default trace types
+        trace_types.add(PROTEUS_INFORMATION_SOURCE)
+        trace_types.add(PROTEUS_AUTHOR)
+        trace_types.add(PROTEUS_WORKS_FOR)
+        trace_types.add(PROTEUS_DEPENDENCY)
+        return trace_types
 
     # ----------------------------------------------------------------------
     # Method     : get_objects

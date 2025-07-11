@@ -1,0 +1,101 @@
+# ==========================================================================
+# File: en_us.yaml
+# Description: Default repository archetypes translations
+# Date: 02/02/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+# --------------------------------------------------------------------------
+# Update: 04/09/2024 (Amador Durán)
+# Check before release for RE course
+# --------------------------------------------------------------------------
+# Update: 07/11/2024 (Amador Durán)
+# New conceptual modeling classes added
+# --------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------
+# Archetype categories (toolbar tabs)
+# -----------------------------------------------------------------------
+
+archetype.category.general: "General"
+
+# -----------------------------------------------------------------------
+# Archetype classes
+# -----------------------------------------------------------------------
+
+# General category
+
+archetype.class.general-traceable-object: "General object"
+archetype.class.section: "Section"
+archetype.class.appendix: "Appendix"
+archetype.class.paragraph: "Paragraph"
+archetype.class.glossary-item: "Glossary\nitem"
+archetype.class.figure: "Figure"
+archetype.class.organization: "Organization"
+archetype.class.stakeholder: "Stakeholder"
+archetype.class.symbolic-link: "Symbolic\nlink"
+
+
+# -----------------------------------------------------------------------
+# Archetype property categories
+# -----------------------------------------------------------------------
+
+archetype.prop_category.general: "General"
+archetype.prop_category.detail: "Detail"
+archetype.prop_category.comments: "Comments"
+archetype.prop_category.dependencies: "Dependencies"
+
+# -----------------------------------------------------------------------
+# Archetype enum choices
+# -----------------------------------------------------------------------
+
+archetype.enum_choices.tbd: "To Be Determined"
+archetype.enum_choices.developer: "Developer"
+archetype.enum_choices.user: "User"
+archetype.enum_choices.customer: "Customer"
+
+# -----------------------------------------------------------------------
+# Archetype tooltips
+# -----------------------------------------------------------------------
+
+archetype.tooltip.file-info: "Select a graphic file from your local system to copy it to the assets folder."
+archetype.tooltip.width-info: "Percentage of the page width that the image will occupy."
+
+# -----------------------------------------------------------------------
+# Archetype property names
+# -----------------------------------------------------------------------
+
+archetype.prop_name.name: "Name"
+archetype.prop_name.version: "Version"
+archetype.prop_name.role: "Role"
+archetype.prop_name.date: "Date"
+archetype.prop_name.author: "Author"
+archetype.prop_name.comments: "Comments"
+archetype.prop_name.description: "Description"
+archetype.prop_name.specificdata: "Specific data"
+archetype.prop_name.precondition: "Precondition"
+archetype.prop_name.postcondition: "Postcondition"
+archetype.prop_name.text: "Text"
+archetype.prop_name.url: "URL"
+archetype.prop_name.file: "File"
+archetype.prop_name.authors: "Authors"
+archetype.prop_name.created-by: "Authors"
+archetype.prop_name.dependencies: "Dependencies"
+archetype.prop_name.is-appendix: "Appendix"
+archetype.prop_name.is-glossary: "Glossary item"
+archetype.prop_name.address: "Address"
+archetype.prop_name.phone-number: "Phone number"
+archetype.prop_name.category: "Category"
+archetype.prop_name.organization: "Organization"
+archetype.prop_name.sources: "Sources"
+archetype.prop_name.works-for: "Works for"
+archetype.prop_name.prepared-by: "Prepared by"
+archetype.prop_name.prepared-for: "Prepared for"
+archetype.prop_name.width: "Width (%)"
+archetype.prop_name.link: "Link"
+archetype.prop_name.plural-form: "Plural form"
+archetype.prop_name.synonyms: "Synonyms"
+archetype.prop_name.web: "Website"
+archetype.prop_name.image: "Image"
+archetype.prop_name.email: "E-mail"

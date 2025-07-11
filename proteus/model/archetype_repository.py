@@ -26,7 +26,7 @@ import logging
 from os import listdir
 from os.path import join, isdir, isfile
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Set
 import shutil
 
 # --------------------------------------------------------------------------
@@ -48,7 +48,6 @@ from proteus.model import (
 )
 from proteus.model.project import Project
 from proteus.model.object import Object
-from proteus.model.abstract_object import ProteusState
 from proteus.model.properties import FileProperty
 
 # logging configuration
@@ -441,11 +440,7 @@ class ArchetypeRepository:
         )
 
         # Get the objects to store and remove DEAD objects
-        objects_to_store = archetype.get_descendants_recursively()
-        objects_to_store = set(
-            obj for obj in objects_to_store if obj.state != ProteusState.DEAD
-        )
-
+        objects_to_store: Set[Object] = archetype.get_descendants_recursively(ignore_dead_children=True)
 
         # Store the objects
         for obj in objects_to_store:
@@ -519,10 +514,7 @@ class ArchetypeRepository:
         )
 
         # Get the objects to store and remove DEAD objects
-        objects_to_store = archetype.get_descendants_recursively()
-        objects_to_store = set(
-            obj for obj in objects_to_store if obj.state != ProteusState.DEAD
-        )
+        objects_to_store: Set[Object] = archetype.get_descendants_recursively()
 
         # Create the objects directory
         objects_path = archetype_dir / OBJECTS_REPOSITORY

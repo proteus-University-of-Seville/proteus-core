@@ -156,6 +156,9 @@ class ArchetypeService:
     def get_object_archetypes(self) -> Dict[str, Dict[str, List[Object]]]:
         """
         Object_archetypes getter. Loads the list of object archetypes on demand.
+
+        :return: A dict with key archetype group/category type and value
+        dict of object lists by class (its main  class).
         """
         # Lazy loading of object archetypes
         if self._object_archetypes is None:
@@ -229,7 +232,8 @@ class ArchetypeService:
         First level objects are those that accept as parent any object (:Proteus-any) or
         a document (:Proteus-document).
 
-        :return: Dictionary of first level object archetypes by object class
+        :return: A dict with key archetype group/category type and value
+        dict of object lists by class (its main  class).
         """
         # Copy the dict of object archetypes to pop second level objects
         archetypes: Dict[str, Dict[str, List[Object]]] = (

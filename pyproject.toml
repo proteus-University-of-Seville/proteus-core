@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "PROTEUS"
+version = "v1.0.0"
+description = "Proteus is a configurable tool for editing structured documents, based on the concept of archetypes."
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "lxml==4.9.3",
+    "pyqt6-qt6==6.5.0",
+    "pyqt6==6.5.0",
+    "shortuuid==1.0.9",
+    "strenum==0.4.8",
+    "typing-extensions==4.4.0",
+    "pyqt6-sip==13.5.1",
+    "pyqt6-webengine==6.5.0",
+    "pyqt6-webengine-qt6==6.5.1",
+    "pyyaml==6.0.2",
+    "markdown==3.4.3",
+    "pyspellchecker==0.8.1",
+    "trieregex==1.0.0",
+    "mypy==0.982",
+    "mypy-extensions==0.4.3",
+    "pytest==8.2.2",
+    "pytest-mock==3.11.1",
+    "pytest-lazy-fixtures==1.0.7",
+    "pytest-qt==4.2.0",
+    "pytest-xvfb==3.0.0",
+    "pytest-order==1.1.0",
+    "coverage==7.2.7",
+    "pytest-cov==4.1.0",
+    "pyinstaller==6.2.0",
+]
+
+
+[project.scripts]
+proteus = "proteus.__main__:main"

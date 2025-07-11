@@ -26,7 +26,7 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
-from proteus.model import ProteusClassTag
+from proteus.model import ProteusClassTag, VALUE_ATTRIBUTE
 from proteus.model.properties.property import Property
 from proteus.model.properties import CLASSLIST_PROPERTY_TAG, CLASS_TAG
 
@@ -57,7 +57,8 @@ class ClassListProperty(Property):
 
     def __post_init__(self) -> None:
         """
-        It validates the list of space-separated PROTEUS class names.
+        It validates the value of the property is a list or a space-separated string.
+        Repeated values are removed.
         """
         # Superclass validation
         super().__post_init__()
@@ -67,14 +68,14 @@ class ClassListProperty(Property):
 
         # Check if the value is a string
         if isinstance(self.value, str):
-            object.__setattr__(self, "value", self.value.split())
+            object.__setattr__(self, VALUE_ATTRIBUTE, self.value.split())
 
         # Check if the value is a list
         if not isinstance(self.value, list):
             log.warning(
                 f"ClassListProperty: {self.name} value is not a list but '{type(self.value)}', setting it to an empty list"
             )
-            object.__setattr__(self, "value", list())
+            object.__setattr__(self, VALUE_ATTRIBUTE, list())
 
         # Check values are not repeated
         value_set = set(self.value)
@@ -83,7 +84,14 @@ class ClassListProperty(Property):
                 f"ClassListProperty: {self.name} contains repeated values, setting it to a list with unique values. \
                 This may affect the original order of the list. Original value: {self.value}, new value: {value_set}"
             )
-            object.__setattr__(self, "value", list(value_set))
+            object.__setattr__(self, VALUE_ATTRIBUTE, list(value_set))
+
+        # Check for None values
+        if None in self.value:
+            log.warning(
+                f"ClassListProperty: {self.name} contains None values, setting it to a list without None values"
+            )
+            object.__setattr__(self, VALUE_ATTRIBUTE, [value for value in self.value if value is not None])
 
     def generate_xml_value(self, property_element: ET._Element) -> str | ET.CDATA | None:
         """
@@ -92,7 +100,7 @@ class ClassListProperty(Property):
         """
         for class_name in self.value:
             class_element = ET.SubElement(property_element, CLASS_TAG)
-            class_element.text = ET.CDATA(class_name)
+            class_element.text = class_name
 
         # Returning None avoid the XML to be printed in a single line
         # https://lxml.de/FAQ.html#why-doesn-t-the-pretty-print-option-reformat-my-xml-output

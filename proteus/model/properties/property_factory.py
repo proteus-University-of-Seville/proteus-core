@@ -41,6 +41,8 @@ from proteus.model.properties.url_property import UrlProperty
 from proteus.model.properties.classlist_property import ClassListProperty
 from proteus.model.properties.trace_property import TraceProperty
 from proteus.model.properties.code_property import CodeProperty, ProteusCode
+from proteus.model.properties.tracetypelist_property import TraceTypeListProperty
+from proteus.model.properties.unit_property import UnitProperty, Measurement
 
 from proteus.model import (
     NAME_ATTRIBUTE,
@@ -53,17 +55,22 @@ from proteus.model import (
     ACCEPTED_TARGETS_ATTRIBUTE,
     EXCLUDED_TARGETS_ATTRIBUTE,
     MAX_TARGETS_NUMBER_ATTRIBUTE,
+    CHOICES_ATTRIBUTE,
+    VALUE_TOOLTIPS_ATTRIBUTE,
+    UNITS_ATTRIBUTE,
 )
 
 from proteus.model.properties import (
     CLASS_TAG,
-    CHOICES_ATTRIBUTE,
     PREFIX_TAG,
     NUMBER_TAG,
     SUFFIX_TAG,
     TRACE_TAG,
+    TYPE_TAG,
     NO_TARGETS_LIMIT,
     DEFAULT_TRACE_TYPE,
+    VALUE_TAG,
+    UNIT_TAG,
 )
 
 # logging configuration
@@ -100,6 +107,8 @@ class PropertyFactory:
         ClassListProperty.element_tagname: ClassListProperty,
         CodeProperty.element_tagname: CodeProperty,
         TraceProperty.element_tagname: TraceProperty,
+        TraceTypeListProperty.element_tagname: TraceTypeListProperty,
+        UnitProperty.element_tagname: UnitProperty,
     }
 
     @classmethod
@@ -109,7 +118,7 @@ class PropertyFactory:
         :param element: XML element with the property.
         :return: Property object or None if the property type is not valid.
         """
-        # Check it is one of the valid property types
+        # Check it is one of the valid property types -------------------------
         try:
             property_class = cls.propertyFactory[element.tag]
         except KeyError:
@@ -117,6 +126,8 @@ class PropertyFactory:
                 f"<{element.tag}> is not a valid PROTEUS property type -> ignoring invalid property"
             )
             return None
+
+        # General attributes --------------------------------------------------
 
         # Get name (checked in property constructors)
         name = element.attrib.get(NAME_ATTRIBUTE)
@@ -135,12 +146,20 @@ class PropertyFactory:
         # Get tooltip (checked in property constructors)
         tooltip = element.attrib.get(TOOLTIP_ATTRIBUTE, str())
 
+        # Specific attributes handling ----------------------------------------
+
         # Get value (checked in property constructors)
         if property_class is ClassListProperty:
             # We need to collect the list of class names,
             # put them toghether in a list of ProteusClassTag objects
             if element.findall(CLASS_TAG):
                 value = [ProteusClassTag(e.text) for e in element.findall(CLASS_TAG)]
+            else:
+                value = list()
+        elif property_class is TraceTypeListProperty:
+            # We need to collect the list of trace type names
+            if element.findall(TYPE_TAG):
+                value = [e.text for e in element.findall(TYPE_TAG)]
             else:
                 value = list()
         elif property_class is CodeProperty:
@@ -157,29 +176,55 @@ class PropertyFactory:
 
                 if target is None:
                     log.warning(
-                        f"PROTEUS trace '{name}' has a trace without a target -> ignoring it"
+                        f"PROTEUS trace '{name}' has a trace without a target attribute -> ignoring it"
+                    )
+                    continue
+
+                if target.strip() == "":
+                    log.warning(
+                        f"PROTEUS trace '{name}' has a trace with an empty target attribute -> ignoring it"
                     )
                     continue
 
                 traces.append(target)
 
             value = traces
+        elif property_class is UnitProperty:
+            # We need to collect its value and unit
+            value = Measurement(
+                float(element.find(VALUE_TAG).text),
+                element.find(UNIT_TAG).text,
+            )
         else:
             # Value could be empty
             value = str(element.text)
 
-        # Create and return the property object
+        # Create and return the property object -------------------------------
 
         # Special case: EnumProperty
         if property_class is EnumProperty:
             # We need to collect its choices
             choices = element.attrib.get(CHOICES_ATTRIBUTE, str())
+
+            # We need to collect valueTooltips attribute
+            value_tooltips_str = element.attrib.get(VALUE_TOOLTIPS_ATTRIBUTE, "false")
+            value_tooltips: bool = (
+                True if value_tooltips_str.lower() == "true" else False
+            )
+
             return EnumProperty(
-                name, category, value, tooltip, required, inmutable, choices
+                name,
+                category,
+                value,
+                tooltip,
+                required,
+                inmutable,
+                value_tooltips,
+                choices,
             )
 
         # Special case: traceProperty
-        if property_class is TraceProperty:
+        elif property_class is TraceProperty:
             # We need to collect its trace type, max targets number and accepted targets
             trace_type = element.attrib.get(TRACE_TYPE_ATTRIBUTE, DEFAULT_TRACE_TYPE)
 
@@ -214,5 +259,13 @@ class PropertyFactory:
                 max_targets_number,
             )
 
-        # Ordinary case: rest of property classes
-        return property_class(name, category, value, tooltip, required, inmutable)
+        # Special case: UnitProperty
+        elif property_class is UnitProperty:
+            units_str = element.attrib.get(UNITS_ATTRIBUTE, str())
+            units = units_str.split()
+            return UnitProperty(
+                name, category, value, tooltip, required, inmutable, units
+            )
+        else:
+            # Ordinary case: rest of property classes
+            return property_class(name, category, value, tooltip, required, inmutable)

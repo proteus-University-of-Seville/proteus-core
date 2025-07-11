@@ -417,6 +417,7 @@ def translate(key: str, *args, alternative_text: str = None, allow_new_line_char
         :param key: Key to find the translation.
         :param args: Arguments to format the translation.
         :param alternative_text: Text to return if no translation is found.
+        :param allow_new_line_characters: Flag to allow new line characters in the translation.
 
         :return: Translation for the given key or the key itself if not found.
                     If alternative_text is provided and no translation is found,

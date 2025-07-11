@@ -64,7 +64,7 @@ def test_delete_document(app):
     # Buttons that should change state when document is created in an empty project
     save_button_state = main_window.main_menu.save_button.isEnabled()
     delete_doc_button_state = main_window.main_menu.delete_document_button.isEnabled()
-    export_doc_button_state = main_window.main_menu.export_document_button.isEnabled()
+    export_doc_button_state = main_window.main_menu.export_view_button.isEnabled()
     undo_button_state = main_window.main_menu.undo_button.isEnabled()
 
     # --------------------------------------------
@@ -94,10 +94,10 @@ def test_delete_document(app):
     )
     assert (
         export_doc_button_state
-        != main_window.main_menu.export_document_button.isEnabled()
+        != main_window.main_menu.export_view_button.isEnabled()
     ), (
         "Export document button state should change from ENABLED to DISABLED when a document is deleted and there are no more documents in the project"
-        f"Current state: {main_window.main_menu.export_document_button.isEnabled()}"
+        f"Current state: {main_window.main_menu.export_view_button.isEnabled()}"
     )
     assert (
         undo_button_state != main_window.main_menu.undo_button.isEnabled()
@@ -149,7 +149,7 @@ def test_delete_document_contextmenu(app):
     # Buttons that should change state when document is created in an empty project
     save_button_state = main_window.main_menu.save_button.isEnabled()
     delete_doc_button_state = main_window.main_menu.delete_document_button.isEnabled()
-    export_doc_button_state = main_window.main_menu.export_document_button.isEnabled()
+    export_doc_button_state = main_window.main_menu.export_view_button.isEnabled()
     undo_button_state = main_window.main_menu.undo_button.isEnabled()
 
     # --------------------------------------------
@@ -194,10 +194,10 @@ def test_delete_document_contextmenu(app):
     )
     assert (
         export_doc_button_state
-        != main_window.main_menu.export_document_button.isEnabled()
+        != main_window.main_menu.export_view_button.isEnabled()
     ), (
         "Export document button state should change from ENABLED to DISABLED when a document is deleted and there are no more documents in the project"
-        f"Current state: {main_window.main_menu.export_document_button.isEnabled()}"
+        f"Current state: {main_window.main_menu.export_view_button.isEnabled()}"
     )
     assert (
         undo_button_state != main_window.main_menu.undo_button.isEnabled()

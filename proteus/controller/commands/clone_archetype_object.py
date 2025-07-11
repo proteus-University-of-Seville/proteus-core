@@ -100,7 +100,9 @@ class CloneArchetypeObjectCommand(QUndoCommand):
         #       an edit operation is performed and undone we will not be able
         #       to redo if also undo is performed for the clone operation due
         #       to the ProteusID change.
-        if self.cloned_object is None:
+        redo_not_performed_before: bool = self.cloned_object is None
+
+        if redo_not_performed_before:
             # Set redo text
             self.setText(
                 f"Clone archetype object {self.archetype_id} to {self.parent_id}"
@@ -117,6 +119,8 @@ class CloneArchetypeObjectCommand(QUndoCommand):
             self.cloned_object = self.archetype_service.create_object(
                 self.archetype_id, parent, project
             )
+
+            StateManager().last_cloned_archetype = self.cloned_object.id
 
             # Get the list of cloned objects in this operation
             self.cloned_objects_list = self.cloned_object.get_ids()
@@ -136,7 +140,8 @@ class CloneArchetypeObjectCommand(QUndoCommand):
             parent.state = self.after_clone_parent_state
 
         # Emit the event to update the view
-        AddObjectEvent().notify(self.cloned_object.id)
+        AddObjectEvent().notify(self.cloned_object.id, update_view=True)
+
 
     # ----------------------------------------------------------------------
     # Method     : undo

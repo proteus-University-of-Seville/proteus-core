@@ -76,13 +76,13 @@ def test_load_profile_settings_min():
         profile_settings.xslt_directory == profile_path / "templates"
     ), f"Expected: {profile_path / 'templates'}, Actual: {profile_settings.xslt_directory}"
     assert (
-        profile_settings.i18n_directory == None
+        profile_settings.i18n_directory is None
     ), f"Expected: None, Actual: {profile_settings.i18n_directory}"
     assert (
-        profile_settings.icons_directory == None
+        profile_settings.icons_directory is None
     ), f"Expected: None, Actual: {profile_settings.icons_directory}"
     assert (
-        profile_settings.plugins_directory == None
+        profile_settings.plugins_directory is None
     ), f"Expected: None, Actual: {profile_settings.plugins_directory}"
 
     # Check preferences
@@ -179,13 +179,13 @@ def test_load_profile_optional_dirs_defined_but_not_found():
         profile_settings.xslt_directory == profile_path / "templates"
     ), f"Expected: {profile_path / 'templates'}, Actual: {profile_settings.xslt_directory}"
     assert (
-        profile_settings.i18n_directory == None
+        profile_settings.i18n_directory is None
     ), f"Expected: None, Actual: {profile_settings.i18n_directory}"
     assert (
-        profile_settings.icons_directory == None
+        profile_settings.icons_directory is None
     ), f"Expected: None, Actual: {profile_settings.icons_directory}"
     assert (
-        profile_settings.plugins_directory == None
+        profile_settings.plugins_directory is None
     ), f"Expected: None, Actual: {profile_settings.plugins_directory}"
 
     # Check preferences

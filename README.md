@@ -14,7 +14,7 @@ XSLT templates, archetypes repositories and plugins are grouped in profiles. A p
 This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
 
 <div align = center>
-  <img src="https://github.com/user-attachments/assets/936f4820-0017-4da3-a8de-901bccdaf952" width="800" />
+  <img width="800" alt="proteus" src="https://github.com/user-attachments/assets/835ad4c1-36bf-4f27-be14-ff46fcafbbfe" />
 </div>
 
 ## License
@@ -23,12 +23,20 @@ PROTEUS is licensed under the BSD 3-Clause "New" or "Revised" License. See [LICE
 ## Installation
 PROTEUS is a Python application. It is developed using Python 3.10 or 3.11. It does not work with Python 3.12 for the moment. It is recommended to use a virtual environment to install the application. The application dependencies are listed in the `requirements.txt` file.
 
+### Running using UV
+
+PROTEUS can be run using [uv](https://docs.astral.sh/uv/) (An extremely fast Python package and project manager, written in Rust). It will install the necessary Python version if not found, create a virtual environment and run the application with a single command.
+
+```bash
+uv run proteus
+``` 
+
 ### Detailed installation instructions
 
 Clone the repository and navigate to the top-level directory of the application.
 
 ```bash
-git clone https://github.com/Josdelsan/Proteus.git
+git clone https://github.com/proteus-University-of-Seville/proteus-core.git
 
 cd Proteus
 ```
@@ -56,6 +64,7 @@ Run the application.
 python -m proteus
 ```
 
+
 ### Installation scripts
 
 Installation scripts are provided for Windows, Linux and MacOS. The scripts create a virtual environment called `proteus_env`, install the dependencies and run the application. The first time you run the script it will take a while to install the dependencies and create python cache files.
@@ -74,6 +83,18 @@ Linux and MacOS:
 - Some users may need to restart ibus via `ibus restart` the first time they run the application.
 
 **WARNING**, directory names changes may affect the virtual environment. If you encounter any problem, delete the virtual environment and create/run the scripts again.
+
+
+## Profiles
+PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:
+- [profile-madeja-english](https://github.com/proteus-University-of-Seville/profile-madeja-english)
+- [profile-madeja-spanish](https://github.com/proteus-University-of-Seville/profile-madeja-spanish)
+
+We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu.
+
+### LaTeX rendering
+
+We are currently working on a LaTeX XSLT template and export strategy. This will allow the generation of LaTeX documents and PDF files from the basic profile (extendable to any other profile/archetypes). There is a feature branch for this purpose, contact us if you need more information about its status.
 
 ## Developer features
 

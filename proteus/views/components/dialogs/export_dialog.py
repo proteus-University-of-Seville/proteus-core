@@ -10,6 +10,7 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+from typing import Callable
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -32,9 +33,9 @@ from PyQt6.QtWidgets import (
 
 from proteus.controller.command_stack import Controller
 from proteus.application.resources.translator import translate as _
+from proteus.application.export_strategy import ExportStrategy
+from proteus.application.resources.plugins import Plugins
 from proteus.views.components.dialogs.base_dialogs import ProteusDialog, MessageBox
-from proteus.views.export import ExportFormat, ExportStrategy, ExportPDF, ExportHTML
-
 
 
 # --------------------------------------------------------------------------
@@ -90,7 +91,8 @@ class ExportDialog(ProteusDialog):
 
         # Windows general settings ---------------------------------
         # Set the dialog title and width
-        self.setWindowTitle(_("export_dialog.title"))
+        current_view = self._state_manager.get_current_view()
+        self.setWindowTitle(_("export_dialog.title",_(f"xslt_templates.{current_view}")))
         self.sizeHint = lambda: QSize(400, 0)
 
         # Expand policy
@@ -106,14 +108,17 @@ class ExportDialog(ProteusDialog):
         self.progress_bar.hide()
 
         # Export format selector ---------------------------------
-        export_format_label = QLabel(_("export_dialog.export_format.label"))
+        export_format_label = QLabel(_("export_dialog.export_strategy.label"))
+
+        export_strategies: dict = Plugins().get_export_strategies()
+
         self.export_format_selector = QComboBox()
-        self.export_format_selector.addItem(
-            _("export_dialog.export_format.pdf"), ExportFormat.PDF
-        )
-        self.export_format_selector.addItem(
-            _("export_dialog.export_format.html"), ExportFormat.HTML
-        )
+        for export_strategy_name, export_strategy_class in export_strategies.items():
+            self.export_format_selector.addItem(
+                _(f"export_dialog.export_strategy.{export_strategy_name}"),
+                export_strategy_class,
+            )
+
         self.export_format_selector.currentIndexChanged.connect(
             self.update_export_strategy
         )
@@ -163,7 +168,7 @@ class ExportDialog(ProteusDialog):
         Old export strategy must be deleted to disconnect the signals.
         """
         # Get the selected export format
-        export_format: str = self.export_format_selector.currentData()
+        export_strategy_class: Callable = self.export_format_selector.currentData()
 
         # Update button box
         self.accept_button.setEnabled(False)
@@ -179,12 +184,7 @@ class ExportDialog(ProteusDialog):
             self.export_widget_holder.itemAt(i).widget().setParent(None)
 
         # Update the export strategy ---------------------------------
-        if export_format == ExportFormat.PDF:
-            self._export_strategy = ExportPDF(self._controller)
-        elif export_format == ExportFormat.HTML:
-            self._export_strategy = ExportHTML(self._controller)
-        else:
-            raise ValueError("Invalid export format")
+        self._export_strategy = export_strategy_class(self._controller)
 
         # Setup new export strategy ---------------------------------
         # Strategy export widget

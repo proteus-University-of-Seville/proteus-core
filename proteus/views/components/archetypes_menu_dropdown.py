@@ -27,9 +27,11 @@ from PyQt6.QtWidgets import (
 # --------------------------------------------------------------------------
 
 from proteus.model import ProteusID, PROTEUS_NAME
-from proteus.application.resources.icons import Icons, ProteusIconType
 from proteus.model.object import Object
+from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.configuration.config import Config
 from proteus.views.components.abstract_component import ProteusComponent
+from proteus.views.components.dialogs.property_dialog import PropertyDialog
 
 
 # --------------------------------------------------------------------------
@@ -104,8 +106,8 @@ class ArchetypesMenuDropdown(QMenu, ProteusComponent):
 
             clone_action.setIcon(icon)
             clone_action.triggered.connect(
-                lambda action, arg=archetype.id: self._controller.create_object(
-                    archetype_id=arg, parent_id=self._state_manager.get_current_object()
+                lambda action, arg=archetype.id: self.create_object_from_archetype(
+                    arg, self._state_manager.get_current_object()
                 )
             )
             self.addAction(clone_action)
@@ -114,6 +116,23 @@ class ArchetypesMenuDropdown(QMenu, ProteusComponent):
     # ======================================================================
     # Component slots methods (connected to the component signals and helpers)
     # ======================================================================
+
+    def create_object_from_archetype(self, archetype_id: ProteusID, parent_id: ProteusID) -> None:
+        """
+        Create a new object from the provided archetype and parent.
+
+        :param archetype_id: The archetype id to create the object from.
+        :param parent_id: The parent id to create the object from.
+        """
+        self._controller.create_object(archetype_id, parent_id)
+
+        if Config().app_settings.edit_on_clone:
+            if self._state_manager.last_cloned_archetype is not None:
+                PropertyDialog.create_dialog(
+                    self._controller,
+                    self._state_manager.last_cloned_archetype,
+                    True,
+                )
 
     # ======================================================================
     # Component static methods (create and show the form window)

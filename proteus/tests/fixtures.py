@@ -31,18 +31,54 @@ import yaml
 # --------------------------------------------------------------------------
 
 from proteus.tests import PROTEUS_PROJECT_DATA_FILE
-from proteus.model import NAME_ATTRIBUTE, CATEGORY_ATTRIBUTE, ProteusID
+from proteus.model import NAME_ATTRIBUTE, CATEGORY_ATTRIBUTE, CHOICES_ATTRIBUTE, ProteusID
 from proteus.model.properties import \
     Property,                      \
     DEFAULT_NAME,                  \
     DEFAULT_CATEGORY,              \
-    CHOICES_ATTRIBUTE,             \
     CLASS_TAG,                     \
-    PropertyFactory
+    PropertyFactory,               \
+    STRING_PROPERTY_TAG
 
 # --------------------------------------------------------------------------
 # Fixtures
 # --------------------------------------------------------------------------
+
+def create_property_element(
+    property_tag: str = STRING_PROPERTY_TAG,
+    name: str = DEFAULT_NAME,
+    category: str = DEFAULT_CATEGORY,
+    tooltip: str = str(),
+    required: bool | str = False,
+    inmutable: bool | str = False,
+) -> ET._Element:
+    """
+    Create a property XML element with the given parameters. Tooltip,
+    required and inmutable attributes will be set if its value is True
+    (non-empty string for tooltip).
+
+    :param name: Name of the property. Default is an empty string.
+    :param category: Category of the property. Default is an empty string.
+    :param tooltip: Tooltip of the property. Default is an empty string.
+    :param required: Required attribute of the property. Default is False.
+    :param inmutable: Inmutable attribute of the property. Default is False.
+    :param property_tag: Tag of the property element. Default is "string".
+    :return: The created XML element.
+    """
+    property_element: ET._Element = ET.Element(property_tag)
+
+    property_element.set(NAME_ATTRIBUTE, name)
+    property_element.set(CATEGORY_ATTRIBUTE, category)
+    if tooltip.strip() != "":
+        property_element.set("tooltip", tooltip)
+
+    if required:
+        property_element.set("required", str(required).lower())
+
+    if inmutable:
+        property_element.set("inmutable", str(inmutable).lower())
+
+    return property_element
 
 def create_property(property_tag, name, category, value, choices = None) -> tuple[Property,str,str]:
     """

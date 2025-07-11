@@ -79,27 +79,27 @@ class Property(ABC):
             )
             # self.name = DEFAULT_NAME cannot be used when frozen=True
             # https://stackoverflow.com/questions/53756788/how-to-set-the-value-of-dataclass-field-in-post-init-when-frozen-true
-            object.__setattr__(self, "name", DEFAULT_NAME)
+            object.__setattr__(self, NAME_ATTRIBUTE, DEFAULT_NAME)
 
         # Category validation
         if not self.category:
             # self.category = DEFAULT_CATEGORY cannot be used when frozen=True
-            object.__setattr__(self, "category", DEFAULT_CATEGORY)
+            object.__setattr__(self, CATEGORY_ATTRIBUTE, DEFAULT_CATEGORY)
 
         # Required validation
         if not isinstance(self.required, bool):
             # self.required = False cannot be used when frozen=True
-            object.__setattr__(self, "required", False)
+            object.__setattr__(self, REQUIRED_ATTRIBUTE, False)
 
         # Inmutable validation
         if not isinstance(self.inmutable, bool):
             # self.inmutable = False cannot be used when frozen=True
-            object.__setattr__(self, "inmutable", False)
+            object.__setattr__(self, INMUTABLE_ATTRIBUTE, False)
 
         # tooltip validation
         if not self.tooltip:
             # self.tooltip = str() cannot be used when frozen=True
-            object.__setattr__(self, "tooltip", str())
+            object.__setattr__(self, TOOLTIP_ATTRIBUTE, str())
 
     def clone(self, new_value=None) -> "Property":
         """
@@ -145,10 +145,15 @@ class Property(ABC):
 
     def compare(self, other: "Property") -> bool:
         """
-        It compares two properties to check if they are equal.
+        It compares two properties to check if they are equal. If a non-property
+        object is provided, it returns False.
+        
         :param other: the other property to compare.
         :return: True if both properties are equal comparing their attributes.
         """
+        if not isinstance(other, Property):
+            return False
+
         return (
             self.name == other.name
             and self.category == other.category

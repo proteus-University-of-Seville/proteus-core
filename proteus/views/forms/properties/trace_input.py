@@ -11,6 +11,7 @@
 # --------------------------------------------------------------------------
 
 from typing import List
+import logging
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -22,11 +23,14 @@ from typing import List
 # --------------------------------------------------------------------------
 
 from proteus.model import ProteusID
+from proteus.model.object import Object
 from proteus.model.properties import TraceProperty
 from proteus.controller.command_stack import Controller
 from proteus.views.forms.properties.property_input import PropertyInput
-from proteus.views.forms.trace_edit import TraceEdit
+from proteus.views.forms.items.objects_list_edit import ObjectsListEdit
 
+# Module configuration
+log = logging.getLogger(__name__)  # Logger
 
 # --------------------------------------------------------------------------
 # Class: TraceInput
@@ -40,6 +44,11 @@ class TraceInput(PropertyInput):
     Trace input widget for properties forms.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.wrap_in_group_box = True
+
     # ----------------------------------------------------------------------
     # Method     : get_value
     # Description: Returns the value of the input widget.
@@ -52,8 +61,8 @@ class TraceInput(PropertyInput):
         Returns the value of the input widget. The value is converted to a
         list.
         """
-        self.input: TraceEdit
-        return self.input.traces()
+        self.input: ObjectsListEdit
+        return self.input.items()
 
     # ----------------------------------------------------------------------
     # Method     : validate
@@ -83,17 +92,43 @@ class TraceInput(PropertyInput):
         element_id: ProteusID,
         *args,
         **kwargs
-    ) -> TraceEdit:
+    ) -> ObjectsListEdit:
         """
-        Creates the input widget based on PROTEUS TraceEdit.
+        Creates the input widget based on PROTEUS ObjectListEdit.
         """
 
-        input: TraceEdit = TraceEdit(
-            element_id=element_id,
-            controller=controller,
-            accepted_targets=property.acceptedTargets,
-            excluded_targets=property.excludedTargets,
-            limit=property.max_targets_number,
+        # Candidates
+        candidates_objects: List[Object] = controller.get_objects(
+            classes=property.acceptedTargets
         )
-        input.setTraces(property.value)
+
+        # Filter candidates by excluded targets (classes), element_id
+        candidates = [
+            obj.id
+            for obj in candidates_objects
+            if not any(
+                excluded_class in obj.classes
+                for excluded_class in property.excludedTargets
+            )
+            and obj.id != element_id
+        ]
+
+        input = ObjectsListEdit(
+            controler=controller,
+            candidates=candidates,
+            item_limit=property.maxTargetsNumber,
+        )
+        
+        # Set traced objects
+        traced_objects: List[Object] = []
+        for trace in property.value:
+            # Discard traces to non-existing objects
+            try:
+                item = controller.get_element(trace)
+                traced_objects.append(item)
+            except Exception as e:
+                log.error(f"Error getting traced object '{trace}': {e}")
+
+        input.setItems(traced_objects)
+
         return input

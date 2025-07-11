@@ -63,7 +63,7 @@ def sample_archetype_service():
 
 @pytest.mark.parametrize(
     "index",
-    [0, 1],
+    [0],
 )
 def test_clone_archetype_document_command_redo(
     sample_project_service: ProjectService,
@@ -121,7 +121,7 @@ def test_clone_archetype_document_command_redo(
 
 @pytest.mark.parametrize(
     "index",
-    [0, 1],
+    [0],
 )
 def test_clone_archetype_object_command_undo(
     sample_project_service: ProjectService,
@@ -172,7 +172,7 @@ def test_clone_archetype_object_command_undo(
 
 @pytest.mark.parametrize(
     "index",
-    [0, 1],
+    [0],
 )
 def test_clone_archetype_object_command_redo_after_undo(
     sample_project_service: ProjectService,

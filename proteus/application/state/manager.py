@@ -68,6 +68,7 @@ class StateManager(metaclass=SingletonMeta):
         self.current_document: ProteusID = None
         self.current_object: Dict[ProteusID, ProteusID] = {}
         self.current_view: str = None
+        self.last_cloned_archetype: ProteusID = None
 
         self.current_project_path: Path = None
 
@@ -347,4 +348,5 @@ class StateManager(metaclass=SingletonMeta):
         self.current_object = {}
         self.current_view = None
         self.current_project_path = None
+        self.last_cloned_archetype = None
         self.opened_views = []

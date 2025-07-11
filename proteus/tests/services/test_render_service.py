@@ -32,7 +32,7 @@ from proteus.tests import PROTEUS_SAMPLE_PROJECTS_PATH, PROTEUS_SAMPLE_DATA_PATH
 # Fixtures
 # --------------------------------------------------------------------------
 
-DEFAULT_TEMPLATE = "remus"
+DEFAULT_TEMPLATE = "default"
 
 
 @pytest.fixture()
@@ -49,7 +49,7 @@ def render_service():
     Config().profile_settings.xslt_directory = PROTEUS_SAMPLE_DATA_PATH / "xslt"
 
     # Load plugins
-    Plugins().load_plugins(Config().profile_settings.plugins_directory)
+    Plugins().load_plugins(Config().app_settings.plugins_directory)
 
     # Create service
     service = RenderService()

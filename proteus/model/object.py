@@ -25,7 +25,7 @@ from __future__ import annotations  # it has to be the first import
 import pathlib
 import os
 import logging
-from typing import List, NewType, Union, Dict, Set
+from typing import List, NewType, Union, Dict
 import copy
 import shutil
 import datetime
@@ -327,25 +327,6 @@ class Object(AbstractObject):
                 return self.parent.get_document()
         except AttributeError:
             raise Exception(f"Parent document not found for object {self.id}")
-
-    # ----------------------------------------------------------------------
-    # Method     : get_descendants_recursively
-    # Description: It returns a list with all the descendants of an object
-    # including the object itself.
-    # Date       : 29/10/2024
-    # Version    : 0.1
-    # Author     : José María Delgado Sánchez
-    # ----------------------------------------------------------------------
-    def get_descendants_recursively(self) -> Set[Object]:
-        """
-        It returns a list with all the descendants of an object including the object itself.
-        :return: List with all the descendants of an object including the object itself.
-        """
-        descendants = set()
-        descendants.add(self)
-        for child in self.children:
-            descendants.update(child.get_descendants_recursively())
-        return descendants
 
     # ----------------------------------------------------------------------
     # Method     : get_descendants
@@ -725,7 +706,7 @@ class Object(AbstractObject):
 
         # Create file path
         project_objects_path = pathlib.Path(project.path).parent / OBJECTS_REPOSITORY
-        new_object.path = project_objects_path / f"{new_object.id}.xml"
+        new_object.path = (project_objects_path / f"{new_object.id}.xml").as_posix()
 
         # -------------------------------------------------------
         # Handle special properties (Date, Code, FileProperties)

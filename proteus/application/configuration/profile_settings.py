@@ -69,14 +69,15 @@ class ProfileSettings:
     config_parser: ConfigParser = None
 
     # Directory settings
-    plugins_directory: Path = None
     archetypes_directory: Path = None
     xslt_directory: Path = None
-    icons_directory: Path = None
-    i18n_directory: Path = None
+    # Other directories (optional)
+    plugins_directory: Path | None = None
+    icons_directory: Path | None = None
+    i18n_directory: Path | None = None
 
-    # Profile preferences settings
-    preferred_default_view: str = None
+    # Profile preferences settings (optional)
+    preferred_default_view: str | None = None
 
     # Found templates
     listed_templates: List[str] = None
@@ -98,14 +99,14 @@ class ProfileSettings:
 
         assert (
             config_file_path.exists()
-        ), f"PROTEUS profile configuration file {CONFIG_FILE} does not exist in {profile_path}!"
+        ), f"PROTEUS profile configuration file '{CONFIG_FILE}' does not exist in '{profile_path}'!"
 
         config_parser: ConfigParser = ConfigParser()
         config_parser.read(config_file_path, encoding="utf-8")
 
         settings_file_path: Path = config_file_path
 
-        log.info(f"Loading settings from {settings_file_path}...")
+        log.info(f"Loading settings from '{settings_file_path}'...")
 
         profile_settings = ProfileSettings(
             profile_path=profile_path,
@@ -133,57 +134,67 @@ class ProfileSettings:
         # Directories section
         directories = self.config_parser[DIRECTORIES]
 
-        self.archetypes_directory = (
-            self.profile_path / directories[ARCHETYPES_DIRECTORY]
-        )
-        self.xslt_directory = self.profile_path / directories[XSLT_DIRECTORY]
-        self.plugins_directory = self.profile_path / directories[PLUGINS_DIRECTORY]
-        self.icons_directory = self.profile_path / directories[ICONS_DIRECTORY]
-        self.i18n_directory = self.profile_path / directories[I18N_DIRECTORY]
+        # Mandatory directories
+        archetypes_directory = directories.get(ARCHETYPES_DIRECTORY, None)
+        assert (
+            archetypes_directory is not None and archetypes_directory != ""
+        ), f"Archetypes directory is not defined in '{self.settings_file_path}'!"
+
+        self.archetypes_directory = self.profile_path / archetypes_directory
+
+        xslt_directory = directories.get(XSLT_DIRECTORY, None)
+        assert (
+            xslt_directory is not None and xslt_directory != ""
+        ), f"XSLT directory is not defined in '{self.settings_file_path}'!"
+        self.xslt_directory = self.profile_path / xslt_directory
+
+        # Optional directories
+        plugins_directory = directories.get(PLUGINS_DIRECTORY, None)
+        if plugins_directory is not None and plugins_directory != "":
+            plugins_directory = plugins_directory.strip()
+            self.plugins_directory = self.profile_path / plugins_directory
+
+        icons_directory = directories.get(ICONS_DIRECTORY, None)
+        if icons_directory is not None and icons_directory != "":
+            icons_directory = icons_directory.strip()
+            self.icons_directory = self.profile_path / icons_directory
+
+        i18n_directory = directories.get(I18N_DIRECTORY, None)
+        if i18n_directory is not None and i18n_directory != "":
+            i18n_directory = i18n_directory.strip()
+            self.i18n_directory = self.profile_path / i18n_directory
 
         # Archetypes and XSLT directories are mandatory
         assert (
             self.archetypes_directory.exists()
-        ), f"Archetypes directory {self.archetypes_directory} does not exist in profile {self.profile_path}!"
+        ), f"Archetypes directory '{self.archetypes_directory}' does not exist in profile '{self.profile_path}'!"
         assert (
             self.xslt_directory.exists()
-        ), f"XSLT directory {self.xslt_directory} does not exist in profile {self.profile_path}!"
+        ), f"XSLT directory '{self.xslt_directory}' does not exist in profile '{self.profile_path}'!"
 
-        # Plugins, icons and i18n directories are optional
-        if not directories[PLUGINS_DIRECTORY]:
-            log.warning(
-                f"Plugins directory is not set in profile config {self.profile_path}!"
-            )
-            self.plugins_directory = None
-        elif not self.plugins_directory.exists():
-            log.warning(
-                f"Plugins directory {self.plugins_directory} does not exist in profile {self.profile_path}!"
-            )
-            self.plugins_directory = None
+        # Check existence of optional directories
+        if self.plugins_directory is not None:
+            if not self.plugins_directory.exists():
+                log.warning(
+                    f"Plugins directory '{self.plugins_directory}' was provided but does not exist in profile '{self.profile_path}'!"
+                )
+                self.plugins_directory = None
 
-        if not directories[ICONS_DIRECTORY]:
-            log.warning(
-                f"Icons directory is not set in profile config {self.profile_path}!"
-            )
-            self.icons_directory = None
-        elif not self.icons_directory.exists():
-            log.warning(
-                f"Icons directory {self.icons_directory} does not exist in profile {self.profile_path}!"
-            )
-            self.icons_directory = None
+        if self.icons_directory is not None:
+            if not self.icons_directory.exists():
+                log.warning(
+                    f"Icons directory '{self.icons_directory}' was provided but does not exist in profile '{self.profile_path}'!"
+                )
+                self.icons_directory = None
 
-        if not directories[I18N_DIRECTORY]:
-            log.warning(
-                f"i18n directory is not set in profile config {self.profile_path}!"
-            )
-            self.i18n_directory = None
-        elif not self.i18n_directory.exists():
-            log.warning(
-                f"i18n directory {self.i18n_directory} does not exist in profile {self.profile_path}!"
-            )
-            self.i18n_directory = None
+        if self.i18n_directory is not None:
+            if not self.i18n_directory.exists():
+                log.warning(
+                    f"i18n directory '{self.i18n_directory}' was provided but does not exist in profile '{self.profile_path}'!"
+                )
+                self.i18n_directory = None
 
-        log.info(f"Directories loaded from {self.settings_file_path}.")
+        log.info(f"Directories loaded from '{self.settings_file_path}'.")
         log.info(f"{self.archetypes_directory = }")
         log.info(f"{self.xslt_directory = }")
         log.info(f"{self.plugins_directory = }")
@@ -202,18 +213,26 @@ class ProfileSettings:
         Load user settings from the configuration file.
         """
         # Settings section
-        settings = self.config_parser[PREFERENCES]
+        try:
+            settings = self.config_parser[PREFERENCES]
+        except Exception as e:
+            log.error(
+                f"Could not load preference settings from '{self.settings_file_path}'. Error: {e}"
+            )
+            settings = dict()
 
         # Default view -----------------------
-        preferred_default_view = settings[PREFERENCE_DEFAULT_VIEW]
+        preferred_default_view = settings.get(PREFERENCE_DEFAULT_VIEW, None)
 
-        assert (
-            preferred_default_view is not None and preferred_default_view != ""
-        ), f"Selected view setting is not defined in {self.settings_file_path}!"
+        if preferred_default_view is None or preferred_default_view == "":
+            log.warning(
+                f"Preferred default view is not defined in '{self.settings_file_path}'! Using first view found instead."
+            )
+            preferred_default_view = self.listed_templates[0]
 
         if preferred_default_view not in self.listed_templates:
             log.error(
-                f"Selected view {preferred_default_view} was not found in the XSLT directory. Using first view found instead."
+                f"Selected view '{preferred_default_view}' was not found in the XSLT directory. Using first view found instead."
             )
             preferred_default_view = self.listed_templates[0]
 
@@ -242,14 +261,14 @@ class ProfileSettings:
                 self.listed_templates.append(template.name)
             except Exception as e:
                 log.error(
-                    f"Could not load template from {template_dir}. It will be ignored in profile settings. Error: {e}"
+                    f"Could not load template from '{template_dir}'. It will be ignored in profile settings. Error: {e}"
                 )
 
         assert (
             len(self.listed_templates) > 0
-        ), f"No valid templates found in the XSLT directory {self.xslt_directory}!"
+        ), f"No valid templates found in the XSLT directory '{self.xslt_directory}'!"
 
-        log.info(f"Listed templates: {self.listed_templates}")
+        log.info(f"Listed templates: '{self.listed_templates}'")
 
         # Archetype repository ----------------
         try:
@@ -258,7 +277,7 @@ class ProfileSettings:
             ArchetypeRepository.load_project_archetypes(self.archetypes_directory)
         except Exception as e:
             log.error(
-                f"Could not load archetype repository from {self.archetypes_directory}. It will be ignored in profile settings. Error: {e}"
+                f"Could not load archetype repository from '{self.archetypes_directory}'. It will be ignored in profile settings. Error: {e}"
             )
             raise e
 
@@ -365,7 +384,9 @@ class ProfileBasicMetadata:
             log.warning(
                 f"Profile image {self.image} is not a valid file. Using default image instead."
             )
-            self.image = proteus.PROTEUS_APP_PATH / "resources" / "default.png"
+            self.image = (
+                proteus.PROTEUS_APP_PATH / "resources" / "icons" / "default.png"
+            )
 
         log.info(f"Profile information loaded from '{self.settings_file_path}'.")
         log.info(f"{self.name = }")
@@ -391,7 +412,7 @@ class ProfileBasicMetadata:
 
         assert (
             profiles_directory.exists()
-        ), f"PROTEUS profiles directory {profiles_directory} does not exist!"
+        ), f"PROTEUS profiles directory '{profiles_directory}' does not exist!"
 
         listed_profiles = dict()
 

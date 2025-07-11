@@ -102,7 +102,7 @@ def test_open_project(mocker, app):
         main_window.main_menu.delete_document_button.isEnabled()
     ), "Expected delete document button to be enabled"
     assert (
-        main_window.main_menu.export_document_button.isEnabled()
+        main_window.main_menu.export_view_button.isEnabled()
     ), "Expected export document button to be enabled"
 
     # Check documents container

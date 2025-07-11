@@ -22,6 +22,7 @@
         <icon key="clipboard_icon" file="clipboard.png"/>
         <icon key="view_icon" file="view.png"/>
         <icon key="model_editor" file="tools.png"/>
+        <icon key="navigate-to-object" file="find.png"/>
 
         <icon key="context-menu-edit" file="context_menu/edit-properties-button.png"/>
         <icon key="context-menu-delete" file="context_menu/delete-object-button.png"/>
@@ -57,5 +58,6 @@
         <icon key="clipboard-copy" file="context_menu/copy.png"/>
         <icon key="clipboard-cut" file="context_menu/cut.png"/>
         <icon key="clipboard-paste" file="context_menu/paste.png"/>
+        <icon key="impact-analysis" file="main_menu/impact-analysis.png"/>
     </type>
 </icons>

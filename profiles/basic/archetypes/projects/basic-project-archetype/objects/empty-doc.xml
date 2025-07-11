@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object 
+  id="empty-doc" 
+  classes=":Proteus-document" 
+  acceptedChildren=":Proteus-any"
+>
+  <properties>
+    <stringProperty name=":Proteus-acronym" category="general"><![CDATA[DOC]]></stringProperty>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Empty document]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2024-09-17</dateProperty>
+    <markdownProperty name="description" category="details"><![CDATA[Empty document that can be used as template.]]></markdownProperty>
+    <traceProperty name="prepared-for" category="dependencies" acceptedTargets="organization" traceType=":Proteus-dependency"/>
+    <traceProperty name="prepared-by" category="dependencies" acceptedTargets="organization" traceType=":Proteus-author"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+</object>

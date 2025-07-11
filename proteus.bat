@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-echo PROTEUS: v1.2.0-beta
+echo PROTEUS: v1.0.0
 
 @REM Initialize variables
 set python_executable=

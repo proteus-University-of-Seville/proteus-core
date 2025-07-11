@@ -225,6 +225,7 @@ def test_config_dialog_change_settings(app, app_settings: AppSettings):
     ), f"Default view settings was not correctly saved. It is {new_app_settings.default_view} but should be {new_default_view} | app: {app_settings_copy.default_view}"
 
 
+@pytest.mark.skip("Temporary disabled because there is only one profile")
 def test_config_dialog_change_profile(app, app_settings: AppSettings):
     """
     Opens the config dialog and changes the profile settings. Then checks if
@@ -290,13 +291,13 @@ def test_config_dialog_change_profile(app, app_settings: AppSettings):
     use_custom_profile_checkbox = second_dialog.use_custom_profile_checkbox.isChecked()
 
     assert (
-        use_custom_profile_checkbox == False
-    ), f"Use custom profile setting is '{use_custom_profile_checkbox}' but should be 'False'"
+        use_custom_profile_checkbox is False
+    ), "Use custom profile setting is '{use_custom_profile_checkbox}' but should be 'False'"
 
     # Check custom_profile_path is disabled
     assert (
-        second_dialog.custom_profile_edit.isEnabled() == False
-    ), f"Custom profile path is enabled but should be disabled"
+        second_dialog.custom_profile_edit.isEnabled() is False
+    ), "Custom profile path is enabled but should be disabled"
 
     # ---------------------
     # Check file
@@ -318,7 +319,7 @@ def test_config_dialog_change_profile(app, app_settings: AppSettings):
     # Check using_custom_profile setting
     assert (
         new_app_settings.using_default_profile
-        == True
+        is True
         == app_settings_copy.using_default_profile
     ), f"Using default profile settings was not correctly saved. It is '{new_app_settings.using_default_profile}' but should be 'True' | app: {app_settings_copy.using_default_profile}"
 
@@ -344,7 +345,9 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
     # --------------------------------------------
 
     # Change settings
-    new_custom_profile_path = Config().app_settings.profiles_directory / "madeja_ir_english"
+    new_custom_profile_path = (
+        Config().app_settings.profiles_directory / "basic"
+    )
 
     # Open config dialog
     dialog: SettingsDialog = get_dialog(settings_button.click)
@@ -370,20 +373,20 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
     # --------------------------------------------
 
     assert (
-        was_enabled_custom_profile_path == False
-    ), f"Custom profile path was enabled before checking the checkbox but should be disabled"
+        was_enabled_custom_profile_path is False
+    ), "Custom profile path was enabled before checking the checkbox but should be disabled"
 
     assert (
-        was_enabled_profile_combo == True
-    ), f"Profile combo was disabled before checking the checkbox but should be enabled"
+        was_enabled_profile_combo is True
+    ), "Profile combo was disabled before checking the checkbox but should be enabled"
 
     assert (
-        is_enabled_custom_profile_path == True
-    ), f"Custom profile path is disabled but should be enabled after checking the checkbox"
+        is_enabled_custom_profile_path is True
+    ), "Custom profile path is disabled but should be enabled after checking the checkbox"
 
     assert (
-        is_enabled_profile_combo == False
-    ), f"Profile combo is enabled but should be disabled after checking the checkbox"
+        is_enabled_profile_combo is False
+    ), "Profile combo is enabled but should be disabled after checking the checkbox"
 
     # ---------------------
     # Check dialog
@@ -394,12 +397,12 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
 
     # Check combo is disabled and custom profile path is enabled
     assert (
-        second_dialog.profile_combo.isEnabled() == False
-    ), f"Profile combo is enabled but should be disabled"
+        second_dialog.profile_combo.isEnabled() is False
+    ), "Profile combo is enabled but should be disabled"
 
     assert (
-        second_dialog.custom_profile_edit.isEnabled() == True
-    ), f"Custom profile path is disabled but should be enabled"
+        second_dialog.custom_profile_edit.isEnabled() is True
+    ), "Custom profile path is disabled but should be enabled"
 
     # Check custom_profile_path setting was correctly set in directory edit and checkbox
     current_custom_profile_path = second_dialog.custom_profile_edit.directory()
@@ -412,7 +415,7 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
     use_custom_profile_checkbox = second_dialog.use_custom_profile_checkbox.isChecked()
 
     assert (
-        use_custom_profile_checkbox == True
+        use_custom_profile_checkbox is True
     ), f"Use custom profile setting is '{use_custom_profile_checkbox}' but should be 'True'"
 
     # ---------------------
@@ -435,6 +438,6 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
     # Check using_custom_profile setting
     assert (
         new_app_settings.using_default_profile
-        == False
+        is False
         == app_settings_copy.using_default_profile
     ), f"Using default profile settings was not correctly saved. It is '{new_app_settings.using_default_profile}' but should be 'False' | app: {app_settings_copy.using_default_profile}"

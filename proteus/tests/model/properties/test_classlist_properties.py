@@ -70,9 +70,9 @@ def test_classlist_properties(
         expected_values_parsed += (
             "<"
             + child_property_tag
-            + "><![CDATA["
+            + ">"
             + class_value
-            + "]]></"
+            + "</"
             + child_property_tag
             + ">"
         )
@@ -107,9 +107,9 @@ def test_classlist_properties(
         new_expected_values_parsed += (
             "<"
             + child_property_tag
-            + "><![CDATA["
+            + ">"
             + class_value
-            + "]]></"
+            + "</"
             + child_property_tag
             + ">"
         )

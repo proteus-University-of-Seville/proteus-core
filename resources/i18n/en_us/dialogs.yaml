@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------------------
 # Common
 # ---------------------------------------------------------------------------
-dialog.accept_button: "Accept"
+dialog.accept_button: "Ok"
 dialog.create_button: "Create"
 dialog.save_button: "Save"
 dialog.export_button: "Export"
@@ -116,8 +116,11 @@ settings_dialog.profile_settings.group: "Profile specific settings"
 settings_dialog.default_view.label: "Default view:"
 settings_dialog.default_repository.label: "Archetype repository:"
 
-settings_dialog.startup.group: "Startup"
+settings_dialog.app.group: "App"
 settings_dialog.open_project_on_startup.checkbox: "Open last project on startup"
+settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project when the application starts"
+settings_dialog.edit_on_clone.checkbox: "Edit on object archetype clone"
+settings_dialog.edit_on_clone.tooltip: "When creating a new object from an archetype, open the new object for editing. If edit dialog is canceled, the clone operation will be undone."
 
 settings_dialog.info.label: "The changes will be applied once the application is restarted"
 
@@ -129,22 +132,22 @@ settings_dialog_warning.text: "The changes will be applied once the application 
 # ---------------------------------------------------------------------------
 # Export dialog
 # ---------------------------------------------------------------------------
-export_dialog.title: "Export current view"
-export_dialog.export_format.label: "Select export format:"
+export_dialog.title: "Export current view: {}"
+export_dialog.export_strategy.label: "Select export format:"
 export_dialog.finished.dialog.title: "Export finished"
 export_dialog.finished.dialog.text: "Current view has been exported successfully in path {}"
 export_dialog.finished.dialog.error.title: "Error exporting"
 export_dialog.finished.dialog.error.text: "Current view could not be exported. For more information, check the log file."
 
 # Export PDF
-export_dialog.export_format.pdf: "PDF file"
+export_dialog.export_strategy.pdf: "PDF file"
 export_dialog.export_pdf.filename.label: "Enter file name and path:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'The file name cannot contain the following characters: / \ : * ? \" < > |'
 export_dialog.export_pdf.filename.error.empty: "The file name cannot be empty"
 export_dialog.export_pdf.filename.error.folder_not_found: "Selected path does not exist"
 
 # Export HTML
-export_dialog.export_format.html: "HTML (with resources folder)"
+export_dialog.export_strategy.html: "HTML (with resources folder)"
 export_dialog.export_html.filepath.label: "Select destination directory:"
 export_dialog.export_html.folder_name.label: "Enter folder name:"
 export_dialog.export_html.error.empty: "The directory name cannot be empty"
@@ -168,12 +171,13 @@ without warranty of any kind, use it at your own risk. The authors are not respo
 Seville, September 2024."
 
 # ---------------------------------------------------------------------------
-# Trace edit dialog
+# Items dialog
 # ---------------------------------------------------------------------------
-trace_edit_dialog.title: "Select an element"
-trace_edit_dialog.name_filter_widget.placeholder_text: "Enter name to filter"
-trace_edit_dialog.error_label.no_objects: "No elements found, create new elements of one of the following classes: {}"
-trace_edit_dialog.any_document: "Any document"
+items_edit_dialog.title: "Select an element"
+items_edit_dialog.name_filter_widget.placeholder_text: "Enter name to filter"
+items_edit_dialog.error_label.no_objects: "No elements found, create new elements of one of the following classes: {}"
+items_edit_dialog.any_document: "Any document"
+items_edit_dialog.no_items_found: "No elements found"
 
 # ---------------------------------------------------------------------------
 # Delete dialog
@@ -189,6 +193,21 @@ delete_dialog.tree.header: Click in each item to see the elements that will be u
 asset_edit.file_dialog.title: "Select image"
 asset_edit.file_dialog.filter: "Images"
 
+
+# ---------------------------------------------------------------------------
+# Impact analysis dialog
+# ---------------------------------------------------------------------------
+impact_analysis_dialog.title: "Impact analysis"
+impact_analysis_dialog.label.analyzed_objects: "Directly affected objects:"
+impact_analysis_dialog.label.trace_types: "Trace types:"
+impact_analysis_dialog.label.affected_objects: "Indirectly affected objects:"
+impact_analysis_dialog.items_edit_dialog.show_only_traced: "Show only traced elements"
+
+impact_analysis_dialog.message.error.impact_analyzer.title: "Error initializing plugin"
+impact_analysis_dialog.message.error.impact_analyzer.text: "There was an error initializing the impact analyzer plugin. Check the log file for more information."
+
+impact_analysis_dialog.button.navigate.tooltip: "Navigate to the selected element"
+impact_analysis_dialog.button.edit.tooltip: "Edit the selected element"
 
 # ---------------------------------------------------------------------------
 # Developer features
@@ -248,3 +267,10 @@ create_document_archetype_dialog.proteus_id_invalid: "ProteusID cannot contain s
 create_document_archetype_dialog.proteus_id_in_use: "An archetype with the same ProteusID already exists"
 create_document_archetype_dialog.directory_name_missing: "Directory name cannot be empty"
 create_document_archetype_dialog.directory_name_in_use: "Already exists a document archetype with the same directory name"
+
+
+# ---------------------------------------------------------------------------
+# WebChannel document interaction plugin dialog
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "The selected item is not in the current document"
+document.navigation.request.text: "The selected item '{}'' is in the document '{}', do you want to navigate to it?"

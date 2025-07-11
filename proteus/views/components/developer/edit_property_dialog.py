@@ -103,6 +103,7 @@ class EditPropertyDialog(ProteusDialog):
 
         # Specific property attributes widgets
         self.choices_input: QLineEdit  # EnumProperty
+        self.value_tooltips_input: BooleanEdit  # EnumProperty
         self.acceptedTargets_input: QLineEdit  # TraceProperty
         self.excludedTargets_input: QLineEdit
         self.type_input: QLineEdit
@@ -179,7 +180,11 @@ class EditPropertyDialog(ProteusDialog):
         self.choices_input = QLineEdit()
         self.choices_input.setText(self._property.choices)
 
+        self.value_tooltips_input = BooleanEdit("valueTooltips")
+        self.value_tooltips_input.setChecked(self._property.valueTooltips)
+
         form_layout.addRow("choices", self.choices_input)
+        form_layout.addRow("valueTooltips", self.value_tooltips_input)
 
     def _create_trace_property_inputs(self, form_layout: QFormLayout) -> None:
         """
@@ -194,14 +199,14 @@ class EditPropertyDialog(ProteusDialog):
             " ".join([tag for tag in self._property.excludedTargets])
         )
         self.type_input = QLineEdit()
-        self.type_input.setText(self._property.type)
+        self.type_input.setText(self._property.traceType)
         self.max_targets_number_input = QLineEdit()
-        self.max_targets_number_input.setText(str(self._property.max_targets_number))
+        self.max_targets_number_input.setText(str(self._property.maxTargetsNumber))
 
-        form_layout.addRow("accepted_targets", self.acceptedTargets_input)
-        form_layout.addRow("excluded_targets", self.excludedTargets_input)
+        form_layout.addRow("acceptedTargets", self.acceptedTargets_input)
+        form_layout.addRow("excludedTargets", self.excludedTargets_input)
         form_layout.addRow("type", self.type_input)
-        form_layout.addRow("max_targets_number", self.max_targets_number_input)
+        form_layout.addRow("maxTargetsNumber", self.max_targets_number_input)
 
     def _create_value_input(self, form_layout: QFormLayout) -> None:
         """
@@ -219,7 +224,7 @@ class EditPropertyDialog(ProteusDialog):
             self.value_input.inmutable_checkbox.hide()
             self.value_input.input.setEnabled(True)
 
-        # NOTE: Special case for EnumProperty, propertyInput is replaces by a
+        # NOTE: Special case for EnumProperty, propertyInput is replaced by a
         # QLineEdit widget
         if isinstance(self._property, EnumProperty):
             self.value_input = QLineEdit()
@@ -332,7 +337,9 @@ class EditPropertyDialog(ProteusDialog):
                 self._property.value != self.value_input.text().strip()
             )
         else:
-            value_has_changed: bool = self._property.value != self.value_input.get_value()
+            value_has_changed: bool = (
+                self._property.value != self.value_input.get_value()
+            )
 
         attributes_have_changed: bool = (
             self._property.name != name
@@ -347,6 +354,7 @@ class EditPropertyDialog(ProteusDialog):
             attributes_have_changed = (
                 attributes_have_changed
                 or self._property.choices != self.choices_input.text().strip()
+                or self._property.valueTooltips != self.value_tooltips_input.checked()
             )
 
         if isinstance(self._property, TraceProperty):
@@ -356,8 +364,8 @@ class EditPropertyDialog(ProteusDialog):
                 != self.acceptedTargets_input.text().split()
                 or self._property.excludedTargets
                 != self.excludedTargets_input.text().split()
-                or self._property.type != self.type_input.text().strip()
-                or self._property.max_targets_number
+                or self._property.traceType != self.type_input.text().strip()
+                or self._property.maxTargetsNumber
                 != int(self.max_targets_number_input.text())
             )
 
@@ -374,6 +382,7 @@ class EditPropertyDialog(ProteusDialog):
                     required=self.required_input.checked(),
                     inmutable=self.inmutable_input.checked(),
                     value=self.value_input.text().strip(),
+                    valueTooltips=self.value_tooltips_input.checked(),
                     choices=self.choices_input.text().strip(),
                 )
             elif isinstance(self._property, TraceProperty):
@@ -386,8 +395,8 @@ class EditPropertyDialog(ProteusDialog):
                     value=self.value_input.get_value(),
                     acceptedTargets=self.acceptedTargets_input.text().split(),
                     excludedTargets=self.excludedTargets_input.text().split(),
-                    type=self.type_input.text().strip(),
-                    max_targets_number=int(self.max_targets_number_input.text()),
+                    traceType=self.type_input.text().strip(),
+                    maxTargetsNumber=int(self.max_targets_number_input.text()),
                 )
             else:
                 self.new_property = property_class(
