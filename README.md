@@ -14,7 +14,7 @@ XSLT templates, archetypes repositories and plugins are grouped in profiles. A p
 This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
 
 <div align = center>
-  <img src="https://github.com/user-attachments/assets/936f4820-0017-4da3-a8de-901bccdaf952" width="800" />
+  <img width="800" alt="proteus" src="https://github.com/user-attachments/assets/835ad4c1-36bf-4f27-be14-ff46fcafbbfe" />
 </div>
 
 ## License
