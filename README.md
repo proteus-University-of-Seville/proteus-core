@@ -5,13 +5,13 @@
 # PROTEUS
 
 </div>
-Proteus is an archetype-based editor for structured documents. An archetype is an off-the-shelf object, document or project that can be cloned as needed to create new ones. Archetypes are organized into profiles, that can be developed for different domains, from software development to legal documents. Any concept that can be expressed in a conceptual model can become an archetype in Proteus. The archetypes are organized in archetype profiles, so that Proteus is actually a meta-tool since each profile configures Proteus with a set of archetypes from a specific domain.
+Proteus is an archetype-based editor for structured documents. An archetype is an off-the-shelf object, document or project that can be cloned as needed to create new ones. Archetypes are organized into profiles, that can be developed for different domains, from software development to legal documents. Any concept that can be expressed in a conceptual model can become an archetype in Proteus. Proteus is actually a meta-tool since each profile configures Proteus with a set of domain-specific archetypes.
 
-In addition to archetypes, Proteus also offers the possibility of having different views for documents and generating PDF files directly. This flexibility is based on the application of XSLT style sheets extended with Python code, allowing HTML, LaTeX or any other text format to be generated from the objects that make up project's documents, all stored in individual XML files for facilitating version control with tools like Git. The goal is letting the user focus on the content but not the format.
+In addition to archetypes, Proteus also offers the possibility of having different views for documents and generating PDF files directly. This flexibility is based on the application of Python-extended XSLT style sheets, allowing HTML, LaTeX or any other text format to be generated from the objects that make up project's documents, all stored in individual XML files for facilitating version control with tools like Git. The goal is letting the user focus on the content and forget about the layout.
 
-XSLT templates, archetypes repositories and plugins are grouped in profiles. A profile completely change the behaviour of the application based on its content, preparing it for a domain specific task. Plugins enhance XSLT templates allowing complex operations using Python and accessing advanced functionalities. Progiles can be selected from the configuration menu and may be included in the application or loaded from a external directory.
+XSLT templates, archetypes repositories and plugins are grouped in profiles. A profile completely change the behaviour of the application based on its content, preparing it for a domain specific task. Plugins enhance XSLT templates allowing complex operations using Python and accessing advanced functionalities. Profiles can be selected from the configuration menu and may be included in the application or loaded from a external directory.
 
-This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
+This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez.
 
 <div align = center>
   <img width="800" alt="proteus" src="https://github.com/user-attachments/assets/835ad4c1-36bf-4f27-be14-ff46fcafbbfe" />
@@ -21,7 +21,7 @@ This application has been developed at the University of Seville (Andalusia, Spa
 PROTEUS is licensed under the BSD 3-Clause "New" or "Revised" License. See [LICENSE](LICENSE) for more information.
 
 ## Installation
-PROTEUS is a Python application. It is developed using Python 3.10 or 3.11. It does not work with Python 3.12 for the moment. It is recommended to use a virtual environment to install the application. The application dependencies are listed in the `requirements.txt` file.
+PROTEUS is a Python application. It is developed using Python 3.10 or 3.11. It does not work with Python 3.12 for the moment. It is recommended to use a virtual environment like `uv` to install the application. The application dependencies are listed in the `requirements.txt` file.
 
 ### Running using UV
 
