@@ -5,7 +5,7 @@
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Simple information requirement]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2023-11-21</dateProperty>
     <floatProperty name="version" category="general">1.0</floatProperty>
-    <markdownProperty name="description" category="details"><![CDATA[TBD]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[TBD]]></markdownProperty>
     <enumProperty name="importance" category="priority" choices="vital important">vital</enumProperty>
     <enumProperty name="urgency" category="priority" choices="immediately pressure">immediately</enumProperty>
     <enumProperty name="status" category="priority" choices="developing pending">developing</enumProperty>

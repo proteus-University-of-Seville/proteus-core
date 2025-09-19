@@ -4,10 +4,10 @@
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Dummy stakeholder 2]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2023-11-21</dateProperty>
     <floatProperty name="version" category="general">1.0</floatProperty>
-    <stringProperty name="role" category="details"><![CDATA[TDB]]></stringProperty>
-    <enumProperty name="category" category="details" choices="customer developer user">developer</enumProperty>
+    <stringProperty name="role" category="detail"><![CDATA[TDB]]></stringProperty>
+    <enumProperty name="category" category="detail" choices="customer developer user">developer</enumProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[No comments.]]></markdownProperty>
-    <traceProperty name="organization" category="details" acceptedTargets="organization" traceType=":Proteus-dependency"/>
+    <traceProperty name="organization" category="detail" acceptedTargets="organization" traceType=":Proteus-dependency"/>
   </properties>
   <children/>
 </object>

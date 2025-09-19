@@ -5,7 +5,7 @@
     <stringProperty name=":Proteus-name"><![CDATA[Empty document]]></stringProperty>
     <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
 	  <dateProperty name=":Proteus-date">2000-12-31</dateProperty>
-    <markdownProperty name="description" category="details"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
     <traceProperty name="prepared-for" acceptedTargets="organization" traceType=":Proteus-dependency"/>
     <traceProperty name="prepared-by" acceptedTargets="organization" traceType=":Proteus-author"/>

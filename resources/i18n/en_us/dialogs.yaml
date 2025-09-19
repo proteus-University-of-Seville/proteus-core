@@ -162,13 +162,13 @@ export_dialog.export_html.error.folder_exists: "The folder already exists, selec
 information_dialog.title: "Proteus information"
 information_dialog.description.text: "Proteus is an archetype-based editor for structured documents.
 An archetype is an off-the-shelf object, document or project that can be cloned as needed to create new ones.
-Archetypes are organized into profiles, that can be developed for different domains.
+Archetypes are organized into domain-specific profiles.
 This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez).
 This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
 information_dialog.license.text: "This application is distributed under the BSD 3-Clause 'New' or 'Revised' License."
 information_dialog.terms_of_use.text: "This application do not collect any personal information. The software is provided 'as is',
 without warranty of any kind, use it at your own risk. The authors are not responsible for any damage caused by the use of this software.
-Seville, September 2024."
+Seville, September 2025."
 
 # ---------------------------------------------------------------------------
 # Items dialog

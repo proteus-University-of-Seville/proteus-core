@@ -4,7 +4,7 @@
     <stringProperty name=":Proteus-name" category="general"><![CDATA[dummy]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2023-11-21</dateProperty>
     <floatProperty name="version" category="general">1.0</floatProperty>
-    <markdownProperty name="text" category="details"><![CDATA[TBD]]></markdownProperty>
+    <markdownProperty name="text" category="detail"><![CDATA[TBD]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[No comments.]]></markdownProperty>
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="dependencies" category="traceability" acceptedTargets="paragraph graphic-file external-resource glossary-item" traceType=":Proteus-dependency"/>

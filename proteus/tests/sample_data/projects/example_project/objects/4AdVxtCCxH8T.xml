@@ -4,7 +4,7 @@
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Im tracing TRACED doc element]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2023-11-28</dateProperty>
     <floatProperty name="version" category="general">1.0</floatProperty>
-    <markdownProperty name="text" category="details"><![CDATA[TBD]]></markdownProperty>
+    <markdownProperty name="text" category="detail"><![CDATA[TBD]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[No comments.]]></markdownProperty>
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author">
       <trace target="3apVcQXCBCqW" traceType=":Proteus-author"/>

@@ -43,6 +43,7 @@ archetype.class.symbolic-link: "Symbolic\nlink"
 
 archetype.prop_category.general: "General"
 archetype.prop_category.detail: "Detail"
+archetype.prop_category.details: "Detail"
 archetype.prop_category.comments: "Comments"
 archetype.prop_category.dependencies: "Dependencies"
 

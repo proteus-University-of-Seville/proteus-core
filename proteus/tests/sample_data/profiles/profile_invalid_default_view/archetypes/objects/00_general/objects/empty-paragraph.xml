@@ -5,7 +5,7 @@
     <dateProperty name=":Proteus-date">2000-12-31</dateProperty>
     <floatProperty name="version"><![CDATA[1.0]]></floatProperty>
     <booleanProperty name="is-glossary" tooltip="property.is-glossary.tooltip">false</booleanProperty>
-    <markdownProperty name="text" category="details"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="text" category="detail"><![CDATA[]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="dependencies" category="dependencies" acceptedTargets="paragraph graphic-file external-resource" traceType=":Proteus-dependency"/>

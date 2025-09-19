@@ -5,7 +5,7 @@
     <dateProperty name=":Proteus-date" category="general">2023-11-21</dateProperty>
     <floatProperty name="version" category="general">1.0</floatProperty>
     <urlProperty name="url" category="general"><![CDATA[https://www.us.es/sites/default/files/2019-05/marca-US-principal.jpg]]></urlProperty>
-    <markdownProperty name="description" category="details"><![CDATA[Logo of the University of Seville.]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Logo of the University of Seville.]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[No comments.]]></markdownProperty>
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="dependencies" category="traceability" acceptedTargets="paragraph graphic-file external-resource glossary-item" traceType=":Proteus-dependency"/>
