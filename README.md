@@ -31,6 +31,8 @@ PROTEUS can be run using [uv](https://docs.astral.sh/uv/) (An extremely fast Pyt
 uv run proteus
 ``` 
 
+<!--
+
 ### Detailed installation instructions
 
 Clone the repository and navigate to the top-level directory of the application.
@@ -84,6 +86,7 @@ Linux and MacOS:
 
 **WARNING**, directory names changes may affect the virtual environment. If you encounter any problem, delete the virtual environment and create/run the scripts again.
 
+-->
 
 ## Profiles
 PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:
