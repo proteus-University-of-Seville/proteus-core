@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  proteus-project.xsd
+  =====================================================================
+  XML Schema for PROTEUS archetype project definition files.
+
+  Validated instance example:
+    profiles/basic/archetypes/projects/<name>/project.xml
+
+  Structure:
+    <project id="...">
+      <properties>
+        <!-- zero or more property elements -->
+      </properties>
+      <documents>
+        <document id="..."/>   <!-- zero or more document references -->
+      </documents>
+    </project>
+
+  The structure is very similar to proteus-object.xsd:
+    - Both roots share the same <properties> block (PropertiesType).
+    - <documents> plays the same structural role as <children> in an
+      object: it lists pre-populated references by their ProteusID.
+    - The project root does not carry class, acceptedChildren or
+      acceptedParents attributes because a project is always the
+      top-level container and its containment rules are fixed.
+
+  Shared definitions are pulled in from proteus-properties.xsd via
+  xs:include (both files must reside in the same directory).
+  =====================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Include shared property type definitions -->
+  <xs:include schemaLocation="proteus-properties.xsd"/>
+
+
+  <!-- =================================================================
+       DocumentRefType
+       Type for each <document> reference inside a <documents> element.
+       id : ProteusID of the referenced document archetype (short UUID)
+       ================================================================= -->
+  <xs:complexType name="DocumentRefType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+
+  <!-- =================================================================
+       DocumentsType
+       Container for document archetype references included in the
+       project by default when it is cloned.
+       Each <document> element points to a document archetype by its id.
+       ================================================================= -->
+  <xs:complexType name="DocumentsType">
+    <xs:sequence>
+      <xs:element name="document" type="DocumentRefType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <!-- =================================================================
+       Root element: <project>
+       Represents a single PROTEUS archetype project definition.
+
+       Attributes:
+         id : unique short UUID identifying this project archetype
+              (required)
+
+       Child elements:
+         <properties> : required; holds all property definitions of the
+                        project (name, version, date, description, etc.)
+         <documents>  : required; lists document archetype references that
+                        are included in the project upon creation (may be
+                        an empty list)
+       ================================================================= -->
+  <xs:element name="project">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="properties" type="PropertiesType"/>
+        <xs:element name="documents"  type="DocumentsType"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>
