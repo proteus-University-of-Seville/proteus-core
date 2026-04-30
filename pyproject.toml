@@ -22,6 +22,10 @@ dependencies = [
     "markdown==3.4.3",
     "pyspellchecker==0.8.1",
     "trieregex==1.0.0",
+]
+
+[dependency-groups]
+dev = [
     "mypy==0.982",
     "mypy-extensions==0.4.3",
     "pytest==8.2.2",
@@ -34,7 +38,6 @@ dependencies = [
     "pytest-cov==4.1.0",
     "pyinstaller==6.2.0",
 ]
-
 
 [project.scripts]
 proteus = "proteus.__main__:main"
