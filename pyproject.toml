@@ -9,7 +9,7 @@ description = "Proteus is a configurable tool for editing structured documents, 
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
-    "lxml==4.9.3",
+    "lxml>=6.1.0",
     "pyqt6-qt6==6.5.0",
     "pyqt6==6.5.0",
     "shortuuid==1.0.9",
@@ -19,7 +19,7 @@ dependencies = [
     "pyqt6-webengine==6.5.0",
     "pyqt6-webengine-qt6==6.5.1",
     "pyyaml==6.0.2",
-    "markdown==3.4.3",
+    "markdown>=3.8.1",
     "pyspellchecker==0.8.1",
     "trieregex==1.0.0",
 ]
@@ -28,7 +28,7 @@ dependencies = [
 dev = [
     "mypy==0.982",
     "mypy-extensions==0.4.3",
-    "pytest==8.2.2",
+    "pytest>=9.0.3",
     "pytest-mock==3.11.1",
     "pytest-lazy-fixtures==1.0.7",
     "pytest-qt==4.2.0",
