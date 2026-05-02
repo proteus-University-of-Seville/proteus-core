@@ -1,0 +1,107 @@
+@startuml
+' PROTEUS basic/default XSLT - phased migration roadmap
+
+title PROTEUS Basic XSLT - Migration Roadmap (Current -> Transitional -> Target)
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment left
+
+legend right
+  == Semantics ==
+  --> structural dependency
+  ..> migration step / implementation move
+endlegend
+
+package "Phase 0 - Current" {
+  component "template.xml" as P0_TEMPLATE
+  component "PROTEUS_lang_en_US.xsl" as P0_EN
+  component "PROTEUS_lang_es_ES.xsl" as P0_ES
+  component "PROTEUS_i18n_English.xsl" as P0_I18N_EN
+  component "PROTEUS_i18n_Spanish.xsl" as P0_I18N_ES
+  component "PROTEUS_main.xsl" as P0_MAIN
+  component "PROTEUS_utilities.xsl" as P0_UTIL
+  component "PROTEUS_properties.xsl" as P0_PROPS
+  component "PROTEUS_document.xsl + PROTEUS_cover.xsl" as P0_DOC
+  component "archetypes/general/*.xsl + default.xsl" as P0_ARCH
+
+  P0_TEMPLATE --> P0_EN : en_US
+  P0_TEMPLATE --> P0_ES : es_ES
+  P0_EN --> P0_I18N_EN : import
+  P0_ES --> P0_I18N_ES : import
+  P0_EN --> P0_MAIN : include
+  P0_ES --> P0_MAIN : include
+  P0_MAIN --> P0_UTIL
+  P0_MAIN --> P0_PROPS
+  P0_MAIN --> P0_DOC
+  P0_MAIN --> P0_ARCH
+}
+
+package "Phase 1 - Transitional" {
+  component "template.xml\n(unchanged)" as P1_TEMPLATE
+  component "PROTEUS_lang_en_US.xsl\n(thin wrapper)" as P1_EN
+  component "PROTEUS_lang_es_ES.xsl\n(thin wrapper)" as P1_ES
+  component "i18n/en_US.xsl" as P1_I18N_EN
+  component "i18n/es_ES.xsl" as P1_I18N_ES
+  component "PROTEUS_root.xsl\n(new orchestrator)" as P1_ROOT
+  component "kernel/*.xsl\n(utilities/properties/document/cover)" as P1_KERNEL
+  component "catalog/archetype_registry.xsl\n(new, initially mirrors current matches)" as P1_REG
+  component "archetypes/*.xsl\n(existing files reused)" as P1_ARCH
+
+  P1_TEMPLATE --> P1_EN
+  P1_TEMPLATE --> P1_ES
+  P1_EN --> P1_I18N_EN : import
+  P1_ES --> P1_I18N_ES : import
+  P1_EN --> P1_ROOT : include
+  P1_ES --> P1_ROOT : include
+  P1_ROOT --> P1_KERNEL
+  P1_ROOT --> P1_REG
+  P1_ROOT --> P1_ARCH
+}
+
+package "Phase 2 - Target" {
+  component "template.xml" as P2_TEMPLATE
+  component "PROTEUS_lang_en_US.xsl" as P2_EN
+  component "PROTEUS_lang_es_ES.xsl" as P2_ES
+  component "i18n/{lang}.xsl\n(locale packs)" as P2_I18N
+  component "PROTEUS_root.xsl\n(stable composition API)" as P2_ROOT
+  component "kernel/*.xsl\n(stable shared contracts)" as P2_KERNEL
+  component "catalog/archetype_registry.xsl\n(single dispatch contract)" as P2_REG
+  component "archetypes/general bundle" as P2_ARCH
+  component "archetypes/default fallback" as P2_FALLBACK
+  component "profile overrides\n(optional extension layer)" as P2_EXT
+
+  P2_TEMPLATE --> P2_EN
+  P2_TEMPLATE --> P2_ES
+  P2_EN --> P2_I18N
+  P2_ES --> P2_I18N
+  P2_EN --> P2_ROOT
+  P2_ES --> P2_ROOT
+  P2_ROOT --> P2_KERNEL
+  P2_ROOT --> P2_REG
+  P2_REG --> P2_ARCH
+  P2_REG --> P2_FALLBACK
+  P2_ROOT --> P2_EXT
+}
+
+' Migration flow across phases
+P0_MAIN ..> P1_ROOT : Step 1: extract orchestration to new root
+P0_I18N_EN ..> P1_I18N_EN : Step 2: move locale files under i18n/
+P0_I18N_ES ..> P1_I18N_ES : Step 2: move locale files under i18n/
+P0_UTIL ..> P1_KERNEL : Step 3: move utilities into kernel module
+P0_PROPS ..> P1_KERNEL : Step 3: move property renderers into kernel module
+P0_DOC ..> P1_KERNEL : Step 3: split document shell and cover
+P0_ARCH ..> P1_ARCH : Step 4: keep archetypes, route via registry
+P1_REG ..> P2_REG : Step 5: consolidate dispatch contract
+P1_ROOT ..> P2_ROOT : Step 6: freeze stable composition API
+P1_ARCH ..> P2_ARCH : Step 7: group and simplify archetype bundles
+
+note bottom
+  Suggested rollout policy:
+  - Keep output parity after each step (snapshot test generated HTML).
+  - Migrate by wrappers first, internals second.
+  - Defer archetype rewrites until registry + kernel contracts stabilize.
+end note
+
+@enduml

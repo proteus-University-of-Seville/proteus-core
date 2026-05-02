@@ -1,4 +1,7 @@
 {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
     "python.testing.pytestArgs": [
         "proteus"
     ],

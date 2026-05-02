@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ========================================================= -->
-<!-- File    : template_en_US.xsl                              -->
-<!-- Content : PROTEUS default XSLT English (main file)        -->
+<!-- File    : PROTEUS_default_es_ES.xsl                       -->
+<!-- Content : PROTEUS default XSLT for Spanish (entry point)  -->
 <!-- Author  : Amador Durán Toro                               -->
 <!--           José María Delgado Sánchez                      -->
 <!-- Date    : 2023/06/29                                      -->
@@ -11,6 +11,9 @@
 <!-- Update  : 2024/09/13 (Amador Durán)                       -->
 <!-- Variable declaration moved to i18n document.              -->
 <!-- ========================================================= -->
+<!-- Update  : 2026/05/02 (Amador Durán)                       -->
+<!-- Renamed and refactored.                                   -->
+<!-- ========================================================= -->
 
 <!-- ======================================================== -->
 <!-- exclude-result-prefixes="proteus" must be set in all     -->
@@ -18,22 +21,22 @@
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:proteus="http://proteus.us.es"
-    xmlns:proteus-utils="http://proteus.us.es/utils"
-    exclude-result-prefixes="proteus proteus-utils"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+exclude-result-prefixes="proteus proteus-utils"
 >
 
 <!-- ======================================================== -->
 <!-- Import default localized strings                         -->
 <!-- ======================================================== -->
 
-<xsl:import href="PROTEUS_i18n_English.xsl"/>
+<xsl:include href="PROTEUS_i18n_Spanish.xsl"/>
 
 <!-- ======================================================== -->
 <!-- Include main XSLT file                                   -->
 <!-- ======================================================== -->
 
-<xsl:include href="PROTEUS_main.xsl"/>
+<xsl:include href="PROTEUS_default_main.xsl"/>
 
 </xsl:stylesheet>

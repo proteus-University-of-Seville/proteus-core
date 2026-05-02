@@ -1,0 +1,110 @@
+@startuml
+' PROTEUS basic/default XSLT dependency map
+' Scope: profiles/basic/xslt/default
+
+title PROTEUS Basic XSLT - Component Dependencies
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment left
+
+legend right
+  == Edge semantics ==
+  --> include/import (file-level dependency)
+  ..> call-template / apply-templates (logical runtime dependency)
+endlegend
+
+package "Entry Point Selection" {
+  component "template.xml\n(entryPoints)" as TEMPLATE
+  component "PROTEUS_lang_en_US.xsl\n(English entrypoint)" as LANG_EN
+  component "PROTEUS_lang_es_ES.xsl\n(Spanish entrypoint)" as LANG_ES
+}
+
+package "Localization" {
+  component "PROTEUS_i18n_English.xsl" as I18N_EN
+  component "PROTEUS_i18n_Spanish.xsl" as I18N_ES
+}
+
+package "Core Orchestrator" {
+  component "PROTEUS_main.xsl\n(root project template + dictionaries)" as MAIN
+}
+
+package "Shared Modules" {
+  component "PROTEUS_utilities.xsl" as UTIL
+  component "PROTEUS_properties.xsl" as PROPS
+  component "PROTEUS_cover.xsl" as COVER
+  component "PROTEUS_document.xsl" as DOC
+}
+
+package "Archetypes - General" {
+  component "archetypes/general/section.xsl" as A_SECTION
+  component "archetypes/general/appendix.xsl" as A_APPENDIX
+  component "archetypes/general/paragraph.xsl" as A_PARAGRAPH
+  component "archetypes/general/glossary_item.xsl" as A_GLOSSARY
+  component "archetypes/general/figure.xsl" as A_FIGURE
+  component "archetypes/general/organization.xsl" as A_ORGANIZATION
+  component "archetypes/general/stakeholder.xsl" as A_STAKEHOLDER
+  component "archetypes/general/symbolic_link.xsl" as A_SYMLINK
+}
+
+package "Fallback" {
+  component "archetypes/default.xsl\n(catch-all object renderer)" as A_DEFAULT
+}
+
+' Entry point selection
+TEMPLATE --> LANG_EN : en_US
+TEMPLATE --> LANG_ES : es_ES
+
+' Language-specific roots
+LANG_EN --> I18N_EN : xsl:import
+LANG_ES --> I18N_ES : xsl:import
+LANG_EN --> MAIN : xsl:include
+LANG_ES --> MAIN : xsl:include
+
+' Main includes
+MAIN --> UTIL : xsl:include
+MAIN --> PROPS : xsl:include
+MAIN --> COVER : xsl:include
+MAIN --> DOC : xsl:include
+MAIN --> A_SECTION : xsl:include
+MAIN --> A_APPENDIX : xsl:include
+MAIN --> A_PARAGRAPH : xsl:include
+MAIN --> A_GLOSSARY : xsl:include
+MAIN --> A_FIGURE : xsl:include
+MAIN --> A_ORGANIZATION : xsl:include
+MAIN --> A_STAKEHOLDER : xsl:include
+MAIN --> A_SYMLINK : xsl:include
+MAIN --> A_DEFAULT : xsl:include
+
+' Cross-module template dependencies (logical)
+DOC ..> COVER : call-template document_cover
+DOC ..> UTIL : call-template pagebreak
+DOC ..> A_SECTION : apply-templates mode="toc"
+DOC ..> A_APPENDIX : apply-templates mode="toc"
+DOC ..> A_SECTION : apply-templates (document body)
+DOC ..> A_APPENDIX : apply-templates (document body)
+DOC ..> A_PARAGRAPH : apply-templates (document body)
+DOC ..> A_GLOSSARY : apply-templates (document body)
+DOC ..> A_FIGURE : apply-templates (document body)
+DOC ..> A_ORGANIZATION : apply-templates (document body)
+DOC ..> A_STAKEHOLDER : apply-templates (document body)
+DOC ..> A_SYMLINK : apply-templates (document body)
+DOC ..> A_DEFAULT : apply-templates fallback
+PROPS ..> UTIL : call-template generate_markdown
+A_PARAGRAPH ..> UTIL : call-template generate_markdown
+A_GLOSSARY ..> UTIL : call-template generate_markdown
+A_FIGURE ..> UTIL : call-template generate_markdown
+A_ORGANIZATION ..> UTIL : call-template generate_header
+A_ORGANIZATION ..> UTIL : call-template generate_property_row
+A_STAKEHOLDER ..> UTIL : call-template generate_header
+A_STAKEHOLDER ..> UTIL : call-template generate_property_row
+A_DEFAULT ..> MAIN : fallback template for unmatched object archetypes
+
+note bottom of MAIN
+  MAIN is the single orchestration hub.
+  Both language roots import locale variables,
+  then include MAIN to compose a full stylesheet.
+end note
+
+@enduml

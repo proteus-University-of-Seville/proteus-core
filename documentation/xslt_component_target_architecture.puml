@@ -1,0 +1,86 @@
+@startuml
+' PROTEUS basic/default XSLT - proposed simplified architecture
+' Goal: preserve language-based entrypoints while reducing coupling.
+
+title PROTEUS Basic XSLT - Proposed Target Architecture
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultTextAlignment left
+
+legend right
+  == Edge semantics ==
+  --> static dependency (include/import or packaging)
+  ..> runtime dispatch/use
+endlegend
+
+package "Entry Layer" {
+  component "template.xml\n(entryPoint selector)" as TEMPLATE
+  component "PROTEUS_lang_en_US.xsl\n(thin entrypoint)" as ENTRY_EN
+  component "PROTEUS_lang_es_ES.xsl\n(thin entrypoint)" as ENTRY_ES
+}
+
+package "Localization Layer" {
+  component "i18n/en_US.xsl\n(locale variables only)" as L10N_EN
+  component "i18n/es_ES.xsl\n(locale variables only)" as L10N_ES
+}
+
+package "Composition Layer" {
+  component "PROTEUS_root.xsl\n(single orchestrator)" as ROOT
+  component "catalog/archetype_registry.xsl\n(class -> template mapping contract)" as REGISTRY
+}
+
+package "Kernel Layer" {
+  component "kernel/utilities.xsl\n(named utility templates)" as K_UTIL
+  component "kernel/properties.xsl\n(property renderers only)" as K_PROPS
+  component "kernel/document_shell.xsl\nhtml/head/body/toc scaffold" as K_DOC
+  component "kernel/cover.xsl" as K_COVER
+}
+
+package "Feature Archetypes" {
+  component "archetypes/general/*.xsl\n(section, appendix, paragraph, ... )" as A_GENERAL
+  component "archetypes/default.xsl\n(generic fallback)" as A_FALLBACK
+}
+
+package "Extension Point" {
+  component "profile overrides\n(optional includes/imports)" as EXT
+}
+
+' Language routing remains explicit
+TEMPLATE --> ENTRY_EN : language=en_US
+TEMPLATE --> ENTRY_ES : language=es_ES
+
+ENTRY_EN --> L10N_EN : xsl:import
+ENTRY_ES --> L10N_ES : xsl:import
+ENTRY_EN --> ROOT : xsl:include
+ENTRY_ES --> ROOT : xsl:include
+
+' Root composition
+ROOT --> K_UTIL
+ROOT --> K_PROPS
+ROOT --> K_DOC
+ROOT --> K_COVER
+ROOT --> REGISTRY
+ROOT --> A_GENERAL
+ROOT --> A_FALLBACK
+ROOT --> EXT
+
+' Runtime behavior
+K_DOC ..> K_COVER : call-template
+K_DOC ..> REGISTRY : dispatch by class
+REGISTRY ..> A_GENERAL : resolve specialized template
+REGISTRY ..> A_FALLBACK : fallback template
+A_GENERAL ..> K_UTIL : shared helpers
+K_PROPS ..> K_UTIL : markdown / row helpers
+
+note bottom of ROOT
+  Refactoring intent:
+  1) keep two language entrypoints for selection compatibility,
+  2) centralize composition into one root,
+  3) isolate reusable kernel modules,
+  4) move archetype routing rules into one registry contract,
+  5) support profile-level overrides without editing kernel files.
+end note
+
+@enduml
