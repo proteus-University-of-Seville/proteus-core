@@ -22,6 +22,7 @@ from typing import Union
 # --------------------------------------------------------------------------
 
 import pytest
+from pytest_lazy_fixtures import lf
 import lxml.etree as ET
 
 # --------------------------------------------------------------------------
@@ -180,8 +181,8 @@ def test_load(sample_project: Project):
 @pytest.mark.parametrize(
     "test_object",
     [
-        pytest.lazy_fixtures("sample_object"),
-        pytest.lazy_fixtures("sample_archetype_document"),
+        lf("sample_object"),
+        lf("sample_archetype_document"),
     ],
 )
 def test_children_lazy_load(test_object: Object):
@@ -209,8 +210,8 @@ def test_children_lazy_load(test_object: Object):
 @pytest.mark.parametrize(
     "test_object",
     [
-        pytest.lazy_fixtures("sample_object"),
-        # pytest.lazy_fixtures("sample_archetype_document"),
+        lf("sample_object"),
+        # lf("sample_archetype_document"),
     ],
 )
 def test_load_children(test_object: Object, request):
@@ -272,20 +273,20 @@ def test_generate_xml(sample_object: Object):
     "test_object_to_clone, test_parent",
     [
         (
-            pytest.lazy_fixtures("sample_object"),
-            pytest.lazy_fixtures("sample_document"),
+            lf("sample_object"),
+            lf("sample_document"),
         ),
         (
-            pytest.lazy_fixtures("sample_document"),
-            pytest.lazy_fixtures("sample_project"),
+            lf("sample_document"),
+            lf("sample_project"),
         ),
         (
-            pytest.lazy_fixtures("sample_archetype_document"),
-            pytest.lazy_fixtures("sample_project"),
+            lf("sample_archetype_document"),
+            lf("sample_project"),
         ),
         (
-            pytest.lazy_fixtures("sample_archetype_object"),
-            pytest.lazy_fixtures("sample_document"),
+            lf("sample_archetype_object"),
+            lf("sample_document"),
         ),
     ],
 )

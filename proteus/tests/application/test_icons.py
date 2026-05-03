@@ -256,7 +256,7 @@ def test_icon_without_memo(mocker, icons_object: Icons):
 
     assert icon is not None, "Icon is None"
     assert isinstance(icon, QIcon), "Icon is not a QIcon object"
-    assert icons_object.icon_path.called_once_with(ProteusIconType.App, "dummy")
+    icons_object.icon_path.assert_called_once_with(ProteusIconType.App, "dummy")
 
 def test_icon_with_memo(mocker, icons_object: Icons):
     """
@@ -270,5 +270,5 @@ def test_icon_with_memo(mocker, icons_object: Icons):
 
     assert icon is not None, "Icon is None"
     assert isinstance(icon, QIcon), "Icon is not a QIcon object"
-    assert icons_object.icon_path.called_once_with(ProteusIconType.App, "dummy")
+    icons_object.icon_path.assert_called_once_with(ProteusIconType.App, "dummy")
 

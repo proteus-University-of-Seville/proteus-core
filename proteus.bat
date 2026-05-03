@@ -1,40 +1,51 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 echo PROTEUS: v1.0.0
 
 @REM Initialize variables
 set python_executable=
+set python_args=
 
-@REM Check if 'python3.11' is installed
-python3.11 --version >nul 2>&1
-if not errorlevel 1 (
-    set python_executable=python3.11
-) else (
-    @REM Check if 'python' is installed
-    python --version >nul 2>&1
-    if not errorlevel 1 (
-        set python_executable=python
-    ) else (
-        @REM Check if 'python3' is installed
-        python3 --version >nul 2>&1
+@REM Try the py launcher with preferred versions (3.14 -> 3.11)
+for %%v in (3.14 3.13 3.12 3.11) do (
+    if not defined python_executable (
+        py -%%v --version >nul 2>&1
         if not errorlevel 1 (
-            set python_executable=python3
+            set python_executable=py
+            set python_args=-%%v
         )
     )
 )
 
-@REM Check if either 'python' or 'python3' is installed
-if "%python_executable%"=="" (
-    echo PROTEUS: Neither 'python', 'python3', nor 'python3.11' was found on your system.
-    echo PROTEUS: Please install Python and try running this script again. Recommended version: 3.11.x
+@REM Fall back to generic 'python' / 'python3', but only if version is in 3.11-3.14
+if not defined python_executable (
+    for %%c in (python python3) do (
+        if not defined python_executable (
+            for /f "tokens=2 delims= " %%V in ('%%c --version 2^>nul') do (
+                for /f "tokens=1,2 delims=." %%a in ("%%V") do (
+                    if "%%a"=="3" (
+                        if "%%b"=="11" set python_executable=%%c
+                        if "%%b"=="12" set python_executable=%%c
+                        if "%%b"=="13" set python_executable=%%c
+                        if "%%b"=="14" set python_executable=%%c
+                    )
+                )
+            )
+        )
+    )
+)
+
+if not defined python_executable (
+    echo PROTEUS: No supported Python ^(3.11-3.14^) was found on your system.
+    echo PROTEUS: Please install Python 3.14 ^(preferred^), 3.13, 3.12 or 3.11 and try again.
     pause
     exit /b 1
 )
 
-echo PROTEUS: %python_executable% is installed on your system.
-echo PROTEUS: Installed Python version:
-%python_executable% --version || true
+@REM Show selected interpreter and version
+for /f "tokens=2 delims= " %%i in ('%python_executable% %python_args% --version') do set "selected_version=%%i"
+echo PROTEUS: Using %python_executable% %python_args% ^(Python %selected_version%^)
 
 @REM Check execution policy is set to Unrestricted, if not tell the user and exit
 echo PROTEUS: Checking execution policy...
@@ -60,7 +71,7 @@ if exist "%venv_dir%" (
     echo PROTEUS: Environment "proteus_env" was not found.
     echo PROTEUS: Creating a virtual environment using %python_executable%...
 
-    %python_executable% -m venv "%venv_dir%"
+    %python_executable% %python_args% -m venv "%venv_dir%"
     
     if exist "%venv_dir%" (
         echo PROTEUS: Virtual environment created successfully.
@@ -77,7 +88,7 @@ echo PROTEUS: Activating the virtual environment...
 call "%venv_dir%\Scripts\activate.bat"
 
 echo PROTEUS: Checking the Python version in the virtual environment...
-for /f "tokens=2 delims= " %%i in ('%python_executable% --version') do set "script_python_version=%%i"
+for /f "tokens=2 delims= " %%i in ('%python_executable% %python_args% --version') do set "script_python_version=%%i"
 for /f "tokens=2 delims= " %%i in ('python --version') do set "venv_python_version=%%i"
 
 echo PROTEUS: Virtual environment Python version: %venv_python_version%

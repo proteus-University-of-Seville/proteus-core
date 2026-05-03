@@ -5,22 +5,35 @@ echo "PROTEUS: v1.0.0"
 # Initialize variables
 python_executable=
 
-# Check if either 'python' or 'python3' is installed
-if command -v python3.11 > /dev/null 2>&1; then
-    python_executable=python3.11
-elif command -v python > /dev/null 2>&1; then
-    python_executable=python
-elif command -v python3 > /dev/null 2>&1; then
-    python_executable=python3
+# Try the preferred direct commands first (3.14 -> 3.11)
+for cand in python3.14 python3.13 python3.12 python3.11; do
+    if command -v "$cand" > /dev/null 2>&1; then
+        python_executable="$cand"
+        break
+    fi
+done
+
+# Fall back to generic 'python' / 'python3', but only if version is in 3.11-3.14
+if [ -z "$python_executable" ]; then
+    for cand in python python3; do
+        if command -v "$cand" > /dev/null 2>&1; then
+            mm=$("$cand" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null)
+            case "$mm" in
+                3.11|3.12|3.13|3.14)
+                    python_executable="$cand"
+                    break
+                    ;;
+            esac
+        fi
+    done
 fi
 
 if [ -n "$python_executable" ]; then
-    echo "PROTEUS: $python_executable is installed on your system."
-    echo "PROTEUS: Installed Python version:"
-    $python_executable --version || true
+    selected_version=$("$python_executable" -c 'import sys; print(sys.version.split()[0])')
+    echo "PROTEUS: Using $python_executable (Python $selected_version)"
 else
-    echo "PROTEUS: Neither 'python', 'python3', nor 'python3.11' was found on your system."
-    echo "PROTEUS: Please install Python and try running this script again. Recommended version: 3.11.x"
+    echo "PROTEUS: No supported Python (3.11-3.14) was found on your system."
+    echo "PROTEUS: Please install Python 3.14 (preferred), 3.13, 3.12 or 3.11 and try again."
     exit 1
 fi
 
