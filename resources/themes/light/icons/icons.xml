@@ -10,13 +10,13 @@
         <icon key="proteus_icon" file="proteus_logo.ico" />
         <icon key="proteus_logo" file="proteus_logo.png" />
         <icon key="US-digital" file="US-marca-digital-cuadrada.png" />
-        <icon key="add_view_icon" file="plus-button.svg"/>
+        <icon key="add_view_icon" file="plus-button.png"/>
         <icon key="browse_asset_icon" file="browse-asset.png"/>
         <icon key="browse_dir_icon" file="browse-dir.png"/>
         <icon key="browse_file_icon" file="browse_file.png"/>
         <icon key="delete_file_input_icon" file="context_menu/delete-object-button.png"/>
-        <icon key="add_trace_icon" file="plus-button.svg"/>
-        <icon key="remove_trace_icon" file="minus-button.svg"/>
+        <icon key="add_trace_icon" file="plus-button.png"/>
+        <icon key="remove_trace_icon" file="minus-button.png"/>
         <icon key="inmutable-property-edit-enabled" file="lock-open.png"/>
         <icon key="inmutable-property-edit-disabled" file="lock-close.png"/>
         <icon key="clipboard_icon" file="clipboard.png"/>

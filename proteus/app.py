@@ -22,6 +22,8 @@ from typing import Dict, Callable
 # Third party imports
 # --------------------------------------------------------------------------
 
+from PyQt6.QtCore import Qt, QDir
+from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import QApplication, QMessageBox
 from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings
 
@@ -30,11 +32,13 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineSettings
 # --------------------------------------------------------------------------
 
 from proteus import PROTEUS_TEMP_DIR
+from proteus.application import THEME_SEARCH_PATH
 from proteus.application.spellcheck import SpellCheckerWrapper
 from proteus.application.configuration.config import Config
 from proteus.application.resources.plugins import Plugins
 from proteus.application.resources.translator import Translator, translate as _
 from proteus.application.resources.icons import Icons
+from proteus.application.resources.themes import Themes, THEMES_DIRECTORY
 from proteus.application.state.restorer import read_state_from_file
 from proteus.application.clipboard import Clipboard
 from proteus.controller.command_stack import Controller
@@ -65,6 +69,7 @@ class ProteusApplication:
         self.plugin_manager: Plugins = Plugins()
         self.translator: Translator = Translator()
         self.dynamic_icons: Icons = Icons()
+        self.themes: Themes = Themes()
         self.spellchecker = SpellCheckerWrapper()
 
         # PyQt6 application and main window
@@ -131,13 +136,90 @@ class ProteusApplication:
         request interceptor and stylesheet
         """
         # App settings resources ------------------------------
+        # Translator and plugins still live under resources/. Icons are
+        # loaded through the theme cascade below — the "light" theme is
+        # the canonical baseline that ships every visual asset.
         self.translator.set_language(self.config.app_settings.language)
         self.translator.set_proteus_i18n_directory(
             self.config.app_settings.i18n_directory
         )
         self.translator.load_translations(self.config.app_settings.i18n_directory)
-        self.dynamic_icons.load_icons(self.config.app_settings.icons_directory)
         self.plugin_manager.load_plugins(self.config.app_settings.plugins_directory)
+
+        # Theme resources -------------------------------------
+        # Icon cascade (later loads override earlier loads per key):
+        #   1. themes/light/icons     baseline (ALWAYS, even when active is light)
+        #   2. themes/{active}/icons  delta (skipped when active IS light)
+        #   3. profile/icons          loaded later, after spellchecker setup
+        #
+        # The "theme:" Qt search path resolves url(theme:icons/...) from
+        # QSS in the same priority order: active theme first, light as
+        # fallback.
+        themes_directory = (
+            self.config.app_settings.resources_directory / THEMES_DIRECTORY
+        )
+        if self.themes.load_themes(themes_directory):
+            self.themes.select_theme(self.config.app_settings.theme)
+
+            # 1) Baseline icons — always loaded.
+            baseline_icons_dir = self.themes.baseline_icons_directory()
+            if baseline_icons_dir is not None:
+                self.dynamic_icons.load_icons(baseline_icons_dir)
+            else:
+                log.error(
+                    "Baseline theme 'light' has no icons directory. "
+                    "Application icons will be incomplete."
+                )
+
+            # 2) Active theme delta — skip if the active theme is itself
+            # the baseline (we already loaded its icons above).
+            active = self.themes.current_theme
+            baseline = self.themes.baseline_theme
+            if (
+                active is not None
+                and baseline is not None
+                and active.key != baseline.key
+            ):
+                active_icons_dir = self.themes.icons_directory()
+                if active_icons_dir is not None:
+                    self.dynamic_icons.load_icons(active_icons_dir)
+
+            # 3) "theme:" search path: [active, baseline].
+            QDir.setSearchPaths(
+                THEME_SEARCH_PATH,
+                self.themes.search_path_directories(),
+            )
+
+            # Force the QPalette to match the theme's intended color scheme.
+            # Without this, the OS palette bleeds through any property the
+            # QSS does not explicitly set — e.g. button text color falls
+            # through to QPalette.ButtonText, which on a dark-mode OS is
+            # white, rendering text invisible against the QSS-styled white
+            # button background.
+            #
+            # Must run before MainWindow is constructed so every widget is
+            # built against the right palette from the start.
+            scheme = self.themes.qt_color_scheme()
+            if scheme != Qt.ColorScheme.Unknown:
+                style_hints = QGuiApplication.styleHints()
+                if hasattr(style_hints, "setColorScheme"):
+                    try:
+                        style_hints.setColorScheme(scheme)
+                        log.info(
+                            f"Forced application color scheme to '{scheme.name}' "
+                            f"to match theme '{self.themes.current_theme.key}'."
+                        )
+                    except Exception as e:
+                        log.warning(
+                            f"Could not set color scheme '{scheme.name}': {e}. "
+                            "Theme will rely on stylesheet only; widgets that "
+                            "fall through to QPalette may look wrong."
+                        )
+                else:
+                    log.warning(
+                        "QStyleHints.setColorScheme is unavailable on this Qt "
+                        "build. Theme will rely on stylesheet only."
+                    )
 
         # Profile resources -----------------------------------
         self.translator.load_translations(self.config.profile_settings.i18n_directory)
@@ -150,15 +232,14 @@ class ProteusApplication:
             self.spellchecker.set_language(spellchecker_language)
 
         # Set application style sheet -------------------------
-        with open(
-            self.config.app_settings.resources_directory
-            / "stylesheets"
-            / "proteus.qss",
-            "r",
-        ) as f:
-            _stylesheet = f.read()
-            self.app.setStyleSheet(_stylesheet)
-            del _stylesheet
+        stylesheet = self.themes.stylesheet()
+        if stylesheet:
+            self.app.setStyleSheet(stylesheet)
+        else:
+            log.error(
+                "No theme stylesheet could be loaded. The application will use "
+                "the platform default appearance."
+            )
 
         # Configure QWebEngineProfile settings ----------------
         profile: QWebEngineProfile = QWebEngineProfile.defaultProfile()

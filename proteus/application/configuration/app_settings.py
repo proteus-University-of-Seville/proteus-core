@@ -35,7 +35,6 @@ DEFAULT_CONFIG_FILE: str = "proteus.default.ini"
 
 # Directories (convention)
 RESOURCES_DIRECTORY: str = "resources"
-ICONS_DIRECTORY: str = "icons"
 I18N_DIRECTORY: str = "i18n"
 PLUGINS_DIRECTORY: str = "plugins"
 PROFILES_DIRECTORY: str = "profiles"
@@ -50,9 +49,14 @@ SETTING_USING_DEFAULT_PROFILE: str = "using_default_profile"
 SETTING_CUSTOM_PROFILE_PATH: str = "custom_profile_path"
 SETTING_OPEN_PROJECT_ON_STARTUP: str = "open_project_on_startup"
 SETTING_EDIT_ON_CLONE: str = "edit_on_clone"
+SETTING_THEME: str = "theme"
 # Special advanced settings
 SETTING_XSLT_DEBUG_MODE: str = "xslt_debug_mode"
 SETTING_DEVELOPER_FEATURES: str = "developer_features"
+
+# Default value for the theme setting. The Themes singleton applies its own
+# fallback chain when this key does not match an installed theme.
+DEFAULT_THEME: str = "light"
 
 # User session data
 SESSION: str = "session"
@@ -76,7 +80,6 @@ class AppSettings:
 
     # Directory settings (not editable by the user)
     resources_directory: Path = None
-    icons_directory: Path = None
     i18n_directory: Path = None
     profiles_directory: Path = None
     plugins_directory: Path = None
@@ -90,6 +93,7 @@ class AppSettings:
     custom_profile_path: Path = None
     open_project_on_startup: bool = None
     edit_on_clone: bool = False
+    theme: str = DEFAULT_THEME
     # Special advanced settings (not editable by the user)
     # These settings must be set manually in the configuration file
     xslt_debug_mode: bool = False
@@ -178,16 +182,12 @@ class AppSettings:
         # Directories section
         self.resources_directory = self.app_path / RESOURCES_DIRECTORY
         self.profiles_directory = self.app_path / PROFILES_DIRECTORY
-        self.icons_directory = self.resources_directory / ICONS_DIRECTORY
         self.i18n_directory = self.resources_directory / I18N_DIRECTORY
         self.plugins_directory = self.resources_directory / PLUGINS_DIRECTORY
-        
+
         assert (
             self.resources_directory.exists()
         ), f"PROTEUS resources directory '{self.resources_directory}' does not exist!"
-        assert (
-            self.icons_directory.exists()
-        ), f"PROTEUS icons directory '{self.icons_directory}' does not exist!"
         assert (
             self.i18n_directory.exists()
         ), f"PROTEUS i18n directory '{self.i18n_directory}' does not exist!"
@@ -201,7 +201,6 @@ class AppSettings:
         log.info(f"Directories loaded from '{self.settings_file_path}'.")
         log.info(f"{self.profiles_directory = }")
         log.info(f"{self.resources_directory = }")
-        log.info(f"{self.icons_directory = }")
         log.info(f"{self.i18n_directory = }")
         log.info(f"{self.plugins_directory = }")
 
@@ -270,6 +269,11 @@ class AppSettings:
         # Edit on clone ------------------------
         self.edit_on_clone = settings.getboolean(SETTING_EDIT_ON_CLONE, False)
 
+        # Theme ------------------------
+        # Use configparser fallback so older proteus.ini files without a
+        # theme key still load. Themes singleton resolves missing themes.
+        self.theme = settings.get(SETTING_THEME, DEFAULT_THEME) or DEFAULT_THEME
+
         # XSLT debug mode ------------------------
         self.xslt_debug_mode = settings.getboolean(SETTING_XSLT_DEBUG_MODE, False)
 
@@ -284,6 +288,7 @@ class AppSettings:
         log.info(f"{self.custom_profile_path = }")
         log.info(f"{self.open_project_on_startup = }")
         log.info(f"{self.edit_on_clone = }")
+        log.info(f"{self.theme = }")
         log.info(f"{self.xslt_debug_mode = }")
         log.info(f"{self.developer_features = }")
 
@@ -329,6 +334,7 @@ class AppSettings:
         custom_profile_path: Path = None,
         open_project_on_startup: bool = None,
         edit_on_clone: bool = None,
+        theme: str = None,
     ) -> "AppSettings":
         """
         Clone the current object with the new user settings (if any).
@@ -357,6 +363,9 @@ class AppSettings:
         if edit_on_clone is None:
             edit_on_clone = self.edit_on_clone
 
+        if theme is None:
+            theme = self.theme
+
         new_settings = replace(
             self,
             language=language,
@@ -367,6 +376,7 @@ class AppSettings:
             custom_profile_path=custom_profile_path,
             open_project_on_startup=open_project_on_startup,
             edit_on_clone=edit_on_clone,
+            theme=theme,
         )
 
         new_settings._validate_profile_path()
@@ -401,6 +411,7 @@ class AppSettings:
         )
 
         self.config_parser[SETTINGS][SETTING_EDIT_ON_CLONE] = str(self.edit_on_clone)
+        self.config_parser[SETTINGS][SETTING_THEME] = self.theme or DEFAULT_THEME
 
         with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
             self.config_parser.write(config_file)
@@ -414,6 +425,7 @@ class AppSettings:
         log.info(f"{self.custom_profile_path = }")
         log.info(f"{self.open_project_on_startup = }")
         log.info(f"{self.edit_on_clone = }")
+        log.info(f"{self.theme = }")
 
     # ==========================================================================
     # Session data

@@ -142,7 +142,18 @@ def load_translations_icons_plugins():
         translator.load_translations(config.profile_settings.i18n_directory)
 
     if dynamic_icons._icons_paths == {}:
-        dynamic_icons.load_icons(config.app_settings.icons_directory)
+        # Mirror app.py:initial_setup. Icons cascade is:
+        #   themes/light/icons (baseline, always)
+        #   themes/{active}/icons (delta, skipped if active is light)
+        #   profile/icons (last)
+        # End-to-end fixtures don't switch themes so we just load light + profile.
+        light_icons = (
+            config.app_settings.resources_directory
+            / "themes"
+            / "light"
+            / "icons"
+        )
+        dynamic_icons.load_icons(light_icons)
         dynamic_icons.load_icons(config.profile_settings.icons_directory)
 
     if plugin_manager._plugins == {}:

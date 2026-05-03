@@ -116,6 +116,12 @@ settings_dialog.profile_settings.group: "Profile specific settings"
 settings_dialog.default_view.label: "Default view:"
 settings_dialog.default_repository.label: "Archetype repository:"
 
+settings_dialog.appearance.group: "Appearance"
+settings_dialog.theme.label: "Theme:"
+settings_dialog.theme.light: "Light"
+settings_dialog.theme.dark: "Dark"
+settings_dialog.theme.none_available: "(no themes available)"
+
 settings_dialog.app.group: "App"
 settings_dialog.open_project_on_startup.checkbox: "Open last project on startup"
 settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project when the application starts"

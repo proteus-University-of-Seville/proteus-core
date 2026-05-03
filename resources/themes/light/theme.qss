@@ -1,9 +1,9 @@
 /* ========================================================================= */
-/* File: proteus.qss                                                         */
-/* Description: Proteus main theme stylesheet.                               */
-/* Date: 05/02/2024                                                          */
-/* Version: 1.0                                                              */
-/* Author: José María Delgado Sánchez                                        */
+/* File: theme.qss (light)                                                   */
+/* Description: PROTEUS light theme. Reproduces the historical look of the   */
+/*              application. Icon URLs use the "theme:" search path which    */
+/*              is configured to fall back to resources/, so the existing    */
+/*              icon assets are reused without duplication.                  */
 /* ========================================================================= */
 
 /* ========================================================================= */
@@ -14,6 +14,19 @@
 QLabel#error_label{
     color: red;
     font: bold;
+}
+
+/* Description state labels (themable replacement for inline setStyleSheet)  */
+/* Set via QWidget.setProperty("descriptionState", "empty"|"filled") and a   */
+/* polish/unpolish nudge — see proteus.views.forms.style_helpers.            */
+QLabel[descriptionState="empty"] {
+    color: red;
+    font-style: italic;
+}
+
+QLabel[descriptionState="filled"] {
+    color: black;
+    font-style: italic;
 }
 
 /* Remove outline dotted border */
@@ -73,11 +86,11 @@ QCalendarWidget #qt_calendar_navigationbar {
 
 QCalendarWidget #qt_calendar_prevmonth {
     padding: 0.15em;
-    qproperty-icon: url(resources:icons/calendar/prev-month.png);
+    qproperty-icon: url(theme:icons/calendar/prev-month.png);
 }
 QCalendarWidget #qt_calendar_nextmonth {
     padding: 0.15em;
-    qproperty-icon: url(resources:icons/calendar/next-month.png);
+    qproperty-icon: url(theme:icons/calendar/next-month.png);
 }
 
 
@@ -101,28 +114,59 @@ QTreeView::item:selected, QListWidget::item:selected {
 
 
 /* QTreeView Tree lines ---------------------------------------------------- */
+/* Full-row selection in the branch column, with treelines visible.
+   Qt 6.5 painted the whole row (branch column included) uniformly with
+   the selection color. Qt 6.7+ left that paint in place but the per-shape
+   border-images below render on top, and the selection paint shows
+   through the transparent areas of the PNGs.
+
+   These rules paint the branch column explicitly with the selection color
+   so the QSS layer "owns" the branch background. The per-shape border-
+   image rules below still apply (their properties don't conflict with
+   ours), so treelines remain visible — drawn over the selection color
+   instead of behind it. */
+QTreeView::branch:has-siblings:!adjoins-item:selected,
+QTreeView::branch:has-siblings:adjoins-item:selected,
+QTreeView::branch:!has-children:!has-siblings:adjoins-item:selected,
+QTreeView::branch:has-children:!has-siblings:closed:selected,
+QTreeView::branch:closed:has-children:has-siblings:selected,
+QTreeView::branch:open:has-children:!has-siblings:selected,
+QTreeView::branch:open:has-children:has-siblings:selected {
+    background-color: lightcyan;
+}
+
+QTreeView::branch:has-siblings:!adjoins-item:hover,
+QTreeView::branch:has-siblings:adjoins-item:hover,
+QTreeView::branch:!has-children:!has-siblings:adjoins-item:hover,
+QTreeView::branch:has-children:!has-siblings:closed:hover,
+QTreeView::branch:closed:has-children:has-siblings:hover,
+QTreeView::branch:open:has-children:!has-siblings:hover,
+QTreeView::branch:open:has-children:has-siblings:hover {
+    background-color: azure;
+}
+
 QTreeView::branch:has-siblings:!adjoins-item {
-    border-image: url(resources:icons/treelines/vline.png) 0;
+    border-image: url(theme:icons/treelines/vline.png) 0;
 }
 
 QTreeView::branch:has-siblings:adjoins-item {
-    border-image: url(resources:icons/treelines/branch-more.png) 0;
+    border-image: url(theme:icons/treelines/branch-more.png) 0;
 }
 
 QTreeView::branch:!has-children:!has-siblings:adjoins-item {
-    border-image: url(resources:icons/treelines/branch-end.png) 0;
+    border-image: url(theme:icons/treelines/branch-end.png) 0;
 }
 
 QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings {
         border-image: none;
-        image: url(resources:icons/treelines/branch-closed.png);
+        image: url(theme:icons/treelines/branch-closed.png);
 }
 
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  {
         border-image: none;
-        image: url(resources:icons/treelines/branch-open.png);
+        image: url(theme:icons/treelines/branch-open.png);
 }
 
 /* QComboBox --------------------------------------------------------------- */
@@ -171,13 +215,13 @@ QComboBox::drop-down {
 }
 
 QComboBox::down-arrow {
-    image: url(resources:icons/treelines/expand-arrow.png);
+    image: url(theme:icons/treelines/expand-arrow.png);
     width: 0.8em;
     height: 0.8em;
 }
 
 QComboBox::down-arrow:on { /* shift the arrow when popup is open */
-    image: url(resources:icons/treelines/expand-arrow-reverse.png);
+    image: url(theme:icons/treelines/expand-arrow-reverse.png);
     width: 0.8em;
     height: 0.8em;
 }
@@ -198,7 +242,7 @@ QTabBar::tab {
 }
 
 QTabBar::tab:selected {
-    
+
 }
 
 QTabBar::tab:hover:!selected {
@@ -264,6 +308,21 @@ QCheckBox:hover {
 
 QCheckBox:pressed {
     background-color: lightcyan;
+}
+
+/* QGroupBox --------------------------------------------------------------- */
+/* Used in dialogs (settings, property editors, trace editors) — a thin
+   subtle border reads cleaner than the default native 2px frame. */
+QGroupBox {
+    border: 1px solid gainsboro;
+    border-radius: 3px;
+    margin-top: 0.6em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 0.5em;
+    padding: 0 0.3em;
 }
 
 /* ========================================================================= */

@@ -40,9 +40,11 @@ from proteus.application.configuration.profile_settings import (
 )
 from proteus.controller.command_stack import Controller
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.application.resources.translator import Translator, translate as _
 from proteus.views.buttons import get_separator
 from proteus.views.forms.directory_edit import DirectoryEdit
+from proteus.views.forms.style_helpers import set_styled_property
 from proteus.views.components.dialogs.base_dialogs import ProteusDialog, MessageBox
 
 
@@ -90,6 +92,8 @@ class SettingsDialog(ProteusDialog):
         self.open_project_on_startup_checkbox: QCheckBox = None
         self.edit_on_clone_checkbox: QCheckBox = None
 
+        self.theme_combo: QComboBox = None
+
         # Description labels
         self.profile_description_label: QLabel = None
         self.view_description_label: QLabel = None
@@ -133,6 +137,7 @@ class SettingsDialog(ProteusDialog):
 
         # Specific settings group boxes
         language_box: QGroupBox = self.create_language_box()
+        appearance_box: QGroupBox = self.create_appearance_box()
         profile_box: QGroupBox = self.create_profile_box()
         profile_specific_settings: QGroupBox = (
             self.create_profile_specific_settings_box()
@@ -142,6 +147,7 @@ class SettingsDialog(ProteusDialog):
         # Add the widgets to the layout
         layout.addWidget(setting_info_label)
         layout.addWidget(language_box)
+        layout.addWidget(appearance_box)
         layout.addWidget(app_box)
         layout.addWidget(profile_specific_settings)
         layout.addWidget(profile_box)
@@ -280,7 +286,9 @@ class SettingsDialog(ProteusDialog):
         # Description label
         self.profile_description_label: QLabel = QLabel()
         self.profile_description_label.setWordWrap(True)
-        self.profile_description_label.setStyleSheet("color: black; font-style: italic")
+        set_styled_property(
+            self.profile_description_label, "descriptionState", "filled"
+        )
 
         # Update the description label when the combo box changes
         # NOTE: Profile metadata is never internationalized
@@ -380,6 +388,57 @@ class SettingsDialog(ProteusDialog):
         group.setLayout(layout)
 
         return group
+
+    # ---------------------------------------------------------------------
+    # Method     : create_appearance_box
+    # Description: Create the appearance (theme) group box
+    # Date       : 03/05/2026
+    # Version    : 0.1
+    # Author     : José María Delgado Sánchez
+    # ---------------------------------------------------------------------
+    def create_appearance_box(self) -> QGroupBox:
+        """
+        Create the Appearance group box that lets the user pick a theme.
+
+        Themes are discovered by the Themes singleton from
+        resources/themes/ at startup. Selecting a different theme persists
+        to proteus.ini and triggers a restart-required notice on save.
+        """
+        appearance_layout: QVBoxLayout = QVBoxLayout()
+
+        theme_label: QLabel = QLabel(_("settings_dialog.theme.label"))
+        self.theme_combo: QComboBox = QComboBox()
+
+        themes = Themes().available_themes
+        for theme_key, metadata in themes.items():
+            display_name: str = _(
+                f"settings_dialog.theme.{theme_key}",
+                alternative_text=metadata.name,
+            )
+            self.theme_combo.addItem(display_name, theme_key)
+
+        # Pre-select the active theme. Use the value from app_settings_copy
+        # so re-opening the dialog reflects the user's pending choice.
+        current_theme: str = Config().app_settings_copy.theme
+        index = self.theme_combo.findData(current_theme)
+        if index < 0 and Themes().current_theme is not None:
+            # Fall back to whichever theme actually loaded.
+            index = self.theme_combo.findData(Themes().current_theme.key)
+        if index >= 0:
+            self.theme_combo.setCurrentIndex(index)
+
+        # Disable the combo if no themes were discovered (defensive).
+        if self.theme_combo.count() == 0:
+            self.theme_combo.setEnabled(False)
+            self.theme_combo.addItem(_("settings_dialog.theme.none_available"), "")
+
+        appearance_layout.addWidget(theme_label)
+        appearance_layout.addWidget(self.theme_combo)
+
+        appearance_group: QGroupBox = QGroupBox(_("settings_dialog.appearance.group"))
+        appearance_group.setLayout(appearance_layout)
+
+        return appearance_group
 
     # ---------------------------------------------------------------------
     # Method     : create_app_box
@@ -531,6 +590,14 @@ class SettingsDialog(ProteusDialog):
             else None
         )
 
+        # Resolve the chosen theme. If the combo holds the empty-fallback
+        # entry (no themes discovered) keep the existing value.
+        chosen_theme: str = (
+            self.theme_combo.currentData()
+            if self.theme_combo is not None and self.theme_combo.currentData()
+            else config.app_settings_copy.theme
+        )
+
         config.app_settings_copy = config.app_settings_copy.clone(
             language=self.language_combo.currentData(),
             spellchecker_language=self.spellchecker_combo.currentData(),
@@ -540,6 +607,7 @@ class SettingsDialog(ProteusDialog):
             custom_profile_path=custom_profile_path,
             open_project_on_startup=self.open_project_on_startup_checkbox.isChecked(),
             edit_on_clone=self.edit_on_clone_checkbox.isChecked(),
+            theme=chosen_theme,
         )
 
         # ---------------------
@@ -583,15 +651,15 @@ class SettingsDialog(ProteusDialog):
                 f"xslt_templates.description.{profile_id}", alternative_text=""
             )
             if description == "":
-                self.view_description_label.setStyleSheet(
-                    "color: red; font-style: italic"
+                set_styled_property(
+                    self.view_description_label, "descriptionState", "empty"
                 )
                 self.view_description_label.setText(
                     _("settings_dialog.descriptions.empty")
                 )
             else:
-                self.view_description_label.setStyleSheet(
-                    "color: black; font-style: italic"
+                set_styled_property(
+                    self.view_description_label, "descriptionState", "filled"
                 )
                 self.view_description_label.setText(description)
 
@@ -604,15 +672,15 @@ class SettingsDialog(ProteusDialog):
         if profile_id:
             description: str = Config().listed_profiles[profile_id].description
             if description == "":
-                self.profile_description_label.setStyleSheet(
-                    "color: red; font-style: italic"
+                set_styled_property(
+                    self.profile_description_label, "descriptionState", "empty"
                 )
                 self.profile_description_label.setText(
                     _("settings_dialog.descriptions.empty")
                 )
             else:
-                self.profile_description_label.setStyleSheet(
-                    "color: black; font-style: italic"
+                set_styled_property(
+                    self.profile_description_label, "descriptionState", "filled"
                 )
                 self.profile_description_label.setText(description)
 
