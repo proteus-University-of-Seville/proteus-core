@@ -17,6 +17,7 @@ from typing import List, Dict
 # --------------------------------------------------------------------------
 
 import pytest
+from pytest_lazy_fixtures import lf
 from lxml import etree as ET
 
 # --------------------------------------------------------------------------
@@ -600,9 +601,9 @@ def test_update_properties(mocker, basic_project_service: ProjectService):
         (None),
         ("invalid list"),
         ([1, 2, 3]),
-        (pytest.lazy_fixtures("mock_property")),
-        ([None, pytest.lazy_fixtures("mock_property")]),
-        ([pytest.lazy_fixtures("mock_property"), 1, 2, 3]),
+        (lf("mock_property")),
+        ([None, lf("mock_property")]),
+        ([lf("mock_property"), 1, 2, 3]),
     ],
 )
 def test_update_properties_negative(
@@ -708,14 +709,10 @@ def test_update_traces_properties_discard_one_invalid_target(mocker, basic_proje
     ), f"Trace should be added to the object"
 
     # Check that the clone method was called with just valid target
-    assert (
-        mock_trace.clone.called_once_with(targets=["valid_target_id"])
-    ), f"clone method should be called once"
+    mock_trace.clone.assert_called_once_with(new_targets=["valid_target_id"])
 
     # Check that the set_property method was called with the cloned trace
-    assert (
-        mock_element.set_property.called_once_with(mock_trace_clone)
-    ), f"set_property method should be called once"
+    mock_element.set_property.assert_called_once_with(mock_trace_clone)
 
     # Check that load_traces_index is called
     assert (
@@ -730,9 +727,9 @@ def test_update_traces_properties_discard_one_invalid_target(mocker, basic_proje
         (None),
         ("invalid list"),
         ([1, 2, 3]),
-        (pytest.lazy_fixtures("mock_trace")),
-        ([None, pytest.lazy_fixtures("mock_trace")]),
-        ([pytest.lazy_fixtures("mock_trace"), 1, 2, 3]),
+        (lf("mock_trace")),
+        ([None, lf("mock_trace")]),
+        ([lf("mock_trace"), 1, 2, 3]),
     ],
 )
 def test_update_traces_negative_invalid_elements_in_traces_list(

@@ -6,7 +6,7 @@
     <urlProperty name="google" category="general"><![CDATA[https://google.com]]></urlProperty>
     <dateProperty name=":Proteus-date" category="general">2022-08-10</dateProperty>
     <stringProperty name="author" category="general"><![CDATA[Amador Durán]]></stringProperty>
-    <markdownProperty name="description" category="details"><![CDATA[Descripción del proyecto]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Descripción del proyecto]]></markdownProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[Comentarios del proyecto con un & y < y >.]]></markdownProperty>
     <integerProperty name="numberOfUsers" category="general">15</integerProperty>
     <floatProperty name="money" category="general">10.5</floatProperty>

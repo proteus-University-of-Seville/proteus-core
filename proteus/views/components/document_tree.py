@@ -22,6 +22,8 @@ import string
 
 from PyQt6.QtCore import Qt, QPoint, QSize
 from PyQt6.QtGui import (
+    QBrush,
+    QColor,
     QDropEvent,
     QDragEnterEvent,
     QKeyEvent,
@@ -50,6 +52,7 @@ from proteus.model.properties.code_property import ProteusCode
 from proteus.model.properties.property import Property
 from proteus.application.resources.translator import translate as _
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.application.clipboard import Clipboard
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.dialogs.base_dialogs import MessageBox
@@ -74,13 +77,31 @@ log = logging.getLogger(__name__)  # Logger
 # Global variables and constants
 # --------------------------------------------------------------------------
 
-# Tree item color
-TREE_ITEM_COLOR = {
-    ProteusState.FRESH: Qt.GlobalColor.darkGreen,
-    ProteusState.DIRTY: Qt.GlobalColor.darkYellow,
-    ProteusState.DEAD: Qt.GlobalColor.darkRed,
-    ProteusState.CLEAN: Qt.GlobalColor.black,
+# Map ProteusState to the key used in Themes().state_colors() so theme files
+# can override every state's color from a single state_colors.json.
+_STATE_TO_THEME_KEY = {
+    ProteusState.FRESH: "fresh",
+    ProteusState.DIRTY: "dirty",
+    ProteusState.DEAD:  "dead",
+    ProteusState.CLEAN: "clean",
 }
+
+
+def tree_item_brush(state: ProteusState) -> QBrush:
+    """
+    Return the QBrush used to paint a tree item for a given ProteusState.
+
+    Reads the active theme's state_colors via the Themes singleton. Falls
+    back to a sensible default if the theme has not been loaded yet (e.g.
+    during early test setup).
+    """
+    theme_colors = Themes().state_colors()
+    color: QColor = theme_colors.get(_STATE_TO_THEME_KEY[state])
+    if color is None or not color.isValid():
+        # Defensive default — shouldn't trigger in practice because
+        # Themes.state_colors merges DEFAULT_STATE_COLORS on every call.
+        color = QColor("#000000")
+    return QBrush(color)
 
 
 # --------------------------------------------------------------------------
@@ -297,7 +318,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         object: Object = self._controller.get_element(object_id)
 
         # Set the background color based on the object ProteusState
-        tree_item.setForeground(0, TREE_ITEM_COLOR[object.state])
+        tree_item.setForeground(0, tree_item_brush(object.state))
 
         # Set the icon based on the object last class
         object_class: ProteusClassTag = object.classes[-1]
@@ -443,7 +464,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         """
         items = self.tree_items.values()
         for tree_item in items:
-            tree_item.setForeground(0, Qt.GlobalColor.black)
+            tree_item.setForeground(0, tree_item_brush(ProteusState.CLEAN))
 
     # ----------------------------------------------------------------------
     # Method     : update_on_add_object
@@ -489,7 +510,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         #       as parent to trigger ADD_OBJECT event. When adding an object
         #       with Project as parent ADD_DOCUMENT event is triggered.
         parent: Object = self._controller.get_element(new_object.parent.id)
-        parent_item.setForeground(0, TREE_ITEM_COLOR[parent.state])
+        parent_item.setForeground(0, tree_item_brush(parent.state))
 
         # Calculate item position relative to its siblings omits DEAD objects
         siblings: List[Object] = [
@@ -552,7 +573,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         #       with Project parent DELETE_DOCUMENT event is triggered.
         parent_id: ProteusID = tree_item.parent().data(1, Qt.ItemDataRole.UserRole)
         parent_object: Object = self._controller.get_element(parent_id)
-        tree_item.parent().setForeground(0, TREE_ITEM_COLOR[parent_object.state])
+        tree_item.parent().setForeground(0, tree_item_brush(parent_object.state))
 
         # Remove the item from the tree including its children
         self._delete_tree_item(tree_item)
@@ -736,7 +757,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
             parent: Object = self._controller.get_element(
                 parent_item.data(1, Qt.ItemDataRole.UserRole)
             )
-            parent_item.setForeground(0, TREE_ITEM_COLOR[parent.state])
+            parent_item.setForeground(0, tree_item_brush(parent.state))
 
             # Remove the item from the tree
             self._delete_tree_item(self.tree_items[object_id])
@@ -756,7 +777,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
             # NOTE: Parent will always be an Object. Project cannot be selected
             #       as parent to trigger CHANGE_OBJECT_POSITION event.
             parent: Object = self._controller.get_element(object.parent.id)
-            parent_item.setForeground(0, TREE_ITEM_COLOR[parent.state])
+            parent_item.setForeground(0, tree_item_brush(parent.state))
 
             # Calculate item position relative to its siblings omits DEAD objects
             siblings: List[Object] = [

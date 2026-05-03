@@ -25,6 +25,7 @@ from typing import List, Generator
 # --------------------------------------------------------------------------
 
 import pytest
+from pytest_lazy_fixtures import lf
 import lxml.etree as ET
 
 # --------------------------------------------------------------------------
@@ -160,8 +161,8 @@ def test_load():
 @pytest.mark.parametrize(
     "test_project",
     [
-        pytest.lazy_fixtures("sample_project"),
-        pytest.lazy_fixtures("sample_archetype_project"),
+        lf("sample_project"),
+        lf("sample_archetype_project"),
     ],
 )
 def test_documents_lazy_load(test_project: Project):
@@ -189,8 +190,8 @@ def test_documents_lazy_load(test_project: Project):
 @pytest.mark.parametrize(
     "test_project",
     [
-        pytest.lazy_fixtures("sample_project"),
-        pytest.lazy_fixtures("sample_archetype_project"),
+        lf("sample_project"),
+        lf("sample_archetype_project"),
     ],
 )
 def test_load_documents(test_project: Project):
@@ -251,8 +252,8 @@ def test_generate_xml(sample_project: Project):
 @pytest.mark.parametrize(
     "test_project",
     [
-        pytest.lazy_fixtures("sample_project"),
-        pytest.lazy_fixtures("sample_archetype_project"),
+        lf("sample_project"),
+        lf("sample_archetype_project"),
     ],
 )
 def test_clone(test_project: Project):

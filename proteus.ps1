@@ -3,36 +3,42 @@ Write-Output "PROTEUS: v1.0.0"
 
 # Initialize variables
 $python_executable = $null
+$python_args = @()
 
-# Check if 'python3.11' is installed
-& python3.11 --version 2>$null
-if ($LASTEXITCODE -eq 0) {
-    $python_executable = 'python3.11'
-} else {
-    # Check if 'python' is installed
-    & python --version 2>$null
-    if ($LASTEXITCODE -eq 0) {
-        $python_executable = 'python'
-    } else {
-        # Check if 'python3' is installed
-        & python3 --version 2>$null
+# Try the py launcher with preferred versions (3.14 -> 3.11)
+if (Get-Command py -ErrorAction SilentlyContinue) {
+    foreach ($v in '3.14','3.13','3.12','3.11') {
+        & py "-$v" --version 2>$null | Out-Null
         if ($LASTEXITCODE -eq 0) {
-            $python_executable = 'python3'
+            $python_executable = 'py'
+            $python_args = @("-$v")
+            break
         }
     }
 }
 
-# Check if any valid Python executable was found
+# Fall back to generic 'python' / 'python3', but only if version is in 3.11-3.14
 if (-not $python_executable) {
-    Write-Output "PROTEUS: Neither 'python', 'python3', nor 'python3.11' was found on your system."
-    Write-Output "PROTEUS: Please install Python and try running this script again. Recommended version: 3.11.x"
+    foreach ($cand in 'python','python3') {
+        if (-not (Get-Command $cand -ErrorAction SilentlyContinue)) { continue }
+        $mm = & $cand -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>$null
+        if ($LASTEXITCODE -eq 0 -and $mm -in '3.11','3.12','3.13','3.14') {
+            $python_executable = $cand
+            break
+        }
+    }
+}
+
+if (-not $python_executable) {
+    Write-Output "PROTEUS: No supported Python (3.11-3.14) was found on your system."
+    Write-Output "PROTEUS: Please install Python 3.14 (preferred), 3.13, 3.12 or 3.11 and try again."
     Pause
     exit 1
 }
 
-Write-Output "PROTEUS: $python_executable is installed on your system."
-Write-Output "PROTEUS: Installed Python version:"
-& $python_executable --version
+# Show selected interpreter and version
+$selected_version = (& $python_executable @python_args --version) -split ' ' | Select-Object -Index 1
+Write-Output "PROTEUS: Using $python_executable $($python_args -join ' ') (Python $selected_version)"
 
 # Check if the execution policy is set to Unrestricted
 Write-Output "PROTEUS: Checking execution policy..."
@@ -58,7 +64,7 @@ if (Test-Path $venv_dir) {
     Write-Output "PROTEUS: Environment 'proteus_env' was not found."
     Write-Output "PROTEUS: Creating a virtual environment using $python_executable..."
     
-    & $python_executable -m venv $venv_dir
+    & $python_executable @python_args -m venv $venv_dir
     
     if (Test-Path $venv_dir) {
         Write-Output "PROTEUS: Virtual environment created successfully."
@@ -76,7 +82,7 @@ Write-Output "PROTEUS: Activating the virtual environment..."
 Write-Output "PROTEUS: Checking the Python version in the virtual environment..."
 
 # Get the Python version from the script environment
-$script_python_version = (& $python_executable --version) -split ' ' | Select-Object -Index 1
+$script_python_version = (& $python_executable @python_args --version) -split ' ' | Select-Object -Index 1
 
 # Get the Python version from the virtual environment
 $venv_python_version = (& python --version) -split ' ' | Select-Object -Index 1

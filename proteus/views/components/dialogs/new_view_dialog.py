@@ -32,6 +32,7 @@ from PyQt6.QtWidgets import (
 from proteus.controller.command_stack import Controller
 from proteus.application.resources.translator import translate as _
 from proteus.views.components.dialogs.base_dialogs import ProteusDialog
+from proteus.views.forms.style_helpers import set_styled_property
 from proteus.application.events import AddViewEvent
 
 
@@ -146,15 +147,15 @@ class NewViewDialog(ProteusDialog):
                 f"xslt_templates.description.{view_name}", alternative_text=""
             )
             if description == "":
-                self.description_content_label.setStyleSheet(
-                    "color: red; font-style: italic;"
+                set_styled_property(
+                    self.description_content_label, "descriptionState", "empty"
                 )
                 self.description_content_label.setText(
                     _("new_document_dialog.archetype.description.empty")
                 )
             else:
-                self.description_content_label.setStyleSheet(
-                    "color: black; font-style: italic;"
+                set_styled_property(
+                    self.description_content_label, "descriptionState", "filled"
                 )
                 self.description_content_label.setText(description)
 

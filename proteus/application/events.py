@@ -13,7 +13,6 @@
 from threading import Lock
 import logging
 from typing import Callable
-from abc import ABC, abstractmethod
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -26,7 +25,6 @@ from PyQt6.QtWidgets import QTreeWidget
 # Project specific imports
 # --------------------------------------------------------------------------
 
-from proteus.application.utils.abstract_meta import AbstractObjectMeta
 from proteus.model import ProteusID
 
 # logging configuration
@@ -37,105 +35,103 @@ log = logging.getLogger(__name__)
 # Class: ProteusEvent
 # Description: Class for the events in the PROTEUS application.
 # Date: 31/12/2023
-# Version: 0.1
+# Version: 0.2
 # Author: José María Delgado Sánchez
 # --------------------------------------------------------------------------
-# TODO: In order to keep things simple, This class singleton implementation
-# is in the class itself and do not use utils.abstract_meta.SingletonMeta
-# This would require to mix SingletonMeta and AbstractObjectMeta, which is
-# may lead to unexpected behavior. Consider if it is necessary to refactor
-# this class.
-class ProteusEvent(QObject, ABC, metaclass=AbstractObjectMeta):
+# Singleton-per-subclass via __new__ with double-checked locking; QObject is
+# initialized exactly once at instance creation. __init__ is intentionally
+# empty so repeated XxxEvent() calls only pay a single attribute check.
+#
+# This shape replaces an earlier design that combined metaclass=AbstractObjectMeta
+# (QObject's sip metaclass × ABCMeta), ABC abstract methods, and a re-entry
+# guard inside __init__. That setup overflowed Windows' 1 MB main-thread C
+# stack on Python 3.12/3.13 the first time any event was instantiated. Since
+# every subclass already implements notify/connect and no third-party
+# subclasses exist, ABC enforcement was dropped in favour of a flatter layout.
+class ProteusEvent(QObject):
     """
-    Abstract class for the events in the PROTEUS application. It defines the
-    basic interface that every event must implement.
+    Base class for the events in the PROTEUS application.
 
-    Events are defined as singletons, so only one instance of each event
-    can exist. This helps to handle events handling reducing the number of
-    lines of code.
+    Events are defined as singletons, so only one instance per subclass can
+    exist for the lifetime of the process. Each subclass declares its own
+    `signal = pyqtSignal(...)` with a type-specific signature plus typed
+    `notify(...)` and `connect(...)` wrappers around it.
 
-    The implementation relies on PyQt signals and slots mechanism. In order
-    to have a better type hinting, there are additional methods that provide
-    more information about the arguments of the signals. They work as
-    wrappers for the signal methods.
-
-    Since the events are unique classes with their own implementation, events
-    could be created as a normal class without using ProteusEvent abstract
-    class and PyQt functionality, although it is recommended for consistency.
+    Concurrency: instance creation is protected by a class-level lock
+    (double-checked locking). Subsequent calls hit the cached singleton
+    with no lock acquisition.
     """
 
-    # Singleton instance
+    # Singleton instance (per-subclass via name mangling: _ProteusEvent__instance)
     __instance = None
-    __lock = Lock()  # Lock for thread safety
+    # Shared lock across all event subclasses; only contended on first creation.
+    __lock = Lock()
 
     # --------------------------------------------------------------------------
     # Method: __new__
-    # Description: Singleton constructor for ProteusEvent class.
+    # Description: Singleton constructor + one-shot QObject initialisation.
     # Date: 31/12/2023
-    # Version: 0.1
+    # Version: 0.2
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
     def __new__(cls, *args, **kwargs):
         """
-        Creates a singleton instance of the class.
+        Returns the cached singleton for `cls`, creating and initialising it
+        on first access. Uses double-checked locking so the lock is only
+        contended the first time any event of this subclass is created.
         """
-        if not cls.__instance:
-            cls.__instance = super(ProteusEvent, cls).__new__(cls)
-            cls.__instance._initialized = False
+        if cls.__instance is None:
+            with cls.__lock:
+                if cls.__instance is None:
+                    instance = super().__new__(cls)
+                    QObject.__init__(instance)
+                    cls.__instance = instance
         return cls.__instance
 
     # --------------------------------------------------------------------------
     # Method: __init__
-    # Description: Initializes the singleton instance of the class.
+    # Description: No-op; QObject.__init__ already ran once in __new__.
     # Date: 31/12/2023
-    # Version: 0.1
+    # Version: 0.2
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
-    def __init__(self):
-        """
-        Initializes the singleton instance of the class.
-        """
-        with self.__class__.__lock:
-            if self._initialized:
-                return
-            super().__init__()
-            self._initialized = True
-
-    # --------------------------------------------------------------------------
-    # Method: notify (abstract)
-    # Description: Notifies the event to the connected methods.
-    # Date: 31/12/2023
-    # Version: 0.1
-    # Author: José María Delgado Sánchez
-    # --------------------------------------------------------------------------
-    @abstractmethod
-    def notify(self) -> None:
-        """
-        Notifies the event to the connected methods by emitting the signal with
-        the corresponding arguments.
-
-        Must be implemented by the subclasses.
-        """
+    def __init__(self) -> None:
+        # Python calls __init__ on every constructor invocation, so this
+        # MUST be a no-op for the singleton to behave correctly. Initialisation
+        # happens exactly once inside __new__.
         pass
 
     # --------------------------------------------------------------------------
-    # Method: connect (abstract)
-    # Description: Connects a method to the event.
+    # Method: notify
+    # Description: Notify the event to connected methods. Subclasses override.
     # Date: 31/12/2023
-    # Version: 0.1
+    # Version: 0.2
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
-    @abstractmethod
+    def notify(self, *args, **kwargs) -> None:
+        """
+        Emit the event's signal. Must be overridden by every concrete subclass
+        with the correct argument signature.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} must implement notify()"
+        )
+
+    # --------------------------------------------------------------------------
+    # Method: connect
+    # Description: Connect a listener to the event. Subclasses override.
+    # Date: 31/12/2023
+    # Version: 0.2
+    # Author: José María Delgado Sánchez
+    # --------------------------------------------------------------------------
     def connect(self, method: Callable) -> None:
         """
-        Connects a method to the event. Receives a method as an argument and
-        connects it to the signal of the event. It is recommended to type hint
-        the method argument to provide more information about the arguments
-        of the signal.
-
-        Must be implemented by the subclasses.
+        Connect a callable to the event's signal. Must be overridden by every
+        concrete subclass with a properly typed callable signature.
         """
-        pass
+        raise NotImplementedError(
+            f"{type(self).__name__} must implement connect()"
+        )
 
 
 # --------------------------------------------------------------------------

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  proteus-object.xsd
+  =====================================================================
+  XML Schema for PROTEUS archetype object definition files.
+
+  Validated instance example:
+    profiles/basic/archetypes/objects/00_general/objects/<name>.xml
+
+  Structure:
+    <object id="..." classes="..." acceptedChildren="..."
+            [acceptedParents="..."] [selectedCategory="..."]>
+      <properties>
+        <!-- zero or more property elements -->
+      </properties>
+      <children [numbered="true|false"]>   <!-- optional -->
+        <child id="..."/>                  <!-- zero or more -->
+      </children>
+    </object>
+
+  Shared definitions are pulled in from proteus-properties.xsd via
+  xs:include (both files must reside in the same directory).
+  =====================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Include shared property type definitions -->
+  <xs:include schemaLocation="proteus-properties.xsd"/>
+
+
+  <!-- =================================================================
+       ChildType
+       Type for each <child> reference inside a <children> element.
+       id : ProteusID of the referenced child object (short UUID)
+       ================================================================= -->
+  <xs:complexType name="ChildType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+
+  <!-- =================================================================
+       ChildrenType
+       Optional container for child object references.
+       Children are listed as <child id="..."/> elements in the order
+       they appear in the document tree.
+
+       numbered : when true, the UI should render children with sequence
+                  numbers (default: false)
+       ================================================================= -->
+  <xs:complexType name="ChildrenType">
+    <xs:sequence>
+      <xs:element name="child" type="ChildType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="numbered" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+
+  <!-- =================================================================
+       Root element: <object>
+       Represents a single PROTEUS archetype object definition.
+
+       Attributes:
+         id               : unique short UUID identifying this archetype
+                            (required)
+         classes          : space-separated list of PROTEUS class tags
+                            assigned to this object (required; at least
+                            one class must be specified)
+         acceptedChildren : space-separated class tags of objects that
+                            may be nested as children; use ":Proteus-any"
+                            to allow any child or ":Proteus-none" to
+                            forbid children (required)
+         acceptedParents  : space-separated class tags of objects that
+                            may contain this object as a child; when
+                            omitted the default is ":Proteus-any"
+                            (optional)
+         selectedCategory : name of the property category tab that should
+                            be pre-selected in the property editor
+                            (optional)
+
+       Child elements:
+         <properties>  : required; holds all property definitions
+         <children>    : optional; lists pre-populated child references
+       ================================================================= -->
+  <xs:element name="object">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="properties" type="PropertiesType"/>
+        <xs:element name="children"   type="ChildrenType" minOccurs="0"/>
+      </xs:sequence>
+      <xs:attribute name="id"               type="xs:string" use="required"/>
+      <xs:attribute name="classes"          type="xs:string" use="required"/>
+      <xs:attribute name="acceptedChildren" type="xs:string" use="required"/>
+      <xs:attribute name="acceptedParents"  type="xs:string"/>
+      <xs:attribute name="selectedCategory" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

@@ -1,17 +1,17 @@
 <div align = center>
-
 <img src="https://github.com/Josdelsan/proteus-tfg/assets/74303153/22db167f-c696-4f66-81ab-20250187eb99" width="100" />
 
 # PROTEUS
 
 </div>
-Proteus is an archetype-based editor for structured documents. An archetype is an off-the-shelf object, document or project that can be cloned as needed to create new ones. Archetypes are organized into profiles, that can be developed for different domains, from software development to legal documents. Any concept that can be expressed in a conceptual model can become an archetype in Proteus. The archetypes are organized in archetype profiles, so that Proteus is actually a meta-tool since each profile configures Proteus with a set of archetypes from a specific domain.
 
-In addition to archetypes, Proteus also offers the possibility of having different views for documents and generating PDF files directly. This flexibility is based on the application of XSLT style sheets extended with Python code, allowing HTML, LaTeX or any other text format to be generated from the objects that make up project's documents, all stored in individual XML files for facilitating version control with tools like Git. The goal is letting the user focus on the content but not the format.
+Proteus is an archetype-based editor for structured documents. An archetype is an off-the-shelf object, document or project that can be cloned as needed to create new ones. Archetypes are organized into profiles, that can be developed for different domains, from software development to legal documents. Any concept that can be expressed in a conceptual model can become an archetype in Proteus. Proteus is actually a meta-tool since each profile configures Proteus with a set of domain-specific archetypes.  
 
-XSLT templates, archetypes repositories and plugins are grouped in profiles. A profile completely change the behaviour of the application based on its content, preparing it for a domain specific task. Plugins enhance XSLT templates allowing complex operations using Python and accessing advanced functionalities. Progiles can be selected from the configuration menu and may be included in the application or loaded from a external directory.
+In addition to archetypes, Proteus also offers the possibility of having different views for documents and generating PDF files directly. This flexibility is based on the application of Python-extended XSLT style sheets, allowing HTML, LaTeX or any other text format to be generated from the objects that make up project's documents, all stored in individual XML files for facilitating version control with tools like Git. The goal is letting the user focus on the content and forget about the layout.
 
-This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
+XSLT templates, archetype repositories and plugins are grouped in profiles. A profile completely changes the behaviour of the application based on its content, preparing it for a domain specific task. Plugins enhance XSLT templates allowing complex operations using Python and accessing advanced functionalities. Profiles can be selected from the configuration menu and may be included in the application or loaded from a external directory.
+
+This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez). This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez.
 
 <div align = center>
   <img width="800" alt="proteus" src="https://github.com/user-attachments/assets/835ad4c1-36bf-4f27-be14-ff46fcafbbfe" />
@@ -21,7 +21,7 @@ This application has been developed at the University of Seville (Andalusia, Spa
 PROTEUS is licensed under the BSD 3-Clause "New" or "Revised" License. See [LICENSE](LICENSE) for more information.
 
 ## Installation
-PROTEUS is a Python application. It is developed using Python 3.10 or 3.11. It does not work with Python 3.12 for the moment. It is recommended to use a virtual environment to install the application. The application dependencies are listed in the `requirements.txt` file.
+PROTEUS is a Python application. It is developed using Python from 3.11 to 3.14. It is recommended to use a virtual environment or `uv` to install the application. The application dependencies are listed in the `requirements.txt` file and `pyproject.toml`.
 
 ### Running using UV
 
@@ -30,6 +30,8 @@ PROTEUS can be run using [uv](https://docs.astral.sh/uv/) (An extremely fast Pyt
 ```bash
 uv run proteus
 ``` 
+
+<!--
 
 ### Detailed installation instructions
 
@@ -69,7 +71,7 @@ python -m proteus
 
 Installation scripts are provided for Windows, Linux and MacOS. The scripts create a virtual environment called `proteus_env`, install the dependencies and run the application. The first time you run the script it will take a while to install the dependencies and create python cache files.
 
-Scripts will look for `python3.11`, `python` and `python3` aliases in that order. It displays the version of Python found, take into account that the application was only tested with Python 3.10 and 3.11. Python 3.12 will be supported in the future.
+Scripts look for Python 3.14, 3.13, 3.12 and 3.11 in that order (the latest is preferred). On Windows the `py` launcher is used (`py -3.14`, `py -3.13`, ...); on Linux and MacOS the `python3.14`, `python3.13`, `python3.12` and `python3.11` aliases are tried, falling back to `python` or `python3` only if their reported version is within the supported 3.11 to 3.14 range. The selected interpreter and version are displayed before the virtual environment is created.
 
 Windows:
 - It is recommended to use de PowerShell script `proteus.ps1`.
@@ -84,6 +86,7 @@ Linux and MacOS:
 
 **WARNING**, directory names changes may affect the virtual environment. If you encounter any problem, delete the virtual environment and create/run the scripts again.
 
+-->
 
 ## Profiles
 PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:

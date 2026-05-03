@@ -68,14 +68,19 @@ def test_load_app_settings_min(mocker):
     assert (
         app_settings.i18n_directory == app_settings.resources_directory / "i18n"
     ), f"Expected languages directory '{app_settings.resources_directory / 'i18n'}, but got '{app_settings.i18n_directory}'"
-    assert (
-        app_settings.icons_directory == app_settings.resources_directory / "icons"
-    ), f"Expected icons directory '{app_settings.resources_directory / 'icons'}, but got '{app_settings.icons_directory}'"
+    # icons_directory has been removed from AppSettings — icons live under
+    # themes/{theme}/icons/ now and are resolved via the Themes singleton.
 
     # Check user settings
     assert (
         app_settings.language == "en_US"
     ), f"Expected language 'en_US', but got '{app_settings.language}'"
+    # init_min/proteus.ini doesn't declare a `theme` key; the loader must
+    # fall back to DEFAULT_THEME ("light"). This catches regressions where
+    # the missing-key fallback gets dropped or set to None.
+    assert (
+        app_settings.theme == "light"
+    ), f"Expected theme 'light' (default), but got '{app_settings.theme}'"
     assert (
         app_settings.default_view == "dummy_view"
     ), f"Expected default view 'dummy_view', but got '{app_settings.default_view}'"
@@ -211,19 +216,20 @@ def test_load_settings_copy_file_to_cwd(mocker):
 
 
 @pytest.mark.parametrize(
-    "language, default_view, selected_profile, using_default_profile, custom_profile_path, expected_using_default_profile, expected_custom_profile_path",
+    "language, default_view, selected_profile, using_default_profile, custom_profile_path, theme, expected_using_default_profile, expected_custom_profile_path",
     [
-        (None, None, None, None, None, None, None),
-        ("es_ES", None, None, None, None, None, None),
-        (None, "another_view", None, None, None, None, None),
-        (None, None, "another_profile", None, None, None, None),
-        (None, None, None, False, None, True, None),  # Invalid path
+        (None, None, None, None, None, None, None, None),
+        ("es_ES", None, None, None, None, None, None, None),
+        (None, "another_view", None, None, None, None, None, None),
+        (None, None, "another_profile", None, None, None, None, None),
+        (None, None, None, False, None, None, True, None),  # Invalid path
         (
             None,
             None,
             None,
             False,
             Path("/path/to/nowhere"),
+            None,
             True,
             Path("/path/to/nowhere"),
         ),  # Invalid path
@@ -233,9 +239,11 @@ def test_load_settings_copy_file_to_cwd(mocker):
             None,
             False,
             Path(),
+            None,
             False,
             Path(),
         ),  # NOTE: Profile validation is not performed in app settings so this is valid
+        (None, None, None, None, None, "dark", None, None),  # theme override
     ],
 )
 def test_app_settings_clone(
@@ -244,6 +252,7 @@ def test_app_settings_clone(
     selected_profile: str,
     using_default_profile: bool,
     custom_profile_path: Path,
+    theme: str,
     expected_using_default_profile: bool,
     expected_custom_profile_path: Path,
 ):
@@ -266,6 +275,7 @@ def test_app_settings_clone(
         selected_profile=selected_profile,
         using_default_profile=using_default_profile,
         custom_profile_path=custom_profile_path,
+        theme=theme,
     )
 
     # --------------------
@@ -318,3 +328,14 @@ def test_app_settings_clone(
         assert (
             cloned_settings.custom_profile_path == expected_custom_profile_path
         ), f"Expected custom profile path '{expected_custom_profile_path}', but got '{cloned_settings.custom_profile_path}'"
+
+    # Theme: when None is passed, clone must preserve the original value;
+    # when a string is passed, clone must adopt it.
+    if theme is None:
+        assert (
+            cloned_settings.theme == app_settings.theme
+        ), f"Expected theme '{app_settings.theme}' (preserved), but got '{cloned_settings.theme}'"
+    else:
+        assert (
+            cloned_settings.theme == theme
+        ), f"Expected theme '{theme}' (override), but got '{cloned_settings.theme}'"

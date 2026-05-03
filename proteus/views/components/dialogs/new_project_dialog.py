@@ -35,6 +35,7 @@ from PyQt6.QtWidgets import (
 from proteus.model import PROTEUS_NAME
 from proteus.model.project import Project
 from proteus.views.forms.directory_edit import DirectoryEdit
+from proteus.views.forms.style_helpers import set_styled_property
 from proteus.views.forms.validators import is_valid_folder_name
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.controller.command_stack import Controller
@@ -169,13 +170,15 @@ class ArchetypePage(QWizardPage):
 
             description_property = archetype.get_property("description")
             if description_property is not None:
-                self.description_container_label.setStyleSheet(
-                    "color: black; font-style: italic"
+                set_styled_property(
+                    self.description_container_label, "descriptionState", "filled"
                 )
                 self.description_container_label.setText(description_property.value)
                 return
 
-        self.description_container_label.setStyleSheet("color: red; font-style: italic")
+        set_styled_property(
+            self.description_container_label, "descriptionState", "empty"
+        )
         self.description_container_label.setText(
             _("settings_dialog.descriptions.empty")
         )

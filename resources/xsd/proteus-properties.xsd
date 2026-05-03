@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  proteus-properties.xsd
+  =====================================================================
+  XML Schema for all PROTEUS property elements.
+
+  This file is shared by proteus-object.xsd and proteus-project.xsd
+  via xs:include.  It defines:
+    - PropertyAttrs   : attribute group common to every property element
+    - One xs:element  : per property type
+    - TraceType       : complex type for individual <trace> child elements
+    - PropertiesType  : complex type for the <properties> container
+  =====================================================================
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- =================================================================
+       Common attribute group shared by ALL property elements
+       name     : unique property identifier within its parent object
+       category : UI grouping tab (default: "general")
+       tooltip  : i18n key or literal text shown as a tooltip
+       required : if true the property must have a non-empty value
+       inmutable: if true the property value cannot be edited by the user
+       ================================================================= -->
+  <xs:attributeGroup name="PropertyAttrs">
+    <xs:attribute name="name"      type="xs:string"  use="required"/>
+    <xs:attribute name="category"  type="xs:string"  default="general"/>
+    <xs:attribute name="tooltip"   type="xs:string"/>
+    <xs:attribute name="required"  type="xs:boolean" default="false"/>
+    <xs:attribute name="inmutable" type="xs:boolean" default="false"/>
+  </xs:attributeGroup>
+
+
+  <!-- =================================================================
+       TEXT-CONTENT PROPERTIES
+       These properties store their value as element text (CDATA).
+       mixed="true" is used so that CDATA sections are permitted.
+       ================================================================= -->
+
+  <!-- stringProperty: plain text string value -->
+  <xs:element name="stringProperty">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- markdownProperty: Markdown-formatted text value (same structure as
+       stringProperty but carries semantic meaning for the renderer) -->
+  <xs:element name="markdownProperty">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- fileProperty: relative file-name or path (may be empty) -->
+  <xs:element name="fileProperty">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- urlProperty: absolute URL string (may be empty while being edited) -->
+  <xs:element name="urlProperty">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       PRIMITIVE-VALUE PROPERTIES
+       These properties use xs:simpleContent so that a typed text value
+       is enforced by the schema.
+       ================================================================= -->
+
+  <!-- booleanProperty: "true" or "false" (lowercase, XSD xs:boolean) -->
+  <xs:element name="booleanProperty">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:boolean">
+          <xs:attributeGroup ref="PropertyAttrs"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- dateProperty: calendar date in YYYY-MM-DD format (xs:date) -->
+  <xs:element name="dateProperty">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:date">
+          <xs:attributeGroup ref="PropertyAttrs"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- timeProperty: time of day in HH:MM:SS format (xs:time) -->
+  <xs:element name="timeProperty">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:time">
+          <xs:attributeGroup ref="PropertyAttrs"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- integerProperty: integer number (xs:integer) -->
+  <xs:element name="integerProperty">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:integer">
+          <xs:attributeGroup ref="PropertyAttrs"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- floatProperty: decimal / floating-point number (xs:decimal) -->
+  <xs:element name="floatProperty">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:decimal">
+          <xs:attributeGroup ref="PropertyAttrs"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       enumProperty
+       Text content holds the currently selected choice value.
+       choices       : space-separated list of all valid choice tokens
+       valueTooltips : when true, each choice token is an i18n key for
+                       a tooltip rather than a display label
+       ================================================================= -->
+  <xs:element name="enumProperty">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="PropertyAttrs"/>
+      <xs:attribute name="choices"       type="xs:string"  use="required"/>
+      <xs:attribute name="valueTooltips" type="xs:boolean" default="false"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       classListProperty
+       Stores an ordered, duplicate-free list of PROTEUS class tags.
+       Each class tag is a child <class> element whose text is the tag.
+       ================================================================= -->
+  <xs:element name="classListProperty">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="class" type="xs:string"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       codeProperty
+       Stores a structured alphanumeric code composed of three parts
+       stored as child elements (in this fixed order):
+         <prefix> : arbitrary string prefix  (may be empty)
+         <number> : zero-padded positive integer string (e.g. "001")
+         <suffix> : arbitrary string suffix  (may be empty)
+       ================================================================= -->
+  <xs:element name="codeProperty">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="prefix" type="xs:string"/>
+        <xs:element name="number">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <!-- One or more digit characters, zero-padded by convention -->
+              <xs:pattern value="[0-9]+"/>
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element name="suffix" type="xs:string"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       traceProperty
+       Stores zero or more object-reference targets as <trace> children.
+
+       Attributes:
+         acceptedTargets  : space-separated class tags of valid targets
+                            (required; use ":Proteus-any" for any target)
+         excludedTargets  : space-separated class tags explicitly excluded
+                            (optional; absent means no exclusions)
+         traceType        : semantic type of the relationship (required)
+         maxTargetsNumber : maximum number of allowed targets;
+                            -1 (the default) means no limit
+
+       Each <trace> child carries:
+         target    : ProteusID of the referenced object (required)
+         traceType : repeated from the parent for self-containedness
+       ================================================================= -->
+
+  <!-- Named complex type for individual <trace> child elements -->
+  <xs:complexType name="TraceType">
+    <xs:attribute name="target"    type="xs:string" use="required"/>
+    <xs:attribute name="traceType" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="traceProperty">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="trace" type="TraceType"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PropertyAttrs"/>
+      <xs:attribute name="acceptedTargets"  type="xs:string"  use="required"/>
+      <xs:attribute name="excludedTargets"  type="xs:string"/>
+      <xs:attribute name="traceType"        type="xs:string"  use="required"/>
+      <!-- -1 means no upper limit on the number of targets -->
+      <xs:attribute name="maxTargetsNumber" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       traceTypeListProperty
+       Stores a list of trace-type identifiers as <type> child elements.
+       Each <type> element contains the name of a trace type as text.
+       ================================================================= -->
+  <xs:element name="traceTypeListProperty">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="type" type="xs:string"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PropertyAttrs"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       unitProperty
+       Stores a numeric measurement together with its unit.
+
+       Attributes:
+         units : space-separated list of allowed unit strings (required)
+
+       Child elements (required, in this order):
+         <value> : the numeric magnitude as a decimal
+         <unit>  : the unit string; must be one of the values in "units"
+       ================================================================= -->
+  <xs:element name="unitProperty">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="value" type="xs:decimal"/>
+        <xs:element name="unit"  type="xs:string"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PropertyAttrs"/>
+      <xs:attribute name="units" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- =================================================================
+       PropertiesType
+       Container type for the <properties> element present in both
+       <object> and <project> archetype files.
+       Any number of property elements may appear in any order.
+       ================================================================= -->
+  <xs:complexType name="PropertiesType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element ref="stringProperty"/>
+      <xs:element ref="markdownProperty"/>
+      <xs:element ref="booleanProperty"/>
+      <xs:element ref="dateProperty"/>
+      <xs:element ref="timeProperty"/>
+      <xs:element ref="integerProperty"/>
+      <xs:element ref="floatProperty"/>
+      <xs:element ref="urlProperty"/>
+      <xs:element ref="fileProperty"/>
+      <xs:element ref="enumProperty"/>
+      <xs:element ref="classListProperty"/>
+      <xs:element ref="codeProperty"/>
+      <xs:element ref="traceProperty"/>
+      <xs:element ref="traceTypeListProperty"/>
+      <xs:element ref="unitProperty"/>
+    </xs:choice>
+  </xs:complexType>
+
+</xs:schema>

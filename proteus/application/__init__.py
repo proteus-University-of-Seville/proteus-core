@@ -8,5 +8,6 @@
 
 # PyQt6 Search Paths
 RESOURCES_SEARCH_PATH = "resources"
+THEME_SEARCH_PATH = "theme"
 TEMPLATE_DUMMY_SEARCH_PATH = "templates"
 ASSETS_DUMMY_SEARCH_PATH = "assets"
