@@ -33,10 +33,10 @@
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:exsl="http://exslt.org/common"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
   exclude-result-prefixes="proteus proteus-utils"
-  xmlns:exsl="http://exslt.org/common"
   extension-element-prefixes="exsl"
 >
   <!-- Output -->
@@ -47,17 +47,18 @@
       indent="yes"
   />
 
-  <!-- Language independent dictionaries -->
-  <xsl:include href="PROTEUS_property_labels.xsl"/>
-  <xsl:include href="PROTEUS_enumeration_labels.xsl"/>
-  <xsl:include href="PROTEUS_trace_type_labels.xsl"/>
+  <!-- Language-independent dictionaries -->
+  <xsl:include href="labels/property_labels.xsl"/>
+  <xsl:include href="labels/enumeration_labels.xsl"/>
+  <xsl:include href="labels/trace_type_labels.xsl"/>
 
-  <!-- XSLT modules -->
-  <xsl:include href="PROTEUS_utilities.xsl" />
-  <xsl:include href="PROTEUS_properties.xsl" />
-  <xsl:include href="PROTEUS_cover.xsl" />
-  <xsl:include href="PROTEUS_document.xsl" />
+  <!-- XSLT core modules -->
+  <xsl:include href="core/PROTEUS_utilities.xsl" />
+  <xsl:include href="core/PROTEUS_properties.xsl" />
+  <xsl:include href="core/cover.xsl" />
+  <xsl:include href="core/document.xsl" />
 
+  <!-- XSLT archetype modules -->
   <xsl:include href="archetypes/general/section.xsl" />
   <xsl:include href="archetypes/general/appendix.xsl" />
   <xsl:include href="archetypes/general/paragraph.xsl" />

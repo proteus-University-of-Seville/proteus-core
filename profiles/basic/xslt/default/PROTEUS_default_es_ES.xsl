@@ -24,14 +24,14 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
-exclude-result-prefixes="proteus proteus-utils"
+  exclude-result-prefixes="proteus proteus-utils"
 >
 
 <!-- ======================================================== -->
 <!-- Import default localized strings                         -->
 <!-- ======================================================== -->
 
-<xsl:include href="PROTEUS_i18n_Spanish.xsl"/>
+<xsl:include href="i18n/i18n_es_ES.xsl"/>
 
 <!-- ======================================================== -->
 <!-- Include main XSLT file                                   -->

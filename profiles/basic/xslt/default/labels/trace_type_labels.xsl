@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- ======================================================== -->
-<!-- File    : PROTEUS_trace_type_labels.xsl                 -->
-<!-- Content : PROTEUS trace type labels XSLT file           -->
+<!-- File    : trace_type_labels.xsl                          -->
+<!-- Content : PROTEUS trace type labels XSLT file            -->
 <!-- Author  : Amador Durán Toro                              -->
 <!-- Date    : 2026/05/02                                     -->
 <!-- Version : 1.0                                            -->
@@ -14,12 +14,12 @@
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:proteus="http://proteus.us.es"
-    xmlns:proteus-utils="http://proteus.us.es/utils"
-    exclude-result-prefixes="proteus proteus-utils"
-    xmlns:exsl="http://exslt.org/common"
-    extension-element-prefixes="exsl"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:exsl="http://exslt.org/common"
+  xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
+  extension-element-prefixes="exsl"
 >
 
 <!-- NOTE: that would not be necessary in XSLT 2.0,  -->

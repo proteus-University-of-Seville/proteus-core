@@ -31,7 +31,7 @@
 <!-- Import default localized strings                         -->
 <!-- ======================================================== -->
 
-<xsl:include href="PROTEUS_i18n_English.xsl"/>
+<xsl:include href="i18n/i18n_en_EN.xsl"/>
 
 <!-- ======================================================== -->
 <!-- Include main XSLT file                                   -->
