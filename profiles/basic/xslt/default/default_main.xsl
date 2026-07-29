@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- ======================================================== -->
-<!-- File    : PROTEUS_main.xsl                               -->
+<!-- File    : default_main.xsl                               -->
 <!-- Content : PROTEUS default XSLT main file                 -->
 <!-- Author  : José María Delgado Sánchez                     -->
 <!-- Date    : 2023/06/09                                     -->
@@ -9,7 +9,7 @@
 <!-- ======================================================== -->
 <!-- Update  : 2024/09/08 (Amador Durán)                      -->
 <!-- encoding="iso-8859-1" -> enconding="utf-8"               -->
-<!-- graphica_file -> local_resource                          -->
+<!-- graphic_file -> local_resource                           -->
 <!-- external_resource -> remote_resource                     -->
 <!-- archetype_link -> symbolic_link                          -->
 <!-- ======================================================== -->
@@ -22,8 +22,8 @@
 <!-- Update  : 2024/09/14 (Amador Durán)                      -->
 <!-- key() does not work on variables in lxml.                -->
 <!-- ======================================================== -->
-<!-- Update  : 2026/05/02 (Amador Durán)                      -->
-<!-- Refactored.                                              -->
+<!-- Update  : 2026/07/29 (Amador Durán)                      -->
+<!-- Renamed and refactored.                                  -->
 <!-- ======================================================== -->
 
 <!-- ======================================================== -->
@@ -53,8 +53,8 @@
   <xsl:include href="labels/trace_type_labels.xsl"/>
 
   <!-- XSLT core modules -->
-  <xsl:include href="core/PROTEUS_utilities.xsl" />
-  <xsl:include href="core/PROTEUS_properties.xsl" />
+  <xsl:include href="core/utilities.xsl" />
+  <xsl:include href="core/properties.xsl" />
   <xsl:include href="core/cover.xsl" />
   <xsl:include href="core/document.xsl" />
 

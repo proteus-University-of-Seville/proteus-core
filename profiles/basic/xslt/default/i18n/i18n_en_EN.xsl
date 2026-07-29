@@ -24,16 +24,6 @@
     exclude-result-prefixes="proteus proteus-utils"
 >
 
-<xsl:variable name="proteus:lang">en</xsl:variable>
-<xsl:variable name="proteus:lang_OCL_condition">Condition (OCL)</xsl:variable>
-<xsl:variable name="proteus:lang_OCL_expression">OCL expression</xsl:variable>
-<xsl:variable name="proteus:lang_OCL_postconditions">Postcondition expressions (OCL)</xsl:variable>
-<xsl:variable name="proteus:lang_OCL_preconditions">Precondition expressions (OCL)</xsl:variable>
-<xsl:variable name="proteus:lang_TBD">TBD</xsl:variable>
-<xsl:variable name="proteus:lang_TBD_expanded">To Be Determined</xsl:variable>
-<xsl:variable name="proteus:lang_The">The</xsl:variable>
-<xsl:variable name="proteus:lang_The_actor">Actor</xsl:variable>
-<xsl:variable name="proteus:lang_TOC">Table of contents</xsl:variable>
 <xsl:variable name="proteus:lang_abstract">abstract</xsl:variable>
 <xsl:variable name="proteus:lang_action">Action</xsl:variable>
 <xsl:variable name="proteus:lang_address">Address</xsl:variable>
@@ -64,7 +54,6 @@
 <xsl:variable name="proteus:lang_critical">Critical</xsl:variable>
 <xsl:variable name="proteus:lang_customer">Customer</xsl:variable>
 <xsl:variable name="proteus:lang_date">Date</xsl:variable>
-<xsl:variable name="proteus:lang_definition">Definition</xsl:variable>
 <xsl:variable name="proteus:lang_defect_type_ambiguity">Ambiguity</xsl:variable>
 <xsl:variable name="proteus:lang_defect_type_design_dependence">Design dependence</xsl:variable>
 <xsl:variable name="proteus:lang_defect_type_imprecision">Imprecision</xsl:variable>
@@ -82,11 +71,12 @@
 <xsl:variable name="proteus:lang_defect_type_verbosity">Verbosity</xsl:variable>
 <xsl:variable name="proteus:lang_defect_type_wrong_lod">Wrong level of detail</xsl:variable>
 <xsl:variable name="proteus:lang_defect_type_wrong_org">Wrong organization</xsl:variable>
+<xsl:variable name="proteus:lang_definition">Definition</xsl:variable>
 <xsl:variable name="proteus:lang_dependencies">Dependencies</xsl:variable>
-<xsl:variable name="proteus:lang_description">Description</xsl:variable>
-<xsl:variable name="proteus:lang_developer">Developer</xsl:variable>
 <xsl:variable name="proteus:lang_derived_attribute">Derived attribute</xsl:variable>
 <xsl:variable name="proteus:lang_derived_role">Derived role</xsl:variable>
+<xsl:variable name="proteus:lang_description">Description</xsl:variable>
+<xsl:variable name="proteus:lang_developer">Developer</xsl:variable>
 <xsl:variable name="proteus:lang_diagram">Diagram</xsl:variable>
 <xsl:variable name="proteus:lang_directly_affected_objects">Directly affects</xsl:variable>
 <xsl:variable name="proteus:lang_disjoint_subtypes">Subtypes (disjoint)</xsl:variable>
@@ -113,14 +103,18 @@
 <xsl:variable name="proteus:lang_isUser">Is user</xsl:variable>
 <xsl:variable name="proteus:lang_lifetime">Lifetime</xsl:variable>
 <xsl:variable name="proteus:lang_low">Low</xsl:variable>
-<xsl:variable name="proteus:lang_maximum">Maximum</xsl:variable>
 <xsl:variable name="proteus:lang_maximum_time">Maximum time</xsl:variable>
+<xsl:variable name="proteus:lang_maximum">Maximum</xsl:variable>
 <xsl:variable name="proteus:lang_medium">Medium</xsl:variable>
 <xsl:variable name="proteus:lang_meeting">Meeting</xsl:variable>
 <xsl:variable name="proteus:lang_multiplicity">Multiplicity</xsl:variable>
 <xsl:variable name="proteus:lang_name">Name</xsl:variable>
 <xsl:variable name="proteus:lang_no">No</xsl:variable>
 <xsl:variable name="proteus:lang_none">None</xsl:variable>
+<xsl:variable name="proteus:lang_OCL_condition">Condition (OCL)</xsl:variable>
+<xsl:variable name="proteus:lang_OCL_expression">OCL expression</xsl:variable>
+<xsl:variable name="proteus:lang_OCL_postconditions">Postcondition expressions (OCL)</xsl:variable>
+<xsl:variable name="proteus:lang_OCL_preconditions">Precondition expressions (OCL)</xsl:variable>
 <xsl:variable name="proteus:lang_optional">Optional</xsl:variable>
 <xsl:variable name="proteus:lang_ordered">ordered</xsl:variable>
 <xsl:variable name="proteus:lang_ordinary_sequence">Ordinary sequence</xsl:variable>
@@ -145,7 +139,7 @@
 <xsl:variable name="proteus:lang_result_type">Result type</xsl:variable>
 <xsl:variable name="proteus:lang_results">Results</xsl:variable>
 <xsl:variable name="proteus:lang_role">Role</xsl:variable>
-<xsl:variable name="proteus:lang_simultaneous_ocurrences">Simultaneous ocurrences</xsl:variable>
+<xsl:variable name="proteus:lang_simultaneous_occurrences">Simultaneous occurrences</xsl:variable>
 <xsl:variable name="proteus:lang_so_that">So that</xsl:variable>
 <xsl:variable name="proteus:lang_solution">Solution</xsl:variable>
 <xsl:variable name="proteus:lang_sources">Sources</xsl:variable>
@@ -160,21 +154,26 @@
 <xsl:variable name="proteus:lang_superclass">superclass</xsl:variable>
 <xsl:variable name="proteus:lang_symlink_tooltip">This is a representation of the original object. Modifying this object will modify the original.</xsl:variable>
 <xsl:variable name="proteus:lang_system">system</xsl:variable>
+<xsl:variable name="proteus:lang_TBD_expanded">To Be Determined</xsl:variable>
+<xsl:variable name="proteus:lang_TBD">TBD</xsl:variable>
 <xsl:variable name="proteus:lang_telephone">Telephone</xsl:variable>
-<xsl:variable name="proteus:lang_the">the</xsl:variable>
 <xsl:variable name="proteus:lang_the_actor">actor</xsl:variable>
+<xsl:variable name="proteus:lang_The_actor">Actor</xsl:variable>
+<xsl:variable name="proteus:lang_the">the</xsl:variable>
+<xsl:variable name="proteus:lang_The">The</xsl:variable>
 <xsl:variable name="proteus:lang_then_this_use_case">then this use case</xsl:variable>
 <xsl:variable name="proteus:lang_time">Time</xsl:variable>
 <xsl:variable name="proteus:lang_times_per">times per</xsl:variable>
-<xsl:variable name="proteus:lang_traceability_matrix">Traceability matrix</xsl:variable>
-<xsl:variable name="proteus:lang_traceability_matrix_missing_class">Cannot display traceability matrix. Make sure at leat one class is selected for rows and columns.</xsl:variable>
-<xsl:variable name="proteus:lang_traceability_matrix_missing_item">Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns.</xsl:variable>
-<xsl:variable name="proteus:lang_trace_type">Trace type</xsl:variable>
+<xsl:variable name="proteus:lang_TOC">Table of contents</xsl:variable>
 <xsl:variable name="proteus:lang_trace_type_proteus_affected">Affected item</xsl:variable>
 <xsl:variable name="proteus:lang_trace_type_proteus_author">Author</xsl:variable>
 <xsl:variable name="proteus:lang_trace_type_proteus_dependency">Dependency</xsl:variable>
 <xsl:variable name="proteus:lang_trace_type_proteus_information_source">Information source</xsl:variable>
 <xsl:variable name="proteus:lang_trace_type_proteus_works_for">Works for</xsl:variable>
+<xsl:variable name="proteus:lang_trace_type">Trace type</xsl:variable>
+<xsl:variable name="proteus:lang_traceability_matrix_missing_class">Cannot display traceability matrix. Make sure at least one class is selected for rows and columns.</xsl:variable>
+<xsl:variable name="proteus:lang_traceability_matrix_missing_item">Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns.</xsl:variable>
+<xsl:variable name="proteus:lang_traceability_matrix">Traceability matrix</xsl:variable>
 <xsl:variable name="proteus:lang_type">Type</xsl:variable>
 <xsl:variable name="proteus:lang_urgency">Urgency</xsl:variable>
 <xsl:variable name="proteus:lang_user">User</xsl:variable>
@@ -186,6 +185,7 @@
 <xsl:variable name="proteus:lang_weakness">Weakness</xsl:variable>
 <xsl:variable name="proteus:lang_web">Website</xsl:variable>
 <xsl:variable name="proteus:lang_yes">Yes</xsl:variable>
+<xsl:variable name="proteus:lang">en</xsl:variable>
 
 <!-- ================== -->
 <!-- General L-patterns -->

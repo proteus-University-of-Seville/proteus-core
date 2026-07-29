@@ -29,6 +29,7 @@
 <xsl:variable name="property_labels_dictionary">
   <label key=":Proteus-date"><xsl:value-of select="$proteus:lang_date"/></label>
   <label key="address"><xsl:value-of select="$proteus:lang_address"/></label>
+  <label key="analysis"><xsl:value-of select="$proteus:lang_analysis"/></label>
   <label key="attenders"><xsl:value-of select="$proteus:lang_attenders"/></label>
   <label key="authors"><xsl:value-of select="$proteus:lang_authors"/></label>
   <label key="category"><xsl:value-of select="$proteus:lang_category"/></label>
@@ -37,30 +38,29 @@
   <label key="date"><xsl:value-of select="$proteus:lang_date"/></label>
   <label key="description"><xsl:value-of select="$proteus:lang_description"/></label>
   <label key="diagram"><xsl:value-of select="$proteus:lang_diagram"/></label>
+  <label key="directly-affected-objects"><xsl:value-of select="$proteus:lang_directly_affected_objects"/></label>
   <label key="email"><xsl:value-of select="$proteus:lang_email"/></label>
   <label key="importance"><xsl:value-of select="$proteus:lang_importance"/></label>
   <label key="inherits-from"><xsl:value-of select="$proteus:lang_inherits_from"/></label>
   <label key="name"><xsl:value-of select="$proteus:lang_name"/></label>
   <label key="ordered"><xsl:value-of select="$proteus:lang_ordered"/></label>
+  <label key="participates-in"><xsl:value-of select="$proteus:lang_participates_in"/></label>
   <label key="phone-number"><xsl:value-of select="$proteus:lang_telephone"/></label>
-  <label key="precondition"><xsl:value-of select="$proteus:lang_precondition"/></label>
+  <label key="place"><xsl:value-of select="$proteus:lang_place"/></label>
   <label key="postcondition"><xsl:value-of select="$proteus:lang_postcondition"/></label>
+  <label key="precondition"><xsl:value-of select="$proteus:lang_precondition"/></label>
+  <label key="priority"><xsl:value-of select="$proteus:lang_priority"/></label>
+  <label key="results"><xsl:value-of select="$proteus:lang_results"/></label>
   <label key="role"><xsl:value-of select="$proteus:lang_role"/></label>
+  <label key="solution"><xsl:value-of select="$proteus:lang_solution"/></label>
   <label key="sources"><xsl:value-of select="$proteus:lang_sources"/></label>
   <label key="stability"><xsl:value-of select="$proteus:lang_stability"/></label>
+  <label key="status"><xsl:value-of select="$proteus:lang_status"/></label>
+  <label key="time"><xsl:value-of select="$proteus:lang_time"/></label>
+  <label key="trace-type"><xsl:value-of select="$proteus:lang_trace_type"/></label>
   <label key="version"><xsl:value-of select="$proteus:lang_version"/></label>
   <label key="web"><xsl:value-of select="$proteus:lang_web"/></label>
   <label key="works-for"><xsl:value-of select="$proteus:lang_organization"/></label>
-  <label key="status"><xsl:value-of select="$proteus:lang_status"/></label>
-  <label key="time"><xsl:value-of select="$proteus:lang_time"/></label>
-  <label key="participates-in"><xsl:value-of select="$proteus:lang_participates_in"/></label>
-  <label key="place"><xsl:value-of select="$proteus:lang_place"/></label>
-  <label key="priority"><xsl:value-of select="$proteus:lang_priority"/></label>
-  <label key="results"><xsl:value-of select="$proteus:lang_results"/></label>
-  <label key="directly-affected-objects"><xsl:value-of select="$proteus:lang_directly_affected_objects"/></label>
-  <label key="analysis"><xsl:value-of select="$proteus:lang_analysis"/></label>
-  <label key="trace-type"><xsl:value-of select="$proteus:lang_trace_type"/></label>
-  <label key="solution"><xsl:value-of select="$proteus:lang_solution"/></label>
 </xsl:variable>
 
 <!-- This is needed because of limitations of XSLT 1.0 -->
@@ -69,7 +69,7 @@
 <xsl:variable name="property_labels" select="exsl:node-set($property_labels_dictionary)"/>
 
 <!-- Define the key for property labels                           -->
-<!-- WARINIG: it is useless, always returns nothing               -->
+<!-- WARNING: it is useless, always returns nothing               -->
 <!-- Using $property_labels/label in key's match is not allowed.  -->
 <!-- Usage: <xsl:value-of select="key('property-label', @name)"/> -->
 <!-- <xsl:key name="property-label" match="label" use="@key"/>    -->

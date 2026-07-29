@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ========================================================= -->
-<!-- File    : PROTEUS_default_en_US.xsl                       -->
-<!-- Content : PROTEUS default XSLT for English (entry point)  -->
+<!-- File    : default_es_ES.xsl                               -->
+<!-- Content : PROTEUS default XSLT for Spanish (entry point)  -->
 <!-- Author  : Amador Durán Toro                               -->
 <!--           José María Delgado Sánchez                      -->
 <!-- Date    : 2023/06/29                                      -->
@@ -11,7 +11,7 @@
 <!-- Update  : 2024/09/13 (Amador Durán)                       -->
 <!-- Variable declaration moved to i18n document.              -->
 <!-- ========================================================= -->
-<!-- Update  : 2026/05/02 (Amador Durán)                       -->
+<!-- Update  : 2026/07/29 (Amador Durán)                       -->
 <!-- Renamed and refactored.                                   -->
 <!-- ========================================================= -->
 
@@ -31,12 +31,12 @@
 <!-- Import default localized strings                         -->
 <!-- ======================================================== -->
 
-<xsl:include href="i18n/i18n_en_EN.xsl"/>
+<xsl:include href="i18n/i18n_es_ES.xsl"/>
 
 <!-- ======================================================== -->
-<!-- Include main XSLT file                                   -->
+<!-- Include default main XSLT file                           -->
 <!-- ======================================================== -->
 
-<xsl:include href="PROTEUS_default_main.xsl"/>
+<xsl:include href="default_main.xsl"/>
 
 </xsl:stylesheet>

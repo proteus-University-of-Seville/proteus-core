@@ -36,6 +36,7 @@
 
   <!-- This is needed because of limitations of XSLT 1.0 -->
   <!-- Note the use of the node-set() extension function -->
+  <!-- Usage: <xsl:value-of select="$trace-types/label[@key=@name])"/> -->
   <xsl:variable name="trace_types" select="exsl:node-set($trace_types_dictionary)"/>
 
 </xsl:stylesheet>

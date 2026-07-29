@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- ======================================================== -->
-<!-- File    : PROTEUS_properties.xsl                         -->
+<!-- File    : properties.xsl                                 -->
 <!-- Content : PROTEUS default XSLT for properties            -->
 <!-- Author  : José María Delgado Sánchez                     -->
 <!-- Date    : 2023/12/08                                     -->
@@ -19,6 +19,9 @@
 <!-- file to be displayed in an <img> element.                -->
 <!-- traceProperty enhanced to include :Proteus-code when     -->
 <!-- present.                                                 -->
+<!-- ======================================================== -->
+<!-- Update  : 2026/07/29 (Amador Durán)                      -->
+<!-- Renamed and refactored.                                  -->
 <!-- ======================================================== -->
 
 <!-- ======================================================== -->

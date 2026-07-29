@@ -27,23 +27,24 @@
 
   <!-- PROTEUS enumeration labels dictionary -->
   <xsl:variable name="enum_labels_dictionary">
-      <label key="awaiting-qa"><xsl:value-of select="$proteus:lang_awaiting_qa"/></label>
-      <label key="awaiting-validation"><xsl:value-of select="$proteus:lang_awaiting_validation"/></label>
-      <label key="critical"><xsl:value-of select="$proteus:lang_critical"/></label>
-      <label key="customer"><xsl:value-of select="$proteus:lang_customer"/></label>
-      <label key="developer"><xsl:value-of select="$proteus:lang_developer"/></label>
-      <label key="draft"><xsl:value-of select="$proteus:lang_draft"/></label>
-      <label key="high"><xsl:value-of select="$proteus:lang_high"/></label>
-      <label key="low"><xsl:value-of select="$proteus:lang_low"/></label>
-      <label key="medium"><xsl:value-of select="$proteus:lang_medium"/></label>
-      <label key="optional"><xsl:value-of select="$proteus:lang_optional"/></label>
-      <label key="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></label>
-      <label key="user"><xsl:value-of select="$proteus:lang_user"/></label>
-      <label key="validated"><xsl:value-of select="$proteus:lang_validated"/></label>
+    <label key="awaiting-qa"><xsl:value-of select="$proteus:lang_awaiting_qa"/></label>
+    <label key="awaiting-validation"><xsl:value-of select="$proteus:lang_awaiting_validation"/></label>
+    <label key="critical"><xsl:value-of select="$proteus:lang_critical"/></label>
+    <label key="customer"><xsl:value-of select="$proteus:lang_customer"/></label>
+    <label key="developer"><xsl:value-of select="$proteus:lang_developer"/></label>
+    <label key="draft"><xsl:value-of select="$proteus:lang_draft"/></label>
+    <label key="high"><xsl:value-of select="$proteus:lang_high"/></label>
+    <label key="low"><xsl:value-of select="$proteus:lang_low"/></label>
+    <label key="medium"><xsl:value-of select="$proteus:lang_medium"/></label>
+    <label key="optional"><xsl:value-of select="$proteus:lang_optional"/></label>
+    <label key="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></label>
+    <label key="user"><xsl:value-of select="$proteus:lang_user"/></label>
+    <label key="validated"><xsl:value-of select="$proteus:lang_validated"/></label>
   </xsl:variable>
 
   <!-- This is needed because of limitations of XSLT 1.0 -->
   <!-- Note the use of the node-set() extension function -->
+  <!-- Usage: <xsl:value-of select="$enum-labels/label[@key=@name])"/> -->
   <xsl:variable name="enum_labels" select="exsl:node-set($enum_labels_dictionary)"/>
 
 </xsl:stylesheet>

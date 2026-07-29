@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- ======================================================== -->
-<!-- File    : PROTEUS_utilities.xsl                          -->
-<!-- Content : PROTEUS default XSLT - utilities               -->
+<!-- File    : utilities.xsl                                  -->
+<!-- Content : PROTEUS default XSLT utilities                 -->
 <!-- Author  : José María Delgado Sánchez                     -->
 <!-- Date    : 2023/06/09                                     -->
 <!-- Version : 1.0                                            -->
@@ -15,6 +15,9 @@
 <!-- generate_software_requirement_expanded_header ->         -->
 <!-- generate_expanded_header and simplified.                 -->
 <!-- generate_version_row simplified.                         -->
+<!-- ======================================================== -->
+<!-- Update  : 2026/07/29 (Amador Durán)                      -->
+<!-- Renamed and refactored.                                  -->
 <!-- ======================================================== -->
 
 <!-- ======================================================== -->
