@@ -263,6 +263,7 @@ class ProteusApplication:
     # NOTE: This is done in app module to keep the main window clean. These are
     # components that will be not displayed but need access to the backend to
     # perform complex operations (usually XSLT related)
+    # --------------------------------------------------------------------------
     def load_plugin_components(self) -> None:
         """
         Load the ProteusComponents from the plugins. It uses MainWindow instance

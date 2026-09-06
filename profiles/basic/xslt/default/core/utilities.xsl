@@ -67,9 +67,9 @@
     <!-- generate_property_row template                -->
     <!-- ============================================= -->
 
-    <!-- current() is the property element being processed. -->
-    <!-- 'tbd' is considered as having no content, it shown -->
-    <!-- only if it mandatory.                              -->
+    <!-- current() is the property element being processed.    -->
+    <!-- 'tbd' is considered as having no content, it is shown -->
+    <!-- only if it mandatory.                                 -->
 
     <xsl:template name="generate_property_row">
         <xsl:param name="label" select="$property_labels/label[@key=current()/@name]"/>
