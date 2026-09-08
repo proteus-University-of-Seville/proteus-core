@@ -1,5 +1,5 @@
 # Display the application name and version
-Write-Output "PROTEUS: v1.0.0"
+Write-Output "PROTEUS: v$((Get-Content "$PSScriptRoot\VERSION" -Raw).Trim())"
 
 # Initialize variables
 $python_executable = $null

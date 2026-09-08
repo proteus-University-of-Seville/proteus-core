@@ -1,6 +1,8 @@
 #!/bin/bash
 
-echo "PROTEUS: v1.0.0"
+script_dir="$(dirname "$0")"
+
+echo "PROTEUS: v$(cat "$script_dir/VERSION")"
 
 # Initialize variables
 python_executable=
@@ -37,7 +39,6 @@ else
     exit 1
 fi
 
-script_dir="$(dirname "$0")"
 venv_dir="$script_dir/proteus_env"
 
 echo "PROTEUS: Checking for the existence of virtual environment 'proteus_env'"

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "PROTEUS"
-version = "v1.0.0"
+dynamic = ["version"]
 description = "Proteus is a configurable tool for editing structured documents, based on the concept of archetypes."
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
@@ -42,3 +42,7 @@ dev = [
 
 [project.scripts]
 proteus = "proteus.__main__:main"
+
+[tool.hatch.version]
+path = "VERSION"
+pattern = "^(?P<version>.+)$"

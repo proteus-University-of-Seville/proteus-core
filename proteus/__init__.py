@@ -7,14 +7,10 @@
 # ==========================================================================
 
 # --------------------------------------------------------------------------
-# PROTEUS version
-# --------------------------------------------------------------------------
-PROTEUS_VERSION = str('v1.0.0')
-
-# --------------------------------------------------------------------------
 # Standard library imports
 # --------------------------------------------------------------------------
 
+from importlib.metadata import PackageNotFoundError, version as _package_version
 from pathlib import Path
 import sys
 
@@ -26,6 +22,29 @@ import sys
 #       for the application to work properly when it is packaged as one file.
 
 PROTEUS_APP_PATH = Path(getattr(sys, '_MEIPASS', Path().parent.absolute()))
+
+# --------------------------------------------------------------------------
+# PROTEUS version
+# --------------------------------------------------------------------------
+# Single source of truth: VERSION file at project root. At runtime the
+# version is read from the installed package metadata; when running from
+# source (launcher scripts) or as a frozen binary, it is read directly
+# from the VERSION file.
+
+def _resolve_version() -> str:
+    try:
+        return f"v{_package_version('PROTEUS')}"
+    except PackageNotFoundError:
+        pass
+
+    for base_dir in (PROTEUS_APP_PATH, Path(__file__).resolve().parent.parent):
+        version_file = base_dir / 'VERSION'
+        if version_file.is_file():
+            return f"v{version_file.read_text().strip().lstrip('v')}"
+
+    raise RuntimeError("PROTEUS version could not be resolved (VERSION file not found).")
+
+PROTEUS_VERSION = str(_resolve_version())
 
 # --------------------------------------------------------------------------
 # Constant declarations for PROTEUS logger

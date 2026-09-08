@@ -1,7 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo PROTEUS: v1.0.0
+set /p PROTEUS_VER=<%~dp0VERSION
+echo PROTEUS: v%PROTEUS_VER%
 
 @REM Initialize variables
 set python_executable=

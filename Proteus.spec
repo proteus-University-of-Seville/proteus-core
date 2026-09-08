@@ -5,7 +5,7 @@ a = Analysis(
     ['proteus\\__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('proteus.default.ini', '.')],
+    datas=[('proteus.default.ini', '.'), ('VERSION', '.')],
     hiddenimports=['trieregex'],
     hookspath=[],
     hooksconfig={},
