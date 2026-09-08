@@ -72,6 +72,38 @@ def test_project_archetypes_lazy_load(archetype_service: ArchetypeService):
     ), "_project_archetypes should be equal to ArchetypeService.project_archetypes"
 
 
+def test_get_all_object_archetypes_returns_flat_complete_catalog(
+    archetype_service: ArchetypeService,
+):
+    """The generic catalog must include every repository object archetype."""
+    grouped = archetype_service.get_object_archetypes()
+    expected = [
+        archetype
+        for group in grouped.values()
+        for archetypes in group.values()
+        for archetype in archetypes
+    ]
+
+    assert archetype_service.get_all_object_archetypes() == expected
+
+
+def test_get_creatable_object_archetypes_uses_parent_compatibility(
+    archetype_service: ArchetypeService,
+):
+    """Generic creation candidates must be filtered only by accept_descendant."""
+    parent = archetype_service.get_all_object_archetypes()[0]
+
+    candidates = archetype_service.get_creatable_object_archetypes(parent)
+
+    assert all(parent.accept_descendant(candidate) for candidate in candidates)
+    expected = [
+        archetype
+        for archetype in archetype_service.get_all_object_archetypes()
+        if parent.accept_descendant(archetype)
+    ]
+    assert candidates == expected
+
+
 # test_document_archetypes_lazy_load ---------------------------------------
 def test_document_archetypes_lazy_load(archetype_service: ArchetypeService):
     """

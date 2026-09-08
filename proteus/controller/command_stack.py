@@ -50,7 +50,7 @@ from proteus.application.state.manager import StateManager
 from proteus.application.utils.decorators import proteus_action
 from proteus.model.object import Object
 from proteus.model.project import Project
-from proteus.model.properties import Property
+from proteus.model.properties import Property, TraceProperty
 from proteus.model.template import Template
 
 from proteus.application.configuration.config import Config
@@ -947,7 +947,7 @@ class Controller:
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
     @proteus_action
-    def create_object(self, archetype_id: ProteusID, parent_id: ProteusID) -> None:
+    def create_object(self, archetype_id: ProteusID, parent_id: ProteusID) -> ProteusID:
         """
         Create a new object with the given archetype id and parent id.
 
@@ -956,14 +956,14 @@ class Controller:
         log.info(
             f"Creating object from archetype: {archetype_id} and parent id: {parent_id}"
         )
-        self._push(
-            CloneArchetypeObjectCommand(
-                archetype_id=archetype_id,
-                parent_id=parent_id,
-                project_service=self._project_service,
-                archetype_service=self._archetype_service,
-            )
+        command = CloneArchetypeObjectCommand(
+            archetype_id=archetype_id,
+            parent_id=parent_id,
+            project_service=self._project_service,
+            archetype_service=self._archetype_service,
         )
+        self._push(command)
+        return command.cloned_object.id
 
     # ----------------------------------------------------------------------
     # Method     : create_document
@@ -973,20 +973,20 @@ class Controller:
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
     @proteus_action
-    def create_document(self, archetype_id: ProteusID) -> None:
+    def create_document(self, archetype_id: ProteusID) -> ProteusID:
         """
         Create a new document with the given archetype id.
 
         :param archetype_id: The id of the archetype to create the document.
         """
         log.info(f"Creating document from archetype: {archetype_id}")
-        self._push(
-            CloneArchetypeDocumentCommand(
-                archetype_id=archetype_id,
-                project_service=self._project_service,
-                archetype_service=self._archetype_service,
-            )
+        command = CloneArchetypeDocumentCommand(
+            archetype_id=archetype_id,
+            project_service=self._project_service,
+            archetype_service=self._archetype_service,
         )
+        self._push(command)
+        return command.cloned_object.id
 
     # ----------------------------------------------------------------------
     # Method     : get_project_archetypes
@@ -1018,6 +1018,49 @@ class Controller:
         """
         log.info("Getting first level object archetypes")
         return self._archetype_service.get_first_level_object_archetypes()
+
+    # ----------------------------------------------------------------------
+    # Method     : get_all_object_archetypes
+    # Description: Get every object archetype.
+    # ----------------------------------------------------------------------
+    def get_all_object_archetypes(self) -> List[Object]:
+        """Return every object archetype, including parent-specific archetypes."""
+        log.info("Getting all object archetypes")
+        return self._archetype_service.get_all_object_archetypes()
+
+    # ----------------------------------------------------------------------
+    # Method     : get_creatable_archetypes
+    # Description: Get every archetype creatable below a parent.
+    # ----------------------------------------------------------------------
+    def get_creatable_archetypes(self, parent_id: ProteusID) -> List[Object]:
+        """Return every archetype that can be created below the given parent."""
+        parent = self._project_service._get_element_by_id(parent_id)
+        if isinstance(parent, Project):
+            return self._archetype_service.get_document_archetypes()
+        return self._archetype_service.get_creatable_object_archetypes(parent)
+
+    # ----------------------------------------------------------------------
+    # Method     : get_trace_targets
+    # Description: Get eligible targets for a trace property.
+    # ----------------------------------------------------------------------
+    def get_trace_targets(
+        self, source_id: ProteusID, trace_property: str
+    ) -> List[Object]:
+        """Return targets that satisfy the trace property's GUI constraints."""
+        source = self._project_service._get_element_by_id(source_id)
+        trace = source.get_property(trace_property)
+        assert isinstance(
+            trace, TraceProperty
+        ), f"Property '{trace_property}' is not a trace on '{source_id}'"
+        return [
+            candidate
+            for candidate in self.get_objects(trace.acceptedTargets)
+            if candidate.id != source_id
+            and not any(
+                excluded_class in candidate.classes
+                for excluded_class in trace.excludedTargets
+            )
+        ]
 
     # ----------------------------------------------------------------------
     # Method     : get_accepted_object_archetypes

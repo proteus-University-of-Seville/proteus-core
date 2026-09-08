@@ -193,6 +193,27 @@ class ArchetypeService:
         return self._object_archetypes
 
     # ----------------------------------------------------------------------
+    # Method     : get_all_object_archetypes
+    # Description: Returns every object archetype as a flat list.
+    # ----------------------------------------------------------------------
+    def get_all_object_archetypes(self) -> List[Object]:
+        """Return every object archetype, including parent-specific archetypes."""
+        self.get_object_archetypes()
+        return list(self._unordered_object_archetypes)
+
+    # ----------------------------------------------------------------------
+    # Method     : get_creatable_object_archetypes
+    # Description: Returns every object archetype accepted by a parent.
+    # ----------------------------------------------------------------------
+    def get_creatable_object_archetypes(self, parent: Object) -> List[Object]:
+        """Return every object archetype that the parent accepts."""
+        return [
+            archetype
+            for archetype in self.get_all_object_archetypes()
+            if parent.accept_descendant(archetype)
+        ]
+
+    # ----------------------------------------------------------------------
     # Method     : get_object_archetypes_groups
     # Description: Returns the list of object archetypes groups
     # Date       : 04/05/2023
@@ -485,6 +506,7 @@ class ArchetypeService:
         # Reload archetypes
         self.reload_archetypes()
 
+
     # ----------------------------------------------------------------------
     # Method     : store_document_as_archetype
     # Description: Stores a document as an archetype
@@ -536,4 +558,3 @@ class ArchetypeService:
 
         # Reload archetypes
         self.reload_archetypes()
-

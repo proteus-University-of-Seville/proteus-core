@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11,<3.15"
 dependencies = [
     "lxml>=6.1.0",
+    "fastmcp==4.0.3",
     "pyqt6-qt6==6.11.0",
     "pyqt6==6.11.0",
     "shortuuid==1.0.13",
