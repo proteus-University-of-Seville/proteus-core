@@ -2,7 +2,7 @@
 
 <!-- ======================================================== -->
 <!-- File    : glossary_item.xsl                              -->
-<!-- Content : PROTEUS default XSLT for glossary-item         -->
+<!-- Content : PROTEUS default XSLT for glossary items        -->
 <!-- Author  : José María Delgado Sánchez                     -->
 <!-- Date    : 2023/06/09                                     -->
 <!-- Version : 1.0                                            -->
@@ -24,6 +24,9 @@
 <!-- Review after integration of trace properties in the list -->
 <!-- of properties                                            -->
 <!-- ======================================================== -->
+<!-- Update  : 2026/09/09 (Amador Durán)                      -->
+<!-- Review for default profile.                              -->
+<!-- ======================================================== -->
 
 <!-- ======================================================== -->
 <!-- exclude-result-prefixes="proteus" must be set in all     -->
@@ -31,67 +34,69 @@
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:proteus="http://proteus.us.es"
-    xmlns:proteus-utils="http://proteus.us.es/utils"
-    exclude-result-prefixes="proteus proteus-utils"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils" 
+  exclude-result-prefixes="proteus proteus-utils"
 >
-    <!-- =========================================================== -->
-    <!-- glossary-item template                                      -->
-    <!-- =========================================================== -->
+  <!-- =========================================================== -->
+  <!-- glossary-item template                                      -->
+  <!-- =========================================================== -->
 
-    <xsl:template match="object[contains(@classes,'glossary-item')]">
-        <div id="{@id}" class="glo" data-proteus-id="{@id}">
-            <p>
-                <!-- Generate glossary item name -->
-                <strong>
-                    <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
-                    <xsl:text>: </xsl:text>
-                </strong>
+  <xsl:template match="object[contains(@classes,'glossary-item')]">
+    <div id="{@id}" class="glo" data-proteus-id="{@id}">
+      <p>
+        <!-- Generate glossary item name -->
+        <span class="glo_name">
+          <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
+          <xsl:text>: </xsl:text>
+        </span>
 
-                <!-- Generate glossary item description -->
-                <xsl:variable name="description" select="properties/*[@name='description']"/>
-                <xsl:variable name="nonempty_content" select="string-length(normalize-space($description)) > 0"/>
+        <!-- Generate glossary item description -->
+        <xsl:variable name="description" select="properties/*[@name='description']"/>
+        <xsl:variable name="nonempty_content" select="string-length(normalize-space($description)) > 0"/>
 
-                <xsl:choose>
-                    <xsl:when test="not($nonempty_content)">
-                        <span class="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></span>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="generate_markdown">
-                            <xsl:with-param name="content" select="$description"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="not($nonempty_content)">
+            <span class="tbd">
+              <xsl:value-of select="$proteus:lang_TBD_expanded"/>
+            </span>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="generate_markdown">
+              <xsl:with-param name="content" select="$description"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
 
-                <!-- Get file name with extension (optional, it could be empty) -->
-                <xsl:variable name="image_path" select="properties/*[@name='image']"/>
-                
-                <!-- Get the image width percentage -->
-                <xsl:variable name="image_width_percentage">
-                    <xsl:choose>
-                        <xsl:when test="properties/*[@name='width']">
-                            <xsl:value-of select="properties/*[@name='width']"/>
-                        </xsl:when>
-                        <xsl:otherwise>50</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:variable>
+        <!-- Get file name with extension (optional, it could be empty) -->
+        <xsl:variable name="image_path" select="properties/*[@name='image']"/>
 
-                <!-- Generate <img> element (if any) -->
-                <xsl:if test="normalize-space($image_path)">
-                    <div>
-                        <img class="figure_image">
-                            <xsl:attribute name="src">
-                                <xsl:value-of select="concat('assets:///', $image_path)" disable-output-escaping="no"/>
-                            </xsl:attribute>
-                            <xsl:attribute name="style">
-                                <xsl:value-of select="concat('width:', $image_width_percentage, '%')"/>
-                            </xsl:attribute>
-                        </img>
-                    </div>
-                </xsl:if>
-            </p>
-        </div>
-    </xsl:template>
+        <!-- Get the image width percentage -->
+        <xsl:variable name="image_width_percentage">
+          <xsl:choose>
+            <xsl:when test="properties/*[@name='width']">
+              <xsl:value-of select="properties/*[@name='width']"/>
+            </xsl:when>
+            <xsl:otherwise>50</xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+
+        <!-- Generate <img> element (if any) -->
+        <xsl:if test="normalize-space($image_path)">
+          <div>
+            <img class="figure_image">
+              <xsl:attribute name="src">
+                <xsl:value-of select="concat('assets:///', $image_path)" disable-output-escaping="no"/>
+              </xsl:attribute>
+              <xsl:attribute name="style">
+                <xsl:value-of select="concat('width:', $image_width_percentage, '%')"/>
+              </xsl:attribute>
+            </img>
+          </div>
+        </xsl:if>
+      </p>
+    </div>
+  </xsl:template>
 
 </xsl:stylesheet>

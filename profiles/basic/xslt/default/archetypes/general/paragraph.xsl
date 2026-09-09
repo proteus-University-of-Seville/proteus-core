@@ -22,6 +22,9 @@
 <!-- of properties.                                           -->
 <!-- It shows "empty paragraph" when the paragraph has no text-->
 <!-- ======================================================== -->
+<!-- Update  : 2026/09/09 (Amador Durán)                      -->
+<!-- Review for default profile.                              -->
+<!-- ======================================================== -->
 
 <!-- ======================================================== -->
 <!-- exclude-result-prefixes="proteus" must be set in all     -->
@@ -29,35 +32,35 @@
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:proteus="http://proteus.us.es"
-    xmlns:proteus-utils="http://proteus.us.es/utils"
-    exclude-result-prefixes="proteus proteus-utils"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils" 
+  exclude-result-prefixes="proteus proteus-utils"
 >
-    <!-- =========================================================== -->
-    <!-- paragraph template                                          -->
-    <!-- =========================================================== -->
+  <!-- =========================================================== -->
+  <!-- paragraph template                                          -->
+  <!-- =========================================================== -->
 
-    <xsl:template match="object[contains(@classes,'paragraph')]">
-        <div id="{@id}" data-proteus-id="{@id}">
-            <xsl:variable name="content" select="properties/*[@name='text']"/>
-            <xsl:variable name="nonempty_content" select="string-length(normalize-space($content)) > 0"/>
-
-            <p>
-                <xsl:choose>
-                    <xsl:when test="not($nonempty_content)">
-                        [<span class="tbd">
-                            <xsl:value-of select="$proteus:lang_empty_paragraph"/> 
-                        </span>]
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:call-template name="generate_markdown">
-                            <xsl:with-param name="content" select="$content"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </p>
-        </div>
-    </xsl:template>
+  <xsl:template match="object[contains(@classes,'paragraph')]">
+    <div id="{@id}" data-proteus-id="{@id}">
+      <xsl:variable name="content" select="properties/*[@name='text']"/>
+      <xsl:variable name="nonempty_content" 
+                    select="string-length(normalize-space($content)) > 0"/>
+      <p>
+        <xsl:choose>
+          <xsl:when test="not($nonempty_content)">
+            [<span class="tbd">
+            <xsl:value-of select="$proteus:lang_empty_paragraph"/>
+            </span>]
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="generate_markdown">
+              <xsl:with-param name="content" select="$content"/>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </p>
+    </div>
+  </xsl:template>
 
 </xsl:stylesheet>

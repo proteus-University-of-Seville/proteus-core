@@ -41,7 +41,7 @@
         <meta name="generatedBy" content="PROTEUS"/>
 
         <!-- Proteus stylesheets -->
-        <link rel="stylesheet" href="templates:///default/resources/css/proteus.css"/>
+        <link rel="stylesheet" href="templates:///default/resources/css/default.css"/>
 
         <!-- Custom stylesheets -->
         <link rel="stylesheet" href="templates:///default/resources/css/codehilite.css"/>
