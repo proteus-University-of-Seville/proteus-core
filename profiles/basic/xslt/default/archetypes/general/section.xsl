@@ -3,28 +3,9 @@
 <!-- ======================================================== -->
 <!-- File    : section.xsl                                    -->
 <!-- Content : PROTEUS default XSLT for section               -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2023/06/09                                     -->
-<!-- Version : 1.0                                            -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/09 (Amador Durán)                      -->
-<!-- match must be object[ends-with(@classes,'section')]      -->
-<!-- To check if an object is of a given class:               -->
-<!--    object[contains(@classes,class_name)]                 -->
-<!-- To check if an object is of a given final class:         -->
-<!--    object[ends-with(@classes,class_name)]                -->
-<!-- PROBLEM: XSLT 1.0 does not include ends-with             -->
-<!-- NOTE: in this case, @classes='section' is kept to avoid  -->
-<!-- matching with appendix, whics is a subclass of section   -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/13 (Amador Durán)                      -->
-<!-- Review after integration of trace properties in the list -->
-<!-- of properties.                                           -->
-<!-- No need to apply markdown to the section title, HTML     -->
-<!-- headers ignore formatting.                               -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/09/09 (Amador Durán)                      -->
-<!-- Review for default profile.                              -->
+<!-- Author  : Amador Durán Toro                              -->
+<!-- Date    : 2026/09/09                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
 <!-- ======================================================== -->
@@ -35,9 +16,21 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils" 
+  xmlns:proteus-utils="http://proteus.us.es/utils"
   exclude-result-prefixes="proteus proteus-utils"
 >
+  <!-- =================================================================== -->
+  <!-- NOTE:                                                               -->
+  <!-- match expression should be object[ends-with(@classes,'section')]    -->
+  <!-- That is, to check if an object is of a given class we should use:   -->
+  <!--    object[contains(@classes,class_name)]                            -->
+  <!-- And to check if an object is of a given final class:                -->
+  <!--    object[ends-with(@classes,class_name)]                           -->
+  <!-- The problem is that XSLT 1.0 does not include ends-with.            -->
+  <!-- In this case, object[@classes='section'] is kept to avoid matching  -->
+  <!-- with appendix objects, which is a subclass of section.              -->
+  <!-- =================================================================== -->
+
   <!-- ============================================= -->
   <!-- section template                              -->
   <!-- ============================================= -->
@@ -83,7 +76,7 @@
       <!-- Generate header element -->
       <xsl:element name="h{$header_level}">
         <xsl:value-of select="$current_index"/>
-        <xsl:text></xsl:text>
+        <xsl:text> </xsl:text>
         <xsl:value-of select="$title"/>
       </xsl:element>
 
@@ -130,7 +123,7 @@
     <!-- Generate TOC item element -->
     <li>
       <xsl:value-of select="$current_index"/>
-      <xsl:text></xsl:text>
+      <xsl:text> </xsl:text>
       <a href="#{@id}">
         <xsl:value-of select="$title"/>
       </a>

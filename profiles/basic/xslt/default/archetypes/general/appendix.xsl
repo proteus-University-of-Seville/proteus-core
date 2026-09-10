@@ -3,9 +3,9 @@
 <!-- ======================================================== -->
 <!-- File    : appendix.xsl                                   -->
 <!-- Content : PROTEUS default XSLT for appendix              -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2024/07/29                                     -->
-<!-- Version : 1.0                                            -->
+<!-- Author  : Amador Durán Toro                              -->
+<!-- Date    : 2026/09/09                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 <!-- Update  : 2024/09/07 (Amador Durán)                      -->
 <!-- match must be object[ends-with(@classes,'appendix')]     -->
@@ -36,14 +36,25 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils" 
+  xmlns:proteus-utils="http://proteus.us.es/utils"
   exclude-result-prefixes="proteus proteus-utils"
 >
+  <!-- =================================================================== -->
+  <!-- NOTE:                                                               -->
+  <!-- match expression should be object[ends-with(@classes,'appendix')]   -->
+  <!-- since appendix is a subclass of section, and its classes attribute  -->
+  <!-- is "section appendix". That is, to check if an object is of a given -->
+  <!-- class we should use:                                                -->
+  <!--    object[contains(@classes,class_name)]                            -->
+  <!-- And to check if an object is of a given final class:                -->
+  <!--    object[ends-with(@classes,class_name)]                           -->
+  <!-- The problem is that XSLT 1.0 does not include ends-with.            -->
+  <!-- =================================================================== -->
+
   <!-- ============================================= -->
   <!-- appendix template                             -->
   <!-- ============================================= -->
 
-  <!-- <xsl:template match="object[ends-with(@classes,'appendix')]"> -->
   <xsl:template match="object[contains(@classes,'appendix')]">
     <!-- Nesting level -->
     <xsl:param name="nesting_level" select="1"/>
@@ -62,7 +73,7 @@
       <!-- Generate header element -->
       <xsl:element name="h1">
         <xsl:value-of select="$appendix_index"/>
-        <xsl:text></xsl:text>
+        <xsl:text> </xsl:text>
         <xsl:value-of select="$title"/>
       </xsl:element>
 
@@ -97,7 +108,7 @@
     <!-- Generate TOC item element -->
     <li>
       <xsl:value-of select="$appendix_index"/>
-      <xsl:text></xsl:text>
+      <xsl:text> </xsl:text>
       <a href="#{@id}">
         <xsl:apply-templates select="$title"/>
       </a>

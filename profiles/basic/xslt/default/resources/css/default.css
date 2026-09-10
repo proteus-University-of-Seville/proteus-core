@@ -79,10 +79,6 @@ body>div {
   }
   */
 
-span.glo_name {
-  font-weight: bold;
-}
-
 span.tbd {
   color: red;
   font-weight: bold;
@@ -191,6 +187,10 @@ div.part {
 }
 
 /* glossary items */
+
+span.glo_name {
+  font-weight: bold;
+}
 
 div.glo>span,
 div.bib>span {
