@@ -1,0 +1,28 @@
+/* ======================================================= */
+/* File    : printing.css                                  */
+/* Content : Default CSS for Proteus (printing)            */
+/* Author  : Amador Durán Toro                             */
+/* Date    : 2026/09/11                                    */
+/* Version : 2.0                                           */
+/* ======================================================= */
+
+@media print {
+  .page-break {
+    clear: both;
+    page-break-before: always;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    page-break-after: avoid;
+  }
+
+  table,
+  figure {
+    page-break-inside: avoid;
+  }
+
+}

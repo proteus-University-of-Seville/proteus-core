@@ -2,14 +2,62 @@
 /* File    : default.css                                   */
 /* Content : Default CSS for Proteus                       */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/11                                    */
-/* Version : 2.0                                           */
+/* Date    : 2026/09/09                                    */
+/* Version : 1.0                                           */
 /* ======================================================= */
 
-@import url('printing.css');
-@import url('cover.css');
-@import url('toc.css');
-@import url('glossary_item.css');
+/* Default tables */
+table {
+  width: 98%;
+  margin: 0 auto;
+  margin-bottom: 2em;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 8px;
+}
+
+/* Symlinked objects */
+.linked-object {
+
+}
+
+.symbolic-link {
+  outline: 2px dashed black;
+  padding-top: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 0.25em;
+
+  background-color: rgb(250, 250, 250);
+}
+
+/* printing */
+
+@media print {
+  .page-break {
+    clear: both;
+    page-break-before: always;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    page-break-after: avoid;
+  }
+
+  table,
+  figure {
+    page-break-inside: avoid;
+  }
+
+}
 
 /* general styles */
 
@@ -40,7 +88,92 @@ code {
   font-size: small;
 }
 
+textarea.markdown {
+  display: none;
+  /*
+    display: block;
+    height: 20em;
+    width: 80em;
+  */
+}
 
+/* warnings */
+
+div#warning_container {
+  display: none;
+  padding: 6px;
+  margin-bottom: 10pt;
+  font-size: small;
+  background-color: lightyellow;
+}
+
+span#warning_title {
+  font-weight: bold;
+}
+
+div#warning_messages ul {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+/* document cover */
+
+div#document_cover {
+  text-align: center;
+}
+
+/* for debugging */
+div#browser_info {
+  display: none;
+}
+
+div#project_name,
+div#document_version,
+div#document_date {
+  font-weight: bold;
+  font-size: large;
+}
+
+div#project_name {
+  margin-bottom: 50pt;
+}
+
+div#document_logo {
+  margin-bottom: 20pt;
+}
+
+div#document_name {
+  font-weight: bold;
+  font-size: xx-large;
+  margin-bottom: 20pt;
+}
+
+div#document_version {
+  margin-bottom: 20pt;
+}
+
+div#document_date {
+  margin-bottom: 50pt;
+}
+
+div#document_prepared_by {
+  margin-bottom: 100pt;
+}
+
+/* table of contents */
+
+ul.toc_list {
+  list-style-type: none;
+  list-style-position: outside;
+  list-style-image: none;
+  line-height: 150%;
+  font-weight: normal;
+}
+
+ul.toc_list_level_1 {
+  margin-left: 0pt;
+  font-weight: bold;
+}
 
 /* parts */
 
@@ -53,6 +186,30 @@ div.part {
   margin-bottom: 200pt;
 }
 
+/* glossary items */
+
+span.glo_name {
+  font-weight: bold;
+}
+
+div.glo>span,
+div.bib>span {
+  float: left;
+}
+
+div.glo p,
+div.bib p {
+  padding-left: 2em;
+}
+
+div.glo p:first-child,
+div.bib p:first-child {
+  text-indent: -2em;
+}
+
+div.glo>span.glo {
+  font-weight: bold;
+}
 
 /* info paragraphs */
 
