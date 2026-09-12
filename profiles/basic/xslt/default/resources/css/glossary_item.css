@@ -6,7 +6,7 @@
 /* Version : 2.0                                           */
 /* ======================================================= */
 
-span.glo_name {
+span.glossary_item_name {
   font-weight: bold;
 }
 
@@ -15,16 +15,12 @@ div.bib>span {
   float: left;
 }
 
-div.glo p,
+div.glossary_item p,
 div.bib p {
   padding-left: 2em;
 }
 
-div.glo p:first-child,
+div.glossary_item p:first-child,
 div.bib p:first-child {
   text-indent: -2em;
-}
-
-div.glo>span.glo {
-  font-weight: bold;
 }

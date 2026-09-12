@@ -19,15 +19,15 @@
   xmlns:proteus-utils="http://proteus.us.es/utils"
   exclude-result-prefixes="proteus proteus-utils"
 >
-  <!-- =========================================================== -->
-  <!-- glossary-item template                                      -->
-  <!-- =========================================================== -->
+  <!-- ====================================================== -->
+  <!-- glossary-item template                                 -->
+  <!-- ====================================================== -->
 
   <xsl:template match="object[contains(@classes,'glossary-item')]">
-    <div id="{@id}" class="glo" data-proteus-id="{@id}">
+    <div id="{@id}" class="glossary_item" data-proteus-id="{@id}">
       <p>
         <!-- Generate glossary item name -->
-        <span class="glo_name">
+        <span class="glossary_item_name">
           <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
           <xsl:text>: </xsl:text>
         </span>
@@ -36,18 +36,20 @@
         <xsl:variable name="description" select="properties/*[@name='description']"/>
         <xsl:variable name="nonempty_content" select="string-length(normalize-space($description)) > 0"/>
 
-        <xsl:choose>
-          <xsl:when test="not($nonempty_content)">
-            <span class="tbd">
-              <xsl:value-of select="$proteus:lang_TBD_expanded"/>
-            </span>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="generate_markdown">
-              <xsl:with-param name="content" select="$description"/>
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
+        <span class="glossary_item_description">
+          <xsl:choose>
+            <xsl:when test="not($nonempty_content)">
+              <span class="tbd">
+                <xsl:value-of select="$proteus:lang_TBD_expanded"/>
+              </span>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="generate_markdown">
+                <xsl:with-param name="content" select="$description"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
+        </span>
 
         <!-- Get file name with extension (optional, it could be empty) -->
         <xsl:variable name="image_path" select="properties/*[@name='image']"/>
@@ -65,7 +67,7 @@
         <!-- Generate <img> element (if any) -->
         <xsl:if test="normalize-space($image_path)">
           <div>
-            <img class="figure_image">
+            <img class="glossary_item_figure">
               <xsl:attribute name="src">
                 <xsl:value-of select="concat('assets:///', $image_path)" disable-output-escaping="no"/>
               </xsl:attribute>

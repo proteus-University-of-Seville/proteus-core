@@ -15,6 +15,7 @@
     <stringProperty name="phone-number" category="detail"><![CDATA[]]></stringProperty>
     <stringProperty name="email" category="detail"><![CDATA[mail@organization.com]]></stringProperty>
 		<urlProperty name="web" category="detail"><![CDATA[https://www.organization.com]]></urlProperty>
+    <fileProperty name="logo" category="detail" tooltip="file-info"><![CDATA[organization_logo.png]]></fileProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 

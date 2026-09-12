@@ -10,6 +10,7 @@
 @import url('cover.css');
 @import url('toc.css');
 @import url('glossary_item.css');
+@import url('figure.css');
 
 /* general styles */
 
@@ -71,34 +72,6 @@ div.info {
   padding-left: 42px;
 }
 
-/* figures and traceability matrices with captions */
-
-div.figure,
-div.traceability_matrix {
-  text-align: center;
-}
-
-img.figure_image {}
-
-p.figure_caption,
-p.matrix_caption {
-  margin-top: 4px;
-}
-
-span.figure_caption_label,
-span.matrix_caption_label {
-  font-weight: bold;
-}
-
-.reduce_font,
-.increase_font {
-  color: lightgray;
-}
-
-.reduce_font:active,
-.increase_font:active {
-    background-color: darkgray;
-}
 
 /* REMUS tables - general styles */
 
@@ -224,6 +197,28 @@ table.use_case th.step_number {
 }
 
 /* traceability matrices */
+
+div.traceability_matrix {
+  text-align: center;
+}
+
+p.matrix_caption {
+  margin-top: 4px;
+}
+
+span.matrix_caption_label {
+  font-weight: bold;
+}
+
+.reduce_font,
+.increase_font {
+  color: lightgray;
+}
+
+.reduce_font:active,
+.increase_font:active {
+    background-color: darkgray;
+}
 
 table.traceability_matrix {
   margin-bottom: 1em;
