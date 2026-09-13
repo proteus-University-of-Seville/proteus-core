@@ -48,12 +48,14 @@
   />
 
   <!-- Language-independent dictionaries -->
+  <xsl:include href="labels/class_labels.xsl"/>
   <xsl:include href="labels/property_labels.xsl"/>
   <xsl:include href="labels/enumeration_labels.xsl"/>
   <xsl:include href="labels/trace_type_labels.xsl"/>
 
   <!-- XSLT core modules -->
   <xsl:include href="core/utilities.xsl" />
+  <xsl:include href="core/generate_table.xsl" />
   <xsl:include href="core/properties.xsl" />
   <xsl:include href="core/cover.xsl" />
   <xsl:include href="core/document.xsl" />
@@ -68,7 +70,7 @@
   <xsl:include href="archetypes/general/stakeholder.xsl" />
   <xsl:include href="archetypes/general/symbolic_link.xsl" />
 
-  <xsl:include href="archetypes/default.xsl" />
+  <xsl:include href="archetypes/any_archetype.xsl" />
 
   <xsl:template match="project">
       <xsl:variable name="currentDocumentId" select="proteus-utils:current_document()"/>

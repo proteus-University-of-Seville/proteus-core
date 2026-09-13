@@ -1,0 +1,11 @@
+/* ======================================================= */
+/* File    : stakeholder.css                               */
+/* Content : Default CSS for Proteus (stakeholder)         */
+/* Author  : Amador Durán Toro                             */
+/* Date    : 2026/09/13                                    */
+/* Version : 2.0                                           */
+/* ======================================================= */
+
+tr.header_row.stakeholder {
+  background-color: lightcyan;
+}

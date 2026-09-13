@@ -4,32 +4,26 @@
 <!-- File    : section.xsl                                    -->
 <!-- Content : PROTEUS default XSLT for section               -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/09                                     -->
+<!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
-  <!-- =================================================================== -->
-  <!-- NOTE:                                                               -->
-  <!-- match expression should be object[ends-with(@classes,'section')]    -->
-  <!-- That is, to check if an object is of a given class we should use:   -->
-  <!--    object[contains(@classes,class_name)]                            -->
-  <!-- And to check if an object is of a given final class:                -->
-  <!--    object[ends-with(@classes,class_name)]                           -->
-  <!-- The problem is that XSLT 1.0 does not include ends-with.            -->
-  <!-- In this case, object[@classes='section'] is kept to avoid matching  -->
-  <!-- with appendix objects, which is a subclass of section.              -->
-  <!-- =================================================================== -->
+
+  <!-- ================================================================== -->
+  <!-- NOTE:                                                              -->
+  <!-- match expression should be object[ends-with(@classes,'section')]   -->
+  <!-- That is, to check if an object is of a given class we should use:  -->
+  <!--    object[contains(@classes,class_name)]                           -->
+  <!-- And to check if an object is of a given final class:               -->
+  <!--    object[ends-with(@classes,class_name)]                          -->
+  <!-- The problem is that XSLT 1.0 does not include ends-with.           -->
+  <!-- In this case, object[@classes='section'] is kept to avoid matching -->
+  <!-- with appendix objects, which is a subclass of section.             -->
+  <!-- ================================================================== -->
 
   <!-- ============================================= -->
   <!-- section template                              -->
@@ -76,7 +70,7 @@
       <!-- Generate header element -->
       <xsl:element name="h{$header_level}">
         <xsl:value-of select="$current_index"/>
-        <xsl:text> </xsl:text>
+        <xsl:text></xsl:text>
         <xsl:value-of select="$title"/>
       </xsl:element>
 
@@ -123,7 +117,7 @@
     <!-- Generate TOC item element -->
     <li>
       <xsl:value-of select="$current_index"/>
-      <xsl:text> </xsl:text>
+      <xsl:text></xsl:text>
       <a href="#{@id}">
         <xsl:value-of select="$title"/>
       </a>

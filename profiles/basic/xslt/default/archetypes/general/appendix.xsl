@@ -4,41 +4,15 @@
 <!-- File    : appendix.xsl                                   -->
 <!-- Content : PROTEUS default XSLT for appendix              -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/09                                     -->
+<!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/07 (Amador Durán)                      -->
-<!-- match must be object[ends-with(@classes,'appendix')]     -->
-<!-- since appendix is a subclass of section, and its classes -->
-<!-- attribute is "section appendix".                         -->
-<!-- To check if an object is of a given class:               -->
-<!--    object[contains(@classes,class_name)]                 -->
-<!-- To check if an object is of a given final class:         -->
-<!--    object[ends-with(@classes,class_name)]                -->
-<!-- PROBLEM: XSLT 1.0 does not include ends-with             -->
-<!-- nest_level -> nesting_level                              -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/13 (Amador Durán)                      -->
-<!-- Review after integration of trace properties in the list -->
-<!-- of properties.                                           -->
-<!-- No need to apply markdown to the appendix title, HTML    -->
-<!-- headers ignore formatting.                               -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/09/09 (Amador Durán)                      -->
-<!-- Review for default profile.                              -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
+
   <!-- =================================================================== -->
   <!-- NOTE:                                                               -->
   <!-- match expression should be object[ends-with(@classes,'appendix')]   -->

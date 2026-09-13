@@ -65,7 +65,7 @@
 
 <!-- This is needed because of limitations of XSLT 1.0 -->
 <!-- Note the use of the node-set() extension function -->
-<!-- Usage: <xsl:value-of select="$property-labels/label[@key=@name])"/> -->
+<!-- Usage: <xsl:value-of select="$property_labels/label[@key=@name])"/> -->
 <xsl:variable name="property_labels" select="exsl:node-set($property_labels_dictionary)"/>
 
 <!-- Define the key for property labels                           -->

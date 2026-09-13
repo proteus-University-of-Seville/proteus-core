@@ -11,6 +11,9 @@
 @import url('toc.css');
 @import url('glossary_item.css');
 @import url('figure.css');
+@import url('proteus_table.css');
+@import url('stakeholder.css');
+@import url('organization.css');
 
 /* general styles */
 
@@ -73,85 +76,10 @@ div.info {
 }
 
 
-/* REMUS tables - general styles */
-
-table.remus_table {
-  margin-left: 1%;
-  margin-right: 1%;
-  width: 98%;
-  box-shadow: 8px 8px 4px lightgrey;
-}
-
-table.remus_table,
-table.remus_table th,
-table.remus_table td {
-  border-style: solid;
-  border-collapse: collapse;
-  border-color: lightslategray;
-  border-width: 1px;
-}
-
-table.remus_table th,
-table.remus_table td {
-  padding: 8px;
-  vertical-align: top;
-}
-
-table.remus_table th.name_column {
-  width: 100%;
-}
-
-/* first row, first column */
-table.remus_table>thead>tr>th:first-child {
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: 4px;
-  min-width: 8em;
-  white-space: nowrap;
-}
-
-/* any row, first column */
-table.remus_table tr>th:first-child {
-  /* white-space: nowrap;*/
-}
-
-/* icon on the first row, first column */
-table.remus_table>thead>tr>th:first-child>img:first-child {
-  padding-right: 0.25em;
-  vertical-align: text-bottom;
-  width: 20px;
-}
-
-/* paragraphs inside tables */
-table.remus_table p {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-
-table.remus_table div.remus_comments p {
-  margin-top: 0em;
-  margin-bottom: 0em;
-}
-
-/* lists inside tables */
-table.remus_table td ul.children,
-table.remus_table td ul.traces,
-table.remus_table td ul.stakeholders,
-table.remus_table td ul.subobjectives,
-table.remus_table td ul.specific_data,
-table.remus_table td ul.affected_objects {
-  margin-top: 0em;
-  margin-bottom: 0em;
-  margin-left: 1em;
-  padding-left: 0em;
-}
 
 /* MADEJA objects */
 
 /* general purpose objects */
-
-table.organization>thead>tr,
-table.stakeholder>thead>tr,
 table.meeting>thead>tr {
   background-color: lightcyan;
 }

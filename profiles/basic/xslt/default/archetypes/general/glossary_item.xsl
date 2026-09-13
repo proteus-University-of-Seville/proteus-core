@@ -4,7 +4,7 @@
 <!-- File    : glossary_item.xsl                              -->
 <!-- Content : PROTEUS default XSLT for glossary items        -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/09                                     -->
+<!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
@@ -16,9 +16,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
+
   <!-- ====================================================== -->
   <!-- glossary-item template                                 -->
   <!-- ====================================================== -->

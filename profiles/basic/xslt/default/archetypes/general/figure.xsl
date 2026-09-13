@@ -4,20 +4,13 @@
 <!-- File    : figure.xsl                                     -->
 <!-- Content : PROTEUS default XSLT for figure                -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/09                                     -->
+<!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ======================================================== -->
   <!-- figure template                                          -->
