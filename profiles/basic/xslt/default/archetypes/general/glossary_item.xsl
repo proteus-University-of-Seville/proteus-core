@@ -1,28 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- ======================================================== -->
-<!-- File    : glossary_item.xsl                              -->
-<!-- Content : PROTEUS default XSLT for glossary items        -->
-<!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/14                                     -->
-<!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
-<!-- ======================================================== -->
+<!-- ======================================================================== -->
+<!-- File    : glossary_item.xsl                                              -->
+<!-- Content : PROTEUS default XSLT for glossary items                        -->
+<!-- Author  : Amador Durán Toro                                              -->
+<!-- Date    : 2026/09/14                                                     -->
+<!-- Version : 2.0                                                            -->
+<!-- ======================================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
 >
+  <!-- ====================================================================== -->
+  <!-- NOTE:                                                                  -->
+  <!-- match expression should be object[ends-with(@classes,'glossary-item')] -->
+  <!-- That is, to check if an object is of a given class we should use:      -->
+  <!--    object[contains(@classes,class_name)]                               -->
+  <!-- And to check if an object is of a given final class:                   -->
+  <!--    object[ends-with(@classes,class_name)]                              -->
+  <!-- The problem is that XSLT 1.0 does not include ends-with.               -->
+  <!-- In this case, object[@classes='traceable-object glossary-item'] is     -->
+  <!-- kept to avoid matching with bibliography items, which is a subclass    -->
+  <!-- of glossary-item.                                                      -->
+  <!-- ====================================================================== -->
 
-  <!-- ====================================================== -->
-  <!-- glossary-item template                                 -->
-  <!-- ====================================================== -->
+  <!-- ====================================================================== -->
+  <!-- glossary-item template                                                 -->
+  <!-- ====================================================================== -->
 
-  <xsl:template match="object[contains(@classes,'glossary-item')]">
+  <xsl:template match="object[@classes='traceable-object glossary-item']">
     <div id="{@id}" class="glossary_item" data-proteus-id="{@id}">
       <p>
         <!-- Generate glossary item name -->
@@ -49,6 +56,20 @@
             </xsl:otherwise>
           </xsl:choose>
         </span>
+
+        <!-- Generate synonym list -->
+        <xsl:variable name="synonyms" select="properties/*[@name='synonyms']"/>
+        <xsl:variable name="nonempty_synonyms" select="string-length(normalize-space($synonyms)) > 0"/>
+
+        <xsl:if test="$nonempty_synonyms">
+          <span class="glossary_item_synonyms">
+              <xsl:text> </xsl:text>
+              <xsl:value-of select="$proteus:lang_synonyms"/>
+              <xsl:text>: </xsl:text>
+              <xsl:value-of select="$synonyms"/>
+              <xsl:text>.</xsl:text>
+          </span>
+        </xsl:if>
 
         <!-- Get file name with extension (optional, it could be empty) -->
         <xsl:variable name="image_path" select="properties/*[@name='image']"/>

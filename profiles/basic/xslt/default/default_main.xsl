@@ -66,6 +66,7 @@
   <xsl:include href="archetypes/general/paragraph.xsl" />
   <xsl:include href="archetypes/general/comment.xsl" />
   <xsl:include href="archetypes/general/glossary_item.xsl" />
+  <xsl:include href="archetypes/general/bibliography_item.xsl" />
   <xsl:include href="archetypes/general/figure.xsl" />
   <xsl:include href="archetypes/general/symbolic_link.xsl" />
 

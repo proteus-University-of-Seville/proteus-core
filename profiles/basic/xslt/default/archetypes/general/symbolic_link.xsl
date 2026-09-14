@@ -4,20 +4,13 @@
 <!-- File    : symbolic_link.xsl                              -->
 <!-- Content : PROTEUS default XSLT for symbolic-link         -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/09                                     -->
+<!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ============================================= -->
   <!-- symbolic-link template                        -->
@@ -36,7 +29,7 @@
 
         <!-- If target object exists -->
         <xsl:if test="$targetObject">
-          <div class="linked-object" data-tippy-content="{$proteus:lang_symlink_tooltip}">
+          <div class="linked-object" title="{$proteus:lang_symlink_tooltip}">
             <xsl:apply-templates select="$targetObject" />
           </div>
         </xsl:if>

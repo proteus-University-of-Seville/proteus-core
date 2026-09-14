@@ -5,7 +5,7 @@
 <!-- Content : PROTEUS default XSLT for paragraph                       -->
 <!-- Author  : Amador Durán Toro                                        -->
 <!-- Date    : 2026/09/14                                               -->
-<!-- Version : 2.0                                                     -->
+<!-- Version : 2.0                                                      -->
 <!-- ================================================================== -->
 
 <xsl:stylesheet version="1.0"

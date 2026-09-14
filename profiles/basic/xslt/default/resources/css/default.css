@@ -2,7 +2,7 @@
 /* File    : default.css                                   */
 /* Content : Default CSS for Proteus                       */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/11                                    */
+/* Date    : 2026/09/14                                    */
 /* Version : 2.0                                           */
 /* ======================================================= */
 
@@ -11,10 +11,12 @@
 @import url('toc.css');
 @import url('comment.css');
 @import url('glossary_item.css');
+@import url('bibliography_item.css');
 @import url('figure.css');
 @import url('proteus_table.css');
 @import url('stakeholder.css');
 @import url('organization.css');
+@import url('symbolic_link.css');
 
 /* general styles */
 
