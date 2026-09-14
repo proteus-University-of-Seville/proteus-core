@@ -64,11 +64,13 @@
   <xsl:include href="archetypes/general/section.xsl" />
   <xsl:include href="archetypes/general/appendix.xsl" />
   <xsl:include href="archetypes/general/paragraph.xsl" />
+  <xsl:include href="archetypes/general/comment.xsl" />
   <xsl:include href="archetypes/general/glossary_item.xsl" />
   <xsl:include href="archetypes/general/figure.xsl" />
-  <xsl:include href="archetypes/general/organization.xsl" />
-  <xsl:include href="archetypes/general/stakeholder.xsl" />
   <xsl:include href="archetypes/general/symbolic_link.xsl" />
+
+  <xsl:include href="archetypes/advanced/organization.xsl" />
+  <xsl:include href="archetypes/advanced/stakeholder.xsl" />
 
   <xsl:include href="archetypes/any_archetype.xsl" />
 

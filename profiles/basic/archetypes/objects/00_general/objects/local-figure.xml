@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object
   id="local-figure"
-  classes="general-traceable-object figure"
+  classes="traceable-object figure"
   acceptedChildren=":Proteus-none"
 >
   <properties>

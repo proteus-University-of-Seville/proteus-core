@@ -2,7 +2,7 @@
 
 <!-- ======================================================== -->
 <!-- File    : appendix.xsl                                   -->
-<!-- Content : PROTEUS default XSLT for appendix              -->
+<!-- Content : PROTEUS default XSLT for appendix (section)    -->
 <!-- Author  : Amador Durán Toro                              -->
 <!-- Date    : 2026/09/14                                     -->
 <!-- Version : 2.0                                            -->
@@ -29,7 +29,7 @@
   <!-- appendix template                             -->
   <!-- ============================================= -->
 
-  <xsl:template match="object[contains(@classes,'appendix')]">
+  <xsl:template match="object[contains(@classes,'section appendix')]">
     <!-- Nesting level -->
     <xsl:param name="nesting_level" select="1"/>
 
@@ -68,7 +68,7 @@
   <!-- A <ul> parent element is assumed              -->
 
   <!-- <xsl:template match="object[ends-with(@classes,'appendix')]" mode="toc"> -->
-  <xsl:template match="object[contains(@classes,'appendix')]" mode="toc">
+  <xsl:template match="object[contains(@classes,'section appendix')]" mode="toc">
 
     <!-- Calculate appendix index with respect to its parent-->
     <!-- Should use ends-with     -->

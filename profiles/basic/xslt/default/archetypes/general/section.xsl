@@ -12,7 +12,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
 >
-
   <!-- ================================================================== -->
   <!-- NOTE:                                                              -->
   <!-- match expression should be object[ends-with(@classes,'section')]   -->
@@ -70,7 +69,7 @@
       <!-- Generate header element -->
       <xsl:element name="h{$header_level}">
         <xsl:value-of select="$current_index"/>
-        <xsl:text></xsl:text>
+        <xsl:text> </xsl:text>
         <xsl:value-of select="$title"/>
       </xsl:element>
 
@@ -117,7 +116,7 @@
     <!-- Generate TOC item element -->
     <li>
       <xsl:value-of select="$current_index"/>
-      <xsl:text></xsl:text>
+      <xsl:text> </xsl:text>
       <a href="#{@id}">
         <xsl:value-of select="$title"/>
       </a>
