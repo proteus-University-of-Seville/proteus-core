@@ -19,7 +19,7 @@ archetype.category.advanced: "Avanzado"
 
 # Categoría general
 
-archetype.class.general-traceable-object: "Objeto general"
+archetype.class.traceable-object: "Objeto general"
 archetype.class.section: "Sección"
 archetype.class.appendix: "Apéndice"
 archetype.class.paragraph: "Párrafo"
