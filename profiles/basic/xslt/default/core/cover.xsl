@@ -29,7 +29,7 @@
       <div id="document_cover">
 
         <div id="project_name">
-          <xsl:value-of select="$proteus:lang_project"/>
+          <xsl:value-of select="proteus-utils:i18n('xslt.text.project')"/>
           <xsl:text> </xsl:text>
           <xsl:value-of select="parent::*/parent::*/properties/stringProperty[@name=':Proteus-name']"/>
         </div>
@@ -43,20 +43,20 @@
         </div>
 
         <div id="document_version">
-          <xsl:value-of select="$proteus:lang_version"/>
+          <xsl:value-of select="proteus-utils:i18n('archetype.prop_name.version')"/>
           <xsl:text> </xsl:text>
           <xsl:value-of select="properties/stringProperty[@name='version']"/>
         </div>
 
         <div id="document_date">
-          <xsl:value-of select="$proteus:lang_date"/>
+          <xsl:value-of select="proteus-utils:i18n('archetype.prop_name.date')"/>
           <xsl:text> </xsl:text>
           <xsl:value-of select="properties/dateProperty[@name=':Proteus-date']"/>
         </div>
 
         <div id="document_prepared_for">
-          <xsl:value-of select="$proteus:lang_prepared_for"/>
-          <xsl:text> </xsl:text>
+          <xsl:value-of select="proteus-utils:i18n('archetype.prop_name.prepared-for')"/>
+          <xsl:text>: </xsl:text>
 
           <xsl:choose>
             <xsl:when test="not(properties/traceProperty[@name='prepared-for']/trace)">
@@ -69,8 +69,8 @@
         </div>
 
         <div id="document_prepared_by">
-          <xsl:value-of select="$proteus:lang_prepared_by"/>
-          <xsl:text> </xsl:text>
+          <xsl:value-of select="proteus-utils:i18n('archetype.prop_name.prepared-by')"/>
+          <xsl:text>: </xsl:text>
 
           <xsl:choose>
             <xsl:when test="not(properties/traceProperty[@name='prepared-by']/trace)">

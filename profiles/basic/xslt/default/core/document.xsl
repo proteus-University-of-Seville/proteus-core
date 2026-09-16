@@ -47,7 +47,7 @@
         <link rel="stylesheet" href="templates:///default/resources/css/codehilite.css"/>
 
         <title>
-          <xsl:value-of select="$proteus:lang_project"/>
+          <xsl:value-of select="proteus-utils:i18n('xslt.text.project')"/>
           <xsl:text> </xsl:text>
           <xsl:value-of select="parent::*/parent::*/properties/stringProperty[@name=':Proteus-name']"/>
         </title>
@@ -61,7 +61,7 @@
 
         <!-- Table of contents -->
         <nav id="toc" role="navigation">
-          <h1><xsl:value-of select="$proteus:lang_TOC"/></h1>
+          <h1><xsl:value-of select="proteus-utils:i18n('xslt.text.toc')"/></h1>
 
           <ul class="toc_list toc_list_level_1">
             <xsl:apply-templates

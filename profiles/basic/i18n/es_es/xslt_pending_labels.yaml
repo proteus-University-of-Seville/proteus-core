@@ -1,0 +1,144 @@
+# ==========================================================================
+# File: es_es/xslt_pending_labels.yaml
+# Description: XSLT labels of archetypes not migrated yet (Spanish)
+# Date: 2026/09/16
+# Version: 1.0
+# Author: Amador Durán Toro
+# ==========================================================================
+#
+# These strings are looked up from the XSLT templates using the
+# proteus-utils:i18n() extension function, e.g.
+#
+#   <xsl:value-of select="proteus-utils:i18n(concat('xslt.property.', @name))"/>
+#
+# Adding labels for a new archetype does not require modifying any XSLT file
+# or any other translation file: just add a new .yaml file to this directory.
+
+
+# NOTE: these strings belong to archetypes that have not been migrated to the
+# basic profile yet (requirements, use cases, traceability matrices, etc.).
+# They are kept here so that no translation work is lost. When one of those
+# archetypes is added, its strings should be moved to its own .yaml file.
+
+# -----------------------------------------------------------------------
+# Enumeration choices not used by any current archetype
+# -----------------------------------------------------------------------
+
+archetype.enum_choices.awaiting-qa: "Esperando verificación de calidad"
+archetype.enum_choices.awaiting-validation: "Esperando validación"
+archetype.enum_choices.critical: "Crítica"
+archetype.enum_choices.draft: "Borrador"
+archetype.enum_choices.high: "Alta"
+archetype.enum_choices.low: "Baja"
+archetype.enum_choices.medium: "Media"
+archetype.enum_choices.optional: "Opcional"
+archetype.enum_choices.validated: "Validado"
+
+# -----------------------------------------------------------------------
+# Literal texts (key: xslt.text.<name>)
+# -----------------------------------------------------------------------
+
+xslt.text.abstract: "abstracto"
+xslt.text.action: "Acción"
+xslt.text.alternatives: "Alternativas"
+xslt.text.as_a: "Como"
+xslt.text.attribute: "Atributo"
+xslt.text.average: "Medio"
+xslt.text.child_requirements: "Requisitos hijos"
+xslt.text.code_attributes: "// atributos"
+xslt.text.code_components: "// componentes"
+xslt.text.code_exception: "exception"
+xslt.text.code_exceptions: "// excepciones"
+xslt.text.code_invariants: "// invariantes"
+xslt.text.code_postconditions: "// postcondiciones"
+xslt.text.code_preconditions: "// precondiciones"
+xslt.text.code_roles: "// roles"
+xslt.text.components: "Componentes"
+xslt.text.condition: "Condición"
+xslt.text.constant_attribute: "Atributo constante"
+xslt.text.constant_role: "Rol constante"
+xslt.text.defect_type_ambiguity: "Ambigüedad"
+xslt.text.defect_type_design_dependence: "Dependencia del diseño"
+xslt.text.defect_type_imprecision: "Imprecisión"
+xslt.text.defect_type_no_achievability: "No alcanzabilidad"
+xslt.text.defect_type_no_completeness: "No completitud"
+xslt.text.defect_type_no_consistency: "No consistencia"
+xslt.text.defect_type_no_necessity: "No necesidad"
+xslt.text.defect_type_no_priority: "No prioridad"
+xslt.text.defect_type_no_stability: "No estabilidad"
+xslt.text.defect_type_no_traceability: "No trazabilidad"
+xslt.text.defect_type_no_understanding: "No comprensión"
+xslt.text.defect_type_no_verificability: "No verificabilidad"
+xslt.text.defect_type_other: "Otro"
+xslt.text.defect_type_redundancy: "Redundancia"
+xslt.text.defect_type_verbosity: "Verborragia"
+xslt.text.defect_type_wrong_lod: "Nivel de detalle incorrecto"
+xslt.text.defect_type_wrong_org: "Organización incorrecta"
+xslt.text.definition: "Definición"
+xslt.text.dependencies: "Dependencias"
+xslt.text.derived_attribute: "Atributo derivado"
+xslt.text.derived_role: "Rol derivado"
+xslt.text.disjoint_subtypes: "Subtipos (disjuntos)"
+xslt.text.exception: "Excepción"
+xslt.text.exceptions: "Excepciones"
+xslt.text.expected_frequency: "Frecuencia esperada"
+xslt.text.expression: "Expresión"
+xslt.text.fax: "Fax"
+xslt.text.freelance: "Freelance"
+xslt.text.i_want_to: "Quiero"
+xslt.text.if: "Si"
+xslt.text.indirectly_affected_objects: "Afecta indirectamente"
+xslt.text.initialvalue: "Valor inicial"
+xslt.text.invariant: "Expresión de invariante"
+xslt.text.iscustomer: "Es cliente"
+xslt.text.isdeveloper: "Es desarrollador"
+xslt.text.isuser: "Es usuario"
+xslt.text.lifetime: "Tiempo de vida"
+xslt.text.maximum: "Máximo"
+xslt.text.maximum_time: "Tiempo máximo"
+xslt.text.meeting: "Reunión"
+xslt.text.multiplicity: "Multiplicidad"
+xslt.text.no: "No"
+xslt.text.none: "Ninguno"
+xslt.text.ocl_condition: "Condición (OCL)"
+xslt.text.ocl_expression: "Expresión OCL"
+xslt.text.ocl_postconditions: "Expresiones de postcondición (OCL)"
+xslt.text.ocl_preconditions: "Expresiones de precondición (OCL)"
+xslt.text.ordinary_sequence: "Secuencia normal"
+xslt.text.overlapping_subtypes: "Subtipos (solapados)"
+xslt.text.parameters: "Parámetros"
+xslt.text.part: "Parte"
+xslt.text.performance: "Rendimiento"
+xslt.text.possible_solution: "Posible solución"
+xslt.text.postconditions: "Expresiones de postcondición"
+xslt.text.preconditions: "Expresiones de precondición"
+xslt.text.related_objectives: "Objetivos de los que depende"
+xslt.text.related_requirements: "Requisitos de los que depende"
+xslt.text.result_type: "Tipo del resultado"
+xslt.text.simultaneous_occurrences: "Ocurrencias simultáneas"
+xslt.text.so_that: "Para"
+xslt.text.specific_data: "Datos específicos"
+xslt.text.step: "Paso"
+xslt.text.strength: "Fortaleza"
+xslt.text.subobjectives: "Subobjetivos"
+xslt.text.subtypes: "Subtipos"
+xslt.text.superclass: "Supertipo"
+xslt.text.system: "sistema"
+xslt.text.tbd: "PD"
+xslt.text.the: "el"
+xslt.text.the_capitalized: "El"
+xslt.text.the_actor: "el actor"
+xslt.text.the_actor_capitalized: "El actor"
+xslt.text.the_system_shall: "El sistema deberá"
+xslt.text.then_this_use_case: "a continuación este caso de uso"
+xslt.text.this_actor_represents: "Este actor representa"
+xslt.text.times_per: "veces por"
+xslt.text.traceability_matrix: "Matriz de trazabilidad"
+xslt.text.traceability_matrix_missing_class: "No se puede visualizar la matriz de trazabilidad. Compruebe que hay al menos una clase seleccionada para las filas y columnas de la matriz."
+xslt.text.traceability_matrix_missing_item: "No se puede visualizar la matriz de trazabilidad. Compruebe que existe al menos un objeto de las clases seleccionadas para las filas y columnas de la matriz."
+xslt.text.type: "Tipo"
+xslt.text.variable_attribute: "Atributo variable"
+xslt.text.variable_role: "Rol variable"
+xslt.text.warnings: "Avisos"
+xslt.text.weakness: "Debilidad"
+xslt.text.yes: "Sí"

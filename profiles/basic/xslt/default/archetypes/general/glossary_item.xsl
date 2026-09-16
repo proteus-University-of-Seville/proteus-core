@@ -11,6 +11,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ====================================================================== -->
   <!-- NOTE:                                                                  -->
@@ -46,7 +48,7 @@
           <xsl:choose>
             <xsl:when test="not($nonempty_content)">
               <span class="tbd">
-                <xsl:value-of select="$proteus:lang_TBD_expanded"/>
+                <xsl:value-of select="proteus-utils:i18n('xslt.text.tbd_expanded')"/>
               </span>
             </xsl:when>
             <xsl:otherwise>
@@ -64,7 +66,7 @@
         <xsl:if test="$nonempty_synonyms">
           <span class="glossary_item_synonyms">
               <xsl:text> </xsl:text>
-              <xsl:value-of select="$proteus:lang_synonyms"/>
+              <xsl:value-of select="proteus-utils:i18n('archetype.prop_name.synonyms')"/>
               <xsl:text>: </xsl:text>
               <xsl:value-of select="$synonyms"/>
               <xsl:text>.</xsl:text>

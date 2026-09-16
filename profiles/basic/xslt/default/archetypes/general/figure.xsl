@@ -11,6 +11,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ======================================================== -->
   <!-- figure template                                          -->
@@ -57,7 +59,7 @@
         <!-- Generate figure caption -->
         <p class="figure_caption">
           <span class="figure_caption_label">
-            <xsl:value-of select="$proteus:lang_figure"/>
+            <xsl:value-of select="proteus-utils:i18n('xslt.text.figure')"/>
             <xsl:text> </xsl:text>
             <!-- from is needed to restart numbering in each document          -->
             <!-- level is needed to avoid restarting numbering in each section -->

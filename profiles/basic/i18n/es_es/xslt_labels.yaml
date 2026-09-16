@@ -1,0 +1,66 @@
+# ==========================================================================
+# File: es_es/xslt_labels.yaml
+# Description: XSLT template labels (Spanish)
+# Date: 2026/09/16
+# Version: 1.0
+# Author: Amador Durán Toro
+# ==========================================================================
+#
+# These strings are looked up from the XSLT templates using the
+# proteus-utils:i18n() extension function, e.g.
+#
+#   <xsl:value-of select="proteus-utils:i18n(concat('xslt.property.', @name))"/>
+#
+# Adding labels for a new archetype does not require modifying any XSLT file
+# or any other translation file: just add a new .yaml file to this directory.
+
+
+# NOTE: the templates share their labels with the application GUI: class
+# labels (archetype.class.*), property labels (archetype.prop_name.*) and
+# enumeration choices (archetype.enum_choices.*) are looked up with the same
+# keys used by the GUI, most of them already defined in basic_archetypes.yaml.
+# Only the property labels missing there are defined below.
+
+# -----------------------------------------------------------------------
+# Property labels (key: archetype.prop_name.<property name>)
+# -----------------------------------------------------------------------
+
+"archetype.prop_name.:proteus-date": "Fecha"
+archetype.prop_name.analysis: "Análisis"
+archetype.prop_name.attenders: "Asistentes"
+archetype.prop_name.diagram: "Diagrama"
+archetype.prop_name.directly-affected-objects: "Afecta directamente"
+archetype.prop_name.importance: "Importancia"
+archetype.prop_name.inherits-from: "Hereda de"
+archetype.prop_name.ordered: "Ordenado"
+archetype.prop_name.participates-in: "Participa en"
+archetype.prop_name.place: "Lugar"
+archetype.prop_name.priority: "Prioridad"
+archetype.prop_name.results: "Resultados"
+archetype.prop_name.solution: "Solución"
+archetype.prop_name.stability: "Estabilidad"
+archetype.prop_name.status: "Estado"
+archetype.prop_name.time: "Hora"
+archetype.prop_name.trace-type: "Tipo de traza"
+archetype.prop_name.urgency: "Urgencia"
+
+# -----------------------------------------------------------------------
+# Trace type labels (key: xslt.trace_type.<trace type name>)
+# -----------------------------------------------------------------------
+
+"xslt.trace_type.:proteus-affected": "Elemento afectado"
+"xslt.trace_type.:proteus-author": "Autor"
+"xslt.trace_type.:proteus-dependency": "Dependencia"
+"xslt.trace_type.:proteus-information-source": "Fuente de información"
+"xslt.trace_type.:proteus-works-for": "Trabaja para"
+
+# -----------------------------------------------------------------------
+# Literal texts used by the templates (key: xslt.text.<name>)
+# -----------------------------------------------------------------------
+
+xslt.text.empty_paragraph: "Párrafo vacío"
+xslt.text.figure: "Figura"
+xslt.text.project: "Proyecto"
+xslt.text.symlink_tooltip: "Esta es una representación del objeto original. Modificar este objeto supone modificar el objeto original."
+xslt.text.tbd_expanded: "Por determinar"
+xslt.text.toc: "Índice"

@@ -11,6 +11,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ============================================= -->
   <!-- symbolic-link template                        -->
@@ -29,7 +31,7 @@
 
         <!-- If target object exists -->
         <xsl:if test="$targetObject">
-          <div class="linked-object" title="{$proteus:lang_symlink_tooltip}">
+          <div class="linked-object" title="{proteus-utils:i18n('xslt.text.symlink_tooltip')}">
             <xsl:apply-templates select="$targetObject" />
           </div>
         </xsl:if>

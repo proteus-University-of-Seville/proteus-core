@@ -30,8 +30,11 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
-  xmlns:proteus-utils="http://proteus.us.es/utils" exclude-result-prefixes="proteus proteus-utils"
-  xmlns:str="http://exslt.org/strings" extension-element-prefixes="str">
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
+  xmlns:str="http://exslt.org/strings"
+  extension-element-prefixes="str"
+>
   <xsl:template name="generate_table">
     <xsl:param name="class" select="str:tokenize(@classes, ' ')[last()]"/>
     <xsl:param name="name" select="properties/*[@name=':Proteus-name']"/>
@@ -53,7 +56,7 @@
             <th class="name_column">
               <img src="{concat($base_url_icons,$icon)}"/>
               <xsl:text></xsl:text>
-              <xsl:value-of select="$class_labels/label[@key=$class]"/>
+              <xsl:value-of select="proteus-utils:i18n_or(concat('archetype.class.', $class), $class)"/>
             </th>
             <th class="value_column" colspan="{$span}">
               <xsl:value-of select="$name"/>

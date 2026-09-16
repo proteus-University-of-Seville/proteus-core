@@ -110,8 +110,9 @@
     <!-- enumProperty                                  -->
     <!-- ============================================= -->
 
+    <!-- Enumeration choices are shared with the application GUI -->
     <xsl:template match="enumProperty">
-        <xsl:value-of select="$enum_labels/label[@key=current()/text()]"/>
+        <xsl:value-of select="proteus-utils:i18n_or(concat('archetype.enum_choices.', current()/text()), current()/text())"/>
     </xsl:template>
 
     <!-- ============================================= -->
@@ -152,7 +153,7 @@
                     </img>
                 </xsl:when>
                 <xsl:otherwise>
-                    <span class="tbd"><xsl:value-of select="$proteus:lang_TBD_expanded"/></span>
+                    <span class="tbd"><xsl:value-of select="proteus-utils:i18n('xslt.text.tbd_expanded')"/></span>
                 </xsl:otherwise>
             </xsl:choose>
         </div>
@@ -168,15 +169,7 @@
                 <xsl:if test="current()/text()">
                     <li>
                         <a>
-                        <xsl:variable name="trace_type_label" select="$trace_types/label[@key=current()/text()]" />
-                        <xsl:choose>
-                            <xsl:when test="normalize-space($trace_type_label)">
-                                <xsl:value-of select="$trace_type_label"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="current()/text()"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:value-of select="proteus-utils:i18n_or(concat('xslt.trace_type.', current()/text()), current()/text())"/>
                         </a>
                     </li>
                 </xsl:if>

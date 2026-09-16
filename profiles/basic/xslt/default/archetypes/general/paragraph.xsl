@@ -11,6 +11,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- ================================================================== -->
   <!-- NOTE:                                                              -->
@@ -38,7 +40,7 @@
         <xsl:choose>
           <xsl:when test="not($nonempty_content)">
             [<span class="tbd">
-            <xsl:value-of select="$proteus:lang_empty_paragraph"/>
+            <xsl:value-of select="proteus-utils:i18n('xslt.text.empty_paragraph')"/>
             </span>]
           </xsl:when>
           <xsl:otherwise>

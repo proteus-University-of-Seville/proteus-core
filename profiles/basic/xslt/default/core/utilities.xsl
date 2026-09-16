@@ -72,7 +72,7 @@
   <!-- only if it included.                                 -->
 
   <xsl:template name="generate_property_row">
-    <xsl:param name="label" select="$property_labels/label[@key=current()/@name]"/>
+    <xsl:param name="label" select="proteus-utils:i18n_or(concat('archetype.prop_name.', current()/@name), current()/@name)"/>
     <!-- <xsl:param name="content" select="current()//text()"/> -->
     <xsl:param name="included" select="false()"/>
     <xsl:param name="alternative"/>
@@ -99,7 +99,7 @@
               <xsl:choose>
                 <xsl:when test="(not($hasContent) and not($hasChildren)) or normalize-space(current()) = 'tbd'">
                   <span class="tbd">
-                    <xsl:value-of select="$proteus:lang_TBD_expanded"/>
+                    <xsl:value-of select="proteus-utils:i18n('xslt.text.tbd_expanded')"/>
                   </span>
                 </xsl:when>
                 <xsl:when test="$alternative">
@@ -212,7 +212,7 @@
           <xsl:choose>
             <xsl:when test="not($content/trace)">
               <span class="tbd">
-                <xsl:value-of select="$proteus:lang_TBD_expanded"/>
+                <xsl:value-of select="proteus-utils:i18n('xslt.text.tbd_expanded')"/>
               </span>
             </xsl:when>
             <xsl:otherwise>
@@ -261,13 +261,13 @@
         </xsl:call-template>
 
         <xsl:call-template name="generate_trace_row">
-            <xsl:with-param name="label" select="$proteus:lang_authors"/>
+            <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.authors')"/>
             <xsl:with-param name="content" select="properties/traceProperty[@name='authors']"/>
             <xsl:with-param name="span" select="$span"/>
         </xsl:call-template>
 
         <xsl:call-template name="generate_trace_row">
-            <xsl:with-param name="label" select="$proteus:lang_sources"/>
+            <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.sources')"/>
             <xsl:with-param name="content" select="properties/traceProperty[@name='source']"/>
             <xsl:with-param name="span" select="$span"/>
         </xsl:call-template>
@@ -286,7 +286,7 @@
   <!-- current() is the object element being processed -->
 
   <xsl:template name="generate_version_row">
-    <xsl:param name="label" select="$proteus:lang_version"/>
+    <xsl:param name="label" select="proteus-utils:i18n('archetype.prop_name.version')"/>
     <xsl:param name="span" select="1"/>
 
     <tr>
@@ -312,7 +312,7 @@
 
     <xsl:if test="properties/enumProperty[@name='importance'] != 'nd'">
       <xsl:call-template name="generate_property_row">
-        <xsl:with-param name="label" select="$proteus:lang_importance"/>
+        <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.importance')"/>
         <xsl:with-param name="content" select="properties/enumProperty[@name='importance']"/>
         <xsl:with-param name="span" select="$span"/>
       </xsl:call-template>
@@ -320,7 +320,7 @@
 
     <xsl:if test="properties/enumProperty[@name='urgency'] != 'nd'">
       <xsl:call-template name="generate_property_row">
-        <xsl:with-param name="label" select="$proteus:lang_urgency"/>
+        <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.urgency')"/>
         <xsl:with-param name="content" select="properties/enumProperty[@name='urgency']"/>
         <xsl:with-param name="span" select="$span"/>
       </xsl:call-template>
@@ -328,7 +328,7 @@
 
     <xsl:if test="properties/enumProperty[@name='status'] != 'nd'">
       <xsl:call-template name="generate_property_row">
-        <xsl:with-param name="label" select="$proteus:lang_status"/>
+        <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.status')"/>
         <xsl:with-param name="content" select="properties/enumProperty[@name='status']"/>
         <xsl:with-param name="span" select="$span"/>
       </xsl:call-template>
@@ -336,7 +336,7 @@
 
     <xsl:if test="properties/enumProperty[@name='stability'] != 'nd'">
       <xsl:call-template name="generate_property_row">
-        <xsl:with-param name="label" select="$proteus:lang_stability"/>
+        <xsl:with-param name="label" select="proteus-utils:i18n('archetype.prop_name.stability')"/>
         <xsl:with-param name="content" select="properties/enumProperty[@name='stability']"/>
         <xsl:with-param name="span" select="$span"/>
       </xsl:call-template>

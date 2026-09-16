@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!-- The template is language-independent: localized strings are retrieved at -->
+<!-- render time with the proteus-utils:i18n() extension function, so a       -->
+<!-- single entry point is needed for every language.                         -->
 <template name="default">
-    <entryPoints default="default_en_US.xsl">
-        <entryPoint language="en_US" file="default_en_US.xsl"/>
-        <entryPoint language="es_ES" file="default_es_ES.xsl"/>
-    </entryPoints>
+    <entryPoints default="default.xsl"/>
     <dependencies>
         <pluginDependency name="basic"/>
     </dependencies>

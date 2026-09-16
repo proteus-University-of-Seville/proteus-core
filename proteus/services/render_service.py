@@ -27,12 +27,108 @@ import lxml.etree as ET
 from proteus.model.template import Template
 from proteus.application.resources.plugins import Plugins
 from proteus.application.configuration.config import Config
+from proteus.application.resources.translator import translate
 
 # logging configuration
 log = logging.getLogger(__name__)
 
 FUNCTION_NAMESPACE = "http://proteus.us.es/utils"
 NAMESPACE_PREFIX = "proteus-utils"
+
+
+# --------------------------------------------------------------------------
+# Function: xpath_string
+# Description: Convert an XPath argument received by an XSLT extension
+#              function into a Python string.
+# Date: 16/09/2026
+# Version: 1.0
+# Author: Amador Durán Toro
+# --------------------------------------------------------------------------
+def xpath_string(value) -> str:
+    """
+    Convert an argument received by an XSLT extension function into a string.
+
+    XPath expressions may return strings, numbers, booleans or node sets, the
+    latter being passed by lxml as a list of nodes. Node sets are reduced to
+    their first node and elements to their text content.
+
+    :param value: Value received from the XSLT engine.
+
+    :return: String representation of the given value.
+    """
+    # Node sets are passed as lists, take the first node (empty string if none)
+    if isinstance(value, (list, tuple)):
+        value = value[0] if value else ""
+
+    # Elements are reduced to their text content
+    if isinstance(value, ET._Element):
+        return "".join(value.itertext())
+
+    return str(value)
+
+
+# --------------------------------------------------------------------------
+# Function: i18n
+# Description: XSLT extension function to translate a key using the
+#              application translator.
+# Date: 16/09/2026
+# Version: 1.0
+# Author: Amador Durán Toro
+# --------------------------------------------------------------------------
+def i18n(context, key, *args) -> str:
+    """
+    Return the translation of the given key in the current application
+    language. Optional arguments are formatted into the translation.
+
+    Translations are loaded by the Translator from the application and the
+    current profile i18n directories, so a new archetype may provide its own
+    labels just by adding a YAML file to the profile i18n language directories.
+
+    Missing keys are returned as '!key!' and logged as a warning by the
+    Translator, so they are easy to spot in the rendered document.
+
+    Usage: <xsl:value-of select="proteus-utils:i18n('xslt.text.figure')"/>
+
+    :param context: XSLT evaluation context (provided by lxml, unused).
+    :param key: Translation key.
+    :param args: Optional arguments to format the translation.
+
+    :return: Translation for the given key or '!key!' if not found.
+    """
+    text_key: str = xpath_string(key)
+    return translate(
+        text_key,
+        *[xpath_string(arg) for arg in args],
+        alternative_text=f"!{text_key}!",
+    )
+
+
+# --------------------------------------------------------------------------
+# Function: i18n_or
+# Description: XSLT extension function to translate a key using the
+#              application translator, with an explicit alternative text.
+# Date: 16/09/2026
+# Version: 1.0
+# Author: Amador Durán Toro
+# --------------------------------------------------------------------------
+def i18n_or(context, key, alternative) -> str:
+    """
+    Return the translation of the given key in the current application
+    language, or the given alternative text if there is no translation.
+
+    It is meant for values which are not known in advance, such as class names
+    or trace types defined by a profile, where showing the raw value is better
+    than showing a missing translation mark.
+
+    Usage: <xsl:value-of select="proteus-utils:i18n_or(concat('archetype.class.',$class),$class)"/>
+
+    :param context: XSLT evaluation context (provided by lxml, unused).
+    :param key: Translation key.
+    :param alternative: Text to return if there is no translation.
+
+    :return: Translation for the given key or the alternative text.
+    """
+    return translate(xpath_string(key), alternative_text=xpath_string(alternative))
 
 
 # --------------------------------------------------------------------------
@@ -90,6 +186,10 @@ class RenderService:
         # Namespace for the XSLT functions
         ns = ET.FunctionNamespace(FUNCTION_NAMESPACE)
         ns.prefix = NAMESPACE_PREFIX
+
+        # Built-in XSLT functions (i.e. not provided by plugins)
+        ns["i18n"] = i18n
+        ns["i18n_or"] = i18n_or
 
     # ----------------------------------------------------------------------
     # Method     : _load_templates

@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- ======================================================== -->
-<!-- File    : default_main.xsl                               -->
-<!-- Content : PROTEUS default XSLT main file                 -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2023/06/09                                     -->
-<!-- Version : 1.0                                            -->
+<!-- File    : default.xsl                                    -->
+<!-- Content : PROTEUS default XSLT template (entry point)    -->
+<!-- Author  : Amador Durán Tor                               -->
+<!-- Date    : 2026/09/16                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
-<!-- Update  : 2024/09/08 (Amador Durán)                      -->
-<!-- encoding="iso-8859-1" -> enconding="utf-8"               -->
-<!-- graphic_file -> local_resource                           -->
-<!-- external_resource -> remote_resource                     -->
-<!-- archetype_link -> symbolic_link                          -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/13 (Amador Durán)                      -->
-<!-- Document loop simplified.                                -->
-<!-- Added dictionaries and keys for property and enum labels -->
-<!-- Use of EXSLT node-set function to overcome some XLST 1.0 -->
-<!-- limitations.                                             -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/14 (Amador Durán)                      -->
-<!-- key() does not work on variables in lxml.                -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/07/29 (Amador Durán)                      -->
-<!-- Renamed and refactored.                                  -->
+<!-- Update  : 2026/09/16 (Amador Durán)                      -->
+<!-- i18n redesigned: label dictionaries and per-language     -->
+<!-- entry points have been removed. Localized strings are    -->
+<!-- now retrieved with the proteus-utils:i18n() extension    -->
+<!-- function from the profile i18n YAML files, so this       -->
+<!-- template is language-independent and new archetypes can  -->
+<!-- provide their own labels without modifying any XSLT      -->
+<!-- file. See documentation/i18n_design.md.                  -->
 <!-- ======================================================== -->
 
 <!-- ======================================================== -->
@@ -33,11 +24,9 @@
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
   exclude-result-prefixes="proteus proteus-utils"
-  extension-element-prefixes="exsl"
 >
   <!-- Output -->
   <xsl:output method="html"
@@ -46,12 +35,6 @@
       encoding="utf-8"
       indent="yes"
   />
-
-  <!-- Language-independent dictionaries -->
-  <xsl:include href="labels/class_labels.xsl"/>
-  <xsl:include href="labels/property_labels.xsl"/>
-  <xsl:include href="labels/enumeration_labels.xsl"/>
-  <xsl:include href="labels/trace_type_labels.xsl"/>
 
   <!-- XSLT core modules -->
   <xsl:include href="core/utilities.xsl" />
