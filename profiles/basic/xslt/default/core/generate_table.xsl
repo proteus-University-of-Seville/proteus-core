@@ -4,13 +4,8 @@
 <!-- File    : generate_table.xsl                             -->
 <!-- Content : PROTEUS default XSLT for generating tables     -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/13                                     -->
+<!-- Date    : 2026/09/17                                     -->
 <!-- Version : 2.0                                            -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
 <!-- ======================================================== -->
 
 <!-- ________________________________________________________ -->
@@ -29,11 +24,9 @@
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:str="http://exslt.org/strings"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
-  xmlns:str="http://exslt.org/strings"
-  extension-element-prefixes="str"
 >
   <xsl:template name="generate_table">
     <xsl:param name="class" select="str:tokenize(@classes, ' ')[last()]"/>
@@ -56,7 +49,7 @@
             <th class="name_column">
               <img src="{concat($base_url_icons,$icon)}"/>
               <xsl:text></xsl:text>
-              <xsl:value-of select="proteus-utils:i18n_or(concat('archetype.class.', $class), $class)"/>
+              <xsl:value-of select="proteus-utils:i18n(concat('archetype.class.', $class))"/>
             </th>
             <th class="value_column" colspan="{$span}">
               <xsl:value-of select="$name"/>

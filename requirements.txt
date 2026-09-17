@@ -2,29 +2,80 @@
 #    uv export --format requirements-txt --no-hashes --output-file requirements.txt
 -e .
 altgraph==0.17.4
+    # via
+    #   macholib
+    #   pyinstaller
 colorama==0.4.6 ; sys_platform == 'win32'
+    # via pytest
 coverage==7.13.5
+    # via pytest-cov
 iniconfig==2.1.0
+    # via pytest
 librt==0.9.0 ; platform_python_implementation != 'PyPy'
+    # via mypy
 lxml==6.1.0
+    # via proteus
 macholib==1.16.3 ; sys_platform == 'darwin'
+    # via pyinstaller
 markdown==3.10.2
+    # via proteus
+markdown-it-py==4.2.0
+    # via rich
+mdurl==0.1.2
+    # via markdown-it-py
 mypy==1.20.2
 mypy-extensions==1.1.0
+    # via mypy
 packaging==25.0
+    # via
+    #   pyinstaller
+    #   pyinstaller-hooks-contrib
+    #   pytest
 pathspec==1.1.1
+    # via mypy
 pefile==2024.8.26 ; sys_platform == 'win32'
+    # via pyinstaller
 pluggy==1.6.0
+    # via
+    #   pytest
+    #   pytest-cov
+    #   pytest-qt
 pygments==2.20.0
+    # via
+    #   pytest
+    #   rich
 pyinstaller==6.20.0
 pyinstaller-hooks-contrib==2026.4
+    # via pyinstaller
 pyqt6==6.11.0
+    # via
+    #   proteus
+    #   pyqt6-webengine
 pyqt6-qt6==6.11.0
+    # via
+    #   proteus
+    #   pyqt6
 pyqt6-sip==13.11.1
+    # via
+    #   proteus
+    #   pyqt6
+    #   pyqt6-webengine
 pyqt6-webengine==6.11.0
+    # via proteus
 pyqt6-webengine-qt6==6.11.0
+    # via
+    #   proteus
+    #   pyqt6-webengine
 pyspellchecker==0.9.0
+    # via proteus
 pytest==9.0.3
+    # via
+    #   pytest-cov
+    #   pytest-lazy-fixtures
+    #   pytest-mock
+    #   pytest-order
+    #   pytest-qt
+    #   pytest-xvfb
 pytest-cov==7.1.0
 pytest-lazy-fixtures==1.4.0
 pytest-mock==3.15.1
@@ -32,11 +83,27 @@ pytest-order==1.4.0
 pytest-qt==4.5.0
 pytest-xvfb==3.1.1
 pyvirtualdisplay==3.0
+    # via pytest-xvfb
 pywin32-ctypes==0.2.3 ; sys_platform == 'win32'
+    # via pyinstaller
 pyyaml==6.0.3
+    # via proteus
+rich==15.0.0
+    # via proteus
 setuptools==80.9.0
+    # via
+    #   pyinstaller
+    #   pyinstaller-hooks-contrib
 shortuuid==1.0.13
+    # via proteus
 strenum==0.4.15
+    # via proteus
 tomli==2.2.1 ; python_full_version <= '3.11'
+    # via coverage
 trieregex==1.0.0
+    # via proteus
 typing-extensions==4.15.0
+    # via
+    #   mypy
+    #   proteus
+    #   pytest-qt

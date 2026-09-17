@@ -58,7 +58,7 @@ archetype.prop_name.urgency: "Urgency"
 # Literal texts used by the templates (key: xslt.text.<name>)
 # -----------------------------------------------------------------------
 
-xslt.text.empty_paragraph: "Empty paragraph"
+xslt.empty_paragraph: "Empty paragraph"
 xslt.text.figure: "Figure"
 xslt.text.project: "Project"
 xslt.text.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
