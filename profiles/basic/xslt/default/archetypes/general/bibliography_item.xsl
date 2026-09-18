@@ -3,32 +3,39 @@
 <!-- ============================================================================ -->
 <!-- File    : bibliography_item.xsl                                              -->
 <!-- Content : PROTEUS default XSLT for bibliography items                        -->
-<!-- Author  : Amador Durán Toro                                                  -->
-<!-- Date    : 2026/09/14                                                         -->
-<!-- Version : 2.0                                                                -->
-<!-- ============================================================================ -->
+<!-- Author  : Amador Durán Toro                                         -->
+<!-- Date    : 2026/09/18                                                -->
+<!-- Version : 2.0                                                       -->
+<!-- =================================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
+  xmlns:proteus-utils="http://proteus.us.es/utils"
 >
-  <!-- ========================================================================== -->
-  <!-- NOTE:                                                                      -->
-  <!-- match expression should be object[ends-with(@classes,'bibliography-item')] -->
-  <!-- since bibliography-item is a subclass of glossary-item, and its classes    -->
-  <!-- attribute is "traceable-object glossary-item bibliography-item". That is,  -->
-  <!-- to check if an object is of a given class we should use:                   -->
-  <!--    object[contains(@classes,class_name)]                                   -->
-  <!-- And to check if an object is of a given final class:                       -->
-  <!--    object[ends-with(@classes,class_name)]                                  -->
-  <!-- The problem is that XSLT 1.0 does not include ends-with.                   -->
-  <!-- ========================================================================== -->
+  <!-- ================================================================ -->
+  <!-- NOTE #1
+       match expression gets rid of leading and trailing spaces in the
+       @classes attribute, and adds a space at the beginning and end of
+       the class name to avoid matching substrings. This way, we can
+       check if a class name is present in the @classes attribute by
+       using contains().
+
+       NOTE #2
+       The bibliography-item template has priority="2" to avoid being 
+       overridden by the glossary-item template, which is its superclass.
+  -->
+  <!-- ================================================================== -->
 
   <!-- ========================================================================== -->
   <!-- bibliography-item template                                                 -->
   <!-- ========================================================================== -->
 
-  <xsl:template match="object[contains(@classes,'bibliography-item')]">
+  <xsl:template
+    match="object[contains(concat(' ', normalize-space(@classes), ' '),' bibliography-item ')]"
+    name="bibliography_item_template"
+    priority="2"
+  >
     <div id="{@id}" class="bibliography_item" data-proteus-id="{@id}">
       <p>
         <!-- Generate bibliography item name -->

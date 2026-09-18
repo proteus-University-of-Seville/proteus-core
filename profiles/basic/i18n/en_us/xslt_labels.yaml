@@ -59,8 +59,9 @@ archetype.prop_name.urgency: "Urgency"
 # -----------------------------------------------------------------------
 
 xslt.empty_paragraph: "Empty paragraph"
+xslt.tbd_expanded: "To Be Determined"
+
 xslt.text.figure: "Figure"
 xslt.text.project: "Project"
 xslt.text.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
-xslt.text.tbd_expanded: "To Be Determined"
 xslt.text.toc: "Table of contents"
