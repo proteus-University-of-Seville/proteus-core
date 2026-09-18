@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- ============================================================================ -->
-<!-- File    : bibliography_item.xsl                                              -->
-<!-- Content : PROTEUS default XSLT for bibliography items                        -->
+<!-- =================================================================== -->
+<!-- File    : bibliography_item.xsl                                     -->
+<!-- Content : PROTEUS default XSLT for bibliography items               -->
 <!-- Author  : Amador Durán Toro                                         -->
 <!-- Date    : 2026/09/18                                                -->
 <!-- Version : 2.0                                                       -->
@@ -40,19 +40,25 @@
       <p>
         <!-- Generate bibliography item name -->
         <span class="bibliography_item_name">
-          <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
-          <xsl:text>: </xsl:text>
+          [<xsl:value-of select="properties/*[@name=':Proteus-name']"/>]
         </span>
 
-        <!-- Generate bibliography item description -->
-        <xsl:variable name="description" select="properties/*[@name='description']"/>
-        <xsl:variable name="nonempty_content" select="string-length(normalize-space($description)) > 0"/>
+        <!-- Generate bibliography item authors -->
+        <xsl:variable name="publication_authors" select="properties/*[@name='publication_authors']"/>
 
-        <span class="bibliography_item_description">
+        <span class="bibliography_item_publication_authors">
+          <xsl:value-of select="$publication_authors"/><xsl:text>.</xsl:text>
+        </span>
+        <xsl:text> </xsl:text>
+
+        <!-- Generate bibliography item publication details -->
+        <xsl:variable name="publication_details" select="properties/*[@name='publication_details']"/>
+
+        <span class="bibliography_item_publication_details">
           <xsl:call-template name="generate_markdown">
-            <xsl:with-param name="content" select="$description"/>
+            <xsl:with-param name="content" select="$publication_details"/>
           </xsl:call-template>
-        </span>
+        </span><xsl:text>.</xsl:text>
       </p>
     </div>
   </xsl:template>
