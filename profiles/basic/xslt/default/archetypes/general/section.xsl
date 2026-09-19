@@ -4,7 +4,7 @@
 <!-- File    : section.xsl                                              -->
 <!-- Content : PROTEUS default XSLT for section                         -->
 <!-- Author  : Amador Durán Toro                                        -->
-<!-- Date    : 2026/09/17                                               -->
+<!-- Date    : 2026/09/19                                               -->
 <!-- Version : 2.0                                                      -->
 <!-- ================================================================== -->
 
@@ -22,10 +22,10 @@
        using contains().
 
        NOTE #2
-       The section template has priority="1" to avoid being overridden by
-       the appendix template, which is a subclass of section. Sublasses
-       should have their own templates with higher priority, and they
-       should call the superclass template by name if they want to reuse it.
+       This template has priority="1" to avoid being overridden by
+       templates of potential subclasses. Subclasses should have their own
+       templates with higher priority, and they should call the superclass
+       template by name if they want to reuse it.
   -->
   <!-- ================================================================== -->
 

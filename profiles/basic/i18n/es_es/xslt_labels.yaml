@@ -60,8 +60,8 @@ archetype.prop_name.urgency: "Urgencia"
 
 xslt.empty_paragraph: "Párrafo vacío"
 xslt.tbd_expanded: "Por determinar"
+xslt.figure: "Figura"
 
-xslt.text.figure: "Figura"
 xslt.text.project: "Proyecto"
 xslt.text.symlink_tooltip: "Esta es una representación del objeto original. Modificar este objeto supone modificar el objeto original."
 xslt.text.toc: "Índice"
