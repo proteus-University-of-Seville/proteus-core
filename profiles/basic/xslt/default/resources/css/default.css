@@ -60,55 +60,39 @@ div.part {
   margin-bottom: 200pt;
 }
 
-
-/* info paragraphs */
-
-div.info {
-  /*font-style:  italic;*/
-  margin-top: 16px;
-  margin-bottom: 16px;
-  padding: 8px;
-  background-color: lightyellow;
-  border: goldenrod solid;
-  border-width: 1px;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAERUExURQAAAP/GOf/IN//ISf/MRP/MQv/GQP/NQP/KQP/KQP/JQf3LQf3LQf3KQf3MQf3KQP3LQf7LQP/LQf7KQP7KQv7KP/7KQf7KQf7KQf7LQP7KQP7LQP7KP/7KP/7KQf7LQf7KQf7LQf7KQP/LQf/LQv/LQ//MQ//MRf/MRv/NSP/OTP/OTf/PTv/QUv/QU//RVf/RV//RWf/SW//TXv/TX//WaP/XbP/Ycf/ad//fif/fi//gjv/gj//hkP/hkv/ilP/knP/knv/lnv/mo//npv/nqP/oqv/rtf/uwP/uwf/vw//wyf/xy//y0f/z1f/34v/45v/45//56f/67P/77//78P/88//99//++v/+/f///4M/5sUAAAAjdFJOUwAJDg4PIyQkMFdaiYqampucyszS0unp6uvs9PT1+fn5+vv8T/4+zAAAAAlwSFlzAAALEgAACxIB0t1+/AAAAW5JREFUOE91k+lWwjAQhVNESqGtlEUKIlqCG264b7grKu675v0fxGlyLck5+v26M3dOmkxn2JARxwvCqFUrFnJppHTssQme0PBHkf7Fcqfhgcm8BUuSKSOvUbZhEtkqkgbVLGyW+dOniozyLf38xcvBQRual9Q9XISSOyHEETTn+di39fu3v6ngBgG9JX6tj0BxSwU9aMKn/mn9ITrn13uQMY00cyD/Icc8KMXy6iwUKLAAiljvPwvxuotIUWQhFNE7vaIrvs8jlNRYBKV4oYoVaEnLLGh/CPE1h0AS6Z/gfJMOeIBWhPolOT+mgjNoRWA+M+7jFrTCMxq18CnE2wwChWO0eocOGEAr6injZ/Wo4AJaQT9L/937VHDfXesi5Lwp53I4MEtPVCEeNxBy7sa+PnKdw/7JNjSBkft3aCvJ9mTHkTKoJGNPZ5SQ1CgZ22e5U8iDpmusHmH7dXhE3df2LiEl1z8KA8+h/ikY+wFGwHtzSILYxAAAAABJRU5ErkJggg==');
-  background-repeat: no-repeat;
-  background-position: left 4px top 4px;
-  min-height: 2em;
-  padding-left: 42px;
-}
-
-
-
 /* MADEJA objects */
 
+/* Each family declares only its accent colour: the header tint, the left  */
+/* edge, the class pill and the links are derived from it in               */
+/* proteus_table.css.                                                      */
+
 /* general purpose objects */
-table.meeting>thead>tr {
-  background-color: lightcyan;
+.proteus_table.meeting {
+  --accent: #0e7490;
 }
 
 /* business analysis objects */
 
-table.business_actor>thead>tr,
-table.business_objective>thead>tr,
-table.business_process>thead>tr,
-table.strength>thead>tr,
-table.weakness>thead>tr,
-table.user_story>thead>tr {
-  background-color: rgb(207, 243, 207);
+.proteus_table.business_actor,
+.proteus_table.business_objective,
+.proteus_table.business_process,
+.proteus_table.strength,
+.proteus_table.weakness,
+.proteus_table.user_story {
+  --accent: #15803d;
 }
 
 /* requirements objects */
 
-table.subsystem>thead>tr,
-table.general_requirement>thead>tr,
-table.system_actor>thead>tr,
-table.information_requirement>thead>tr,
-table.business_rule>thead>tr,
-table.use_case>thead>tr,
-table.functional_requirement>thead>tr,
-table.nonfunctional_requirement>thead>tr {
-  background-color: powderblue;
+.proteus_table.subsystem,
+.proteus_table.general_requirement,
+.proteus_table.system_actor,
+.proteus_table.information_requirement,
+.proteus_table.business_rule,
+.proteus_table.use_case,
+.proteus_table.functional_requirement,
+.proteus_table.nonfunctional_requirement {
+  --accent: #1d4ed8;
 }
 
 /* use case tables */
@@ -195,14 +179,14 @@ table.traceability_matrix td.trace {
 
 /*  modeling objects */
 
-table.entity_class>thead>tr,
-table.association>thead>tr,
-table.enumeration>thead>tr,
-table.constraint>thead>tr,
-table.mockup>thead>tr,
-table.value_type>thead>tr,
-table.system_operation>thead>tr {
-  background-color: gainsboro;
+.proteus_table.entity_class,
+.proteus_table.association,
+.proteus_table.enumeration,
+.proteus_table.constraint,
+.proteus_table.mockup,
+.proteus_table.value_type,
+.proteus_table.system_operation {
+  --accent: #475569;
 }
 
 div.code {
@@ -256,11 +240,10 @@ li.property {
 
 /*  management objects */
 
-table.conflict>thead>tr,
-table.defect>thead>tr,
-table.change_request>thead>tr {
-  /*color: white;*/
-  background-color: pink;
+.proteus_table.conflict,
+.proteus_table.defect,
+.proteus_table.change_request {
+  --accent: #be123c;
 }
 
 /* information icon in defect table header */

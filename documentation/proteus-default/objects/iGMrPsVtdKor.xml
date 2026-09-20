@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="iGMrPsVtdKor" classes="requirement functional-requirement" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section" selectedCategory="general">
+  <properties>
+    <codeProperty name=":Proteus-code" category="general" inmutable="true">
+      <prefix><![CDATA[RF]]></prefix>
+      <number>001</number>
+      <suffix><![CDATA[]]></suffix>
+    </codeProperty>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Gestión de pedidos]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[El sistema deberá ...]]></markdownProperty>
+    <traceProperty name="specifies" category="general" acceptedTargets="user-story" traceType=":SDD-specifies"/>
+    <traceProperty name="relates-to" category="general" acceptedTargets="requirement" traceType=":SDD-relates-to"/>
+  </properties>
+  <children/>
+</object>

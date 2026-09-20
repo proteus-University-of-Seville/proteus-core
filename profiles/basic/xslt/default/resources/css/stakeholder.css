@@ -2,10 +2,19 @@
 /* File    : stakeholder.css                               */
 /* Content : Default CSS for Proteus (stakeholder)         */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/13                                    */
-/* Version : 2.0                                           */
+/* Date    : 2026/09/20                                    */
+/* Version : 3.0                                           */
 /* ======================================================= */
 
-tr.header_row.stakeholder {
-  background-color: lightcyan;
+.proteus_table.stakeholder {
+  --accent: #6d28d9;
+}
+
+/* a photo reads better as a round avatar than as a framed picture */
+.proteus_table.stakeholder img.object_image {
+  width: 2.8em;
+  height: 2.8em;
+  padding: 0;
+  object-fit: cover;
+  border-radius: 50%;
 }

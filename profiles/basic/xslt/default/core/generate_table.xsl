@@ -4,7 +4,7 @@
 <!-- File    : generate_table.xsl                             -->
 <!-- Content : PROTEUS default XSLT for generating tables     -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/17                                     -->
+<!-- Date    : 2026/09/20                                     -->
 <!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
@@ -27,6 +27,7 @@
   xmlns:str="http://exslt.org/strings"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
+  exclude-result-prefixes="str proteus proteus-utils"
 >
   <xsl:template name="generate_table">
     <xsl:param name="class" select="str:tokenize(@classes, ' ')[last()]"/>
@@ -37,8 +38,27 @@
     <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-date,version,authors,sources,'"/>
     <xsl:param name="included_properties"/>
 
+    <!-- Image shown in the upper right corner of the object, if any.     -->
+    <!-- Organizations use 'logo' and stakeholders use 'photo'. An        -->
+    <!-- archetype may pass a different property in this parameter.       -->
+    <xsl:param name="image"
+      select="properties/fileProperty[@name='logo' or @name='photo'][normalize-space() != '']"
+    />
+
+    <!-- The corner image is not shown again as a property row -->
+    <xsl:variable name="all_excluded_properties">
+      <xsl:value-of select="$excluded_properties"/>
+      <xsl:if test="$image">
+        <xsl:value-of select="concat($image[1]/@name, ',')"/>
+      </xsl:if>
+    </xsl:variable>
+
     <!-- All objects are displayed inside a div with their IDs -->
     <div id="{@id}" data-proteus-id="{@id}">
+      <xsl:attribute name="class">
+        <xsl:text>proteus_object</xsl:text>
+        <xsl:if test="$image"> with_image</xsl:if>
+      </xsl:attribute>
 
       <!-- Properties are displayed in a table -->
       <table class="{concat('proteus_table ', $class)}">
@@ -47,11 +67,22 @@
         <thead>
           <tr class="{concat('header_row ', $class)}">
             <th class="name_column">
-              <img src="{concat($base_url_icons,$icon)}"/>
-              <xsl:text></xsl:text>
-              <xsl:value-of select="proteus-utils:i18n(concat('archetype.class.', $class))"/>
+              <!-- the span allows the icon and the class name to be shaped as a pill -->
+              <span class="class_pill">
+                <img src="{concat($base_url_icons,$icon)}"/>
+                <xsl:value-of select="proteus-utils:i18n(concat('archetype.class.', $class))"/>
+              </span>
             </th>
             <th class="value_column" colspan="{$span}">
+              <!-- The image is placed here so that it inherits the archetype  -->
+              <!-- colours; CSS positions it over the upper right corner of    -->
+              <!-- the object. Without CSS it simply shows in the header.      -->
+              <xsl:if test="$image">
+                <img class="object_image"
+                  src="{concat('assets:///', normalize-space($image[1]))}"
+                  alt="{$name}"
+                />
+              </xsl:if>
               <xsl:value-of select="$name"/>
               <xsl:if test="$postfix">
                 <xsl:text></xsl:text>
@@ -65,7 +96,7 @@
         <!-- By wrapping both the list and the current property name with commas, we    -->
         <!-- ensure we're matching whole names and not partial strings.                 -->
         <!-- This was suggested by Claude AI.                                           -->
-        <xsl:for-each select="properties/*[not(contains($excluded_properties,concat(',', @name, ',')))]">
+        <xsl:for-each select="properties/*[not(contains($all_excluded_properties,concat(',', @name, ',')))]">
           <xsl:call-template name="generate_property_row">
             <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
           </xsl:call-template>

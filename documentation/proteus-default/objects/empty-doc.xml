@@ -3,7 +3,7 @@
   <properties>
     <stringProperty name=":Proteus-acronym" category="general"><![CDATA[DOC]]></stringProperty>
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Empty document]]></stringProperty>
-    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.1]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2026-09-10</dateProperty>
     <markdownProperty name="description" category="detail"><![CDATA[Empty document that can be used as template.]]></markdownProperty>
     <traceProperty name="prepared-for" category="dependencies" acceptedTargets="organization" traceType=":Proteus-dependency"/>
@@ -14,6 +14,7 @@
     <child id="6P4qFkqEvp58"/>
     <child id="Kshm3hCb8X32"/>
     <child id="xMn5rUAG9RTS"/>
-    <child id="vW4or7SbruD2"/>
+    <child id="avfq9sfhQfAU"/>
+    <child id="9SpqXBZNZycR"/>
   </children>
 </object>

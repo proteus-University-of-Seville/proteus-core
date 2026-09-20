@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="YKoKhuenYBwA" classes="general-traceable-object user-story" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section" selectedCategory="objective">
+  <properties>
+    <codeProperty name=":Proteus-code" category="general" inmutable="true">
+      <prefix><![CDATA[HU]]></prefix>
+      <number>001</number>
+      <suffix><![CDATA[]]></suffix>
+    </codeProperty>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Historia de usuario]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <markdownProperty name="role" category="role"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="objective" category="objective"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="benefit" category="benefit"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="acceptance-criteria" category="acceptance-criteria"><![CDATA[]]></markdownProperty>
+    <traceProperty name="relates-to" category="general" acceptedTargets="user-story" traceType=":SDD-relates-to"/>
+  </properties>
+  <children/>
+</object>

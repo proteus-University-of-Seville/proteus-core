@@ -2,78 +2,234 @@
 /* File    : proteus_table.css                             */
 /* Content : Default CSS for Proteus (tables)              */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/13                                    */
-/* Version : 2.0                                           */
+/* Date    : 2026/09/20                                    */
+/* Version : 3.0                                           */
+/* ======================================================= */
+/* Update  : 2026/09/20 (Amador Durán & Claude Code)       */
+/* Redesigned: every object is a framed card with a left   */
+/* edge, a tinted header and a class pill, all derived     */
+/* from a single --accent colour per archetype. An         */
+/* archetype stylesheet only has to declare its accent:    */
+/*                                                         */
+/*   .proteus_table.organization { --accent: #0e7490; }    */
+/*                                                         */
 /* ======================================================= */
 
+/* ------------------------------------------------------- */
+/* Design tokens                                           */
+/* ------------------------------------------------------- */
+
 .proteus_table {
+  /* archetype colour, overridden by each archetype stylesheet */
+  --accent: #475569;
+
+  /* neutrals */
+  --surface: #ffffff;
+  --ink: #1d2433;
+  --ink-soft: #5b6675;
+  --line: #dfe3e8;        /* frame and label rule  */
+  --line-soft: #eceff3;   /* separator between rows */
+  --label-bg: #fbfcfd;
+  --row-hover: #fafbfc;
+
+  /* density: change these two values to make tables tighter or airier */
+  --pad-y: 6px;
+  --pad-x: 14px;
+  --line-height: 1.45;
+
+  --radius: 10px;
+  --edge-width: 4px;
+}
+
+/* ------------------------------------------------------- */
+/* The object card                                         */
+/* ------------------------------------------------------- */
+
+table.proteus_table {
+  /* the horizontal inset belongs to div.proteus_object, so that the div and  */
+  /* the table have exactly the same width: the corner image is positioned    */
+  /* against the div, and any difference would push it out of the table       */
+  width: 100%;
+  margin: 0 0 1.2em;
+  border-collapse: separate;
+  border-spacing: 0;
+  line-height: var(--line-height);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: var(--edge-width) solid var(--accent);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+}
+
+/* rounded corners also when overflow cannot clip (e.g. printing) */
+table.proteus_table > thead > tr:first-child > th:first-child { border-top-left-radius: calc(var(--radius) - 1px); }
+table.proteus_table > thead > tr:first-child > th:last-child  { border-top-right-radius: calc(var(--radius) - 1px); }
+
+/* ------------------------------------------------------- */
+/* Corner image (organization logo, stakeholder photo)     */
+/*                                                         */
+/* The image is written inside the header cell, but it is  */
+/* positioned against the object div, so it paints over    */
+/* the upper right corner of the card. A background image  */
+/* cannot be used here: backgrounds always paint behind    */
+/* the content, they would be hidden by the opaque table,  */
+/* and the HTML exporter only recognises assets referenced */
+/* from a src attribute.                                   */
+/* ------------------------------------------------------- */
+
+div.proteus_object {
+  position: relative;
   margin-left: 1%;
   margin-right: 1%;
-  margin-bottom: 1.5em;
-  width: 98%;
-  box-shadow: 8px 8px 4px lightgrey;
 }
 
-proteus_header_any {
-  background-color: powderblue;
+img.object_image {
+  position: absolute;
+  top: .45em;
+  right: var(--pad-x);   /* aligned with the padding of the header cells */
+  z-index: 1;
+  max-height: 2.8em;
+  max-width: 8.5em;
+  object-fit: contain;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, white);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .06);
 }
 
-table.proteus_table,
-table.proteus_table th,
-table.proteus_table td {
-  border-style: solid;
-  border-collapse: collapse;
-  border-color: lightslategray;
-  border-width: 1px;
+/* room for the image: a taller header and a wider right padding, so that */
+/* a long object name never slides underneath it                          */
+div.with_image table.proteus_table > thead > tr {
+  height: 4.2em;
 }
 
-table.proteus_table th,
-table.proteus_table td {
-  padding: 8px;
+div.with_image table.proteus_table > thead > tr > th.value_column {
+  padding-right: 10em;
+}
+
+/* ------------------------------------------------------- */
+/* Header row: one tint across both cells, text in the     */
+/* same hue as the background                              */
+/* ------------------------------------------------------- */
+
+table.proteus_table > thead > tr {
+  background: color-mix(in srgb, var(--accent) 12%, white);
+}
+
+table.proteus_table > thead > tr > th {
+  padding: calc(var(--pad-y) + 1px) var(--pad-x);
+  text-align: left;
+  vertical-align: middle;
+  color: color-mix(in srgb, var(--accent) 82%, black);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, white);
+}
+
+table.proteus_table > thead > tr > th.name_column {
+  width: 13em;
+  white-space: nowrap;
+  border-right: 1px solid color-mix(in srgb, var(--accent) 22%, white);
+}
+
+table.proteus_table > thead > tr > th.value_column {
+  width: auto;
+  font-size: 1.05em;
+  font-weight: 600;
+  letter-spacing: -.005em;
+}
+
+/* archetype pill: icon + class name, in the colour of the left edge */
+span.class_pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 11px 2px 7px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, white);
+  border-radius: 999px;
+  font-size: .76em;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+span.class_pill > img {
+  width: 15px;
+  height: 15px;
+}
+
+/* ------------------------------------------------------- */
+/* Property rows                                           */
+/* ------------------------------------------------------- */
+
+table.proteus_table tbody th,
+table.proteus_table tbody td,
+table.proteus_table > tr > th,
+table.proteus_table > tr > td {
+  padding: var(--pad-y) var(--pad-x);
   vertical-align: top;
+  text-align: left;
+  border-bottom: 1px solid var(--line-soft);
 }
 
-
-table.proteus_table th.value_column {
-  width: 100%;
+table.proteus_table tbody tr:last-child > *,
+table.proteus_table > tr:last-child > * {
+  border-bottom: none;
 }
 
-/* first row, first column */
-table.proteus_table>thead>tr>th:first-child {
-  padding-left: 12px;
-  padding-right: 12px;
-  padding-bottom: 4px;
-  min-width: 8em;
-  white-space: nowrap;
+/* label column */
+table.proteus_table tbody th:first-child,
+table.proteus_table > tr > th:first-child {
+  width: 13em;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--label-bg);
+  border-right: 1px solid var(--line);
 }
 
-/* any row, first column */
-table.proteus_table tr>th:first-child {
-  /* white-space: nowrap;*/
+table.proteus_table tbody tr:hover > td,
+table.proteus_table > tr:hover > td {
+  background: var(--row-hover);
 }
 
-/* icon on the first row, first column */
-table.proteus_table>thead>tr>th:first-child>img:first-child {
-  padding-right: 0.25em;
-  vertical-align: text-bottom;
-  width: 20px;
-}
+/* ------------------------------------------------------- */
+/* Content inside cells                                    */
+/* ------------------------------------------------------- */
 
 /* paragraphs inside tables */
 table.proteus_table p {
-  margin-top: 0em;
-  margin-bottom: 0em;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* consecutive paragraphs still need to be told apart */
+table.proteus_table p + p {
+  margin-top: .45em;
 }
 
 table.proteus_table div.proteus_comments p {
-  margin-top: 0em;
-  margin-bottom: 0em;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* lists inside tables */
 table.proteus_table td ul {
-  margin-top: 0em;
-  margin-bottom: 0em;
-  margin-left: 1em;
-  padding-left: 0em;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  padding-left: 1.1em;
+}
+
+/* links inside tables take the archetype colour */
+table.proteus_table a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, white);
+}
+
+table.proteus_table a:hover {
+  border-bottom-color: var(--accent);
 }

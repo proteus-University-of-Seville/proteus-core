@@ -62,3 +62,20 @@ Class labels, property labels and enumeration choices are also used by the XSLT 
 * xslt.text.&lt;literal text name&gt;
 
 See **documentation/i18n_design.md** for the details of the XSLT i18n design.
+
+Choose a colour for the archetype
+---------------------------------
+
+Objects are rendered as a framed card with a coloured left edge, a tinted header row and a pill holding the archetype icon and name. All of that is derived from a single custom property, so the stylesheet of a new archetype is one rule:
+
+```css
+.proteus_table.<class name> {
+  --accent: #0e7490;
+}
+```
+
+Put it in **&lt;template&gt;/resources/css/&lt;archetype&gt;.css** and add an `@import` to **default.css**. Archetypes which do not declare an accent fall back to a neutral slate colour, so this step is optional.
+
+Colours currently in use: `#0e7490` teal (organizations, meetings), `#6d28d9` violet (people), `#1d4ed8` blue (requirements), `#15803d` green (business analysis), `#475569` slate (modelling), `#be123c` rose (management).
+
+The density of the rows is set in **proteus_table.css** by `--pad-y` and `--line-height`, which apply to every archetype.

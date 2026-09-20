@@ -15,6 +15,7 @@
     <stringProperty name="phone-number" category="detail"><![CDATA[]]></stringProperty>
     <stringProperty name="email" category="detail"><![CDATA[]]></stringProperty>
     <traceProperty name="works-for" category="detail" acceptedTargets="organization" traceType=":Proteus-works-for"/>
+    <fileProperty name="photo" category="detail" tooltip="file-info"><![CDATA[stakeholder_photo.png]]></fileProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 
