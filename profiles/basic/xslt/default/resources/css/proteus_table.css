@@ -127,13 +127,14 @@ table.proteus_table > thead > tr > th {
 }
 
 table.proteus_table > thead > tr > th.name_column {
-  width: 13em;
+  min-width: 6em;
   white-space: nowrap;
   border-right: 1px solid color-mix(in srgb, var(--accent) 22%, white);
 }
 
 table.proteus_table > thead > tr > th.value_column {
-  width: auto;
+  /* claims all the slack left by the name column, which then shrinks to fit its content */
+  width: 100%;
   font-size: 1.05em;
   font-weight: 600;
   letter-spacing: -.005em;
@@ -183,7 +184,6 @@ table.proteus_table > tr:last-child > * {
 /* label column */
 table.proteus_table tbody th:first-child,
 table.proteus_table > tr > th:first-child {
-  width: 13em;
   font-weight: 600;
   color: var(--ink-soft);
   background: var(--label-bg);

@@ -2,7 +2,7 @@
 /* File    : default.css                                   */
 /* Content : Default CSS for Proteus                       */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/14                                    */
+/* Date    : 2026/09/21                                    */
 /* Version : 2.0                                           */
 /* ======================================================= */
 
@@ -16,7 +16,9 @@
 @import url('proteus_table.css');
 @import url('stakeholder.css');
 @import url('organization.css');
+@import url('meeting.css');
 @import url('symbolic_link.css');
+@import url('traceability_matrix.css');
 
 /* general styles */
 
@@ -66,11 +68,6 @@ div.part {
 /* edge, the class pill and the links are derived from it in               */
 /* proteus_table.css.                                                      */
 
-/* general purpose objects */
-.proteus_table.meeting {
-  --accent: #0e7490;
-}
-
 /* business analysis objects */
 
 .proteus_table.business_actor,
@@ -109,72 +106,6 @@ table.use_case th.step_number_column {
 table.use_case th.step_number {
   text-align: center;
   font-weight: normal;
-}
-
-/* traceability matrices */
-
-div.traceability_matrix {
-  text-align: center;
-}
-
-p.matrix_caption {
-  margin-top: 4px;
-}
-
-span.matrix_caption_label {
-  font-weight: bold;
-}
-
-.reduce_font,
-.increase_font {
-  color: lightgray;
-}
-
-.reduce_font:active,
-.increase_font:active {
-    background-color: darkgray;
-}
-
-table.traceability_matrix {
-  margin-bottom: 1em;
-}
-
-table.traceability_matrix>thead>tr {
-  background-color: lavender;
-}
-
-/* first row, first column */
-table.traceability_matrix>thead>tr>th:first-child {
-  width: 7.5em;
-}
-
-table.traceability_matrix th {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-table.traceability_matrix button.reduce_font,
-table.traceability_matrix button.increase_font {
-  height: 1.75em;
-  color: black;
-  border: 2px;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-top: 1px;
-  padding-bottom: 1px;
-  margin-top: 4px;
-  margin-left: 2px;
-  margin-right: 2px;
-  font-weight: bold;
-}
-
-/* TODO: poner URL al CDN de github */
-table.traceability_matrix td.trace {
-  /*
-    background-image: url('data:image/gif;base64,R0lGODlhEAAQAPcAAAAAAIAAAACAAICAAAAAgIAAgACAgMDAwMDcwKTI8AQEBAgICAwMDBERERYWFhwcHCIiIikpKVVVVU1NTUJCQjk5OYGBgYEAAACBAIGBAAAAgYEAgQCBgTMAAGYAAJkAAMwAAAAzADMzAGYzAJkzAMwzAP8zAABmADNmAGZmAJlmAMxmAP9mAACZADOZAGaZAJmZAMyZAP+ZAADMADPMAGbMAJnMAMzMAP/MAGb/AJn/AMz/AAAAMzMAM2YAM5kAM8wAM/8AMwAzMzMzM2YzM5kzM8wzM/8zMwBmMzNmM2ZmM5lmM8xmM/9mMwCZMzOZM2aZM5mZM8yZM/+ZMwDMMzPMM2bMM5nMM8zMM//MMzP/M2b/M5n/M8z/M///MwAAZjMAZmYAZpkAZswAZv8AZgAzZjMzZmYzZpkzZswzZv8zZgBmZjNmZmZmZplmZsxmZgCZZjOZZmaZZpmZZsyZZv+ZZgDMZjPMZpnMZszMZv/MZgD/ZjP/Zpn/Zsz/Zv8AzMwA/wCZmZkzmZkAmcwAmQAAmTMzmWYAmcwzmf8AmQBmmTNmmWYzmZlmmcxmmf8zmTOZmWaZmZmZmcyZmf+ZmQDMmTPMmWbMZpnMmczMmf/MmQD/mTP/mWbMmZn/mcz/mf//mQAAzDMAmWYAzJkAzMwAzAAzmTMzzGYzzJkzzMwzzP8zzABmzDNmzGZmmZlmzMxmzP9mmQCZzDOZzGaZzJmZzMyZzP+ZzADMzDPMzGbMzJnMzMzMzP/MzAD/zDP/zGb/mZn/zMz/zP//zDMAzGYA/5kA/wAzzDMz/2Yz/5kz/8wz//8z/wBm/zNm/2ZmzJlm/8xm//9mzACZ/zOZ/2aZ/5mZ/8yZ//+Z/wDM/zPM/2bM/5nM/8zM///M/zP//2b/zJn//8z///9mZmb/Zv//ZmZm//9m/2b//8HBwV9fX3d3d4aGhpaWlsvLy7KystfX193d3ePj4+rq6vHx8fj4+P/78KCgpICAgP8AAAD/AP//AAAA//8A/wD//////yH5BAEAAAAALAAAAAAQABAABwhDAP8JHEiwoMGBhg4eNGcuoUKCDB0+/Mcw4sSKFSUWxIhRo0BrIEOKtPbQ4kSBJk+mvNhQoaGXL1dC5Njy4EiQJ3MGBAA7');
-    background-repeat: no-repeat;
-    background-position: center;
-    */
 }
 
 /*  modeling objects */

@@ -14,7 +14,7 @@
 		<urlProperty name="url" category="detail"><![CDATA[https://www.us.es/sites/default/files/2019-05/marca-US-principal.jpg]]></urlProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">20</integerProperty>
     <markdownProperty name="description" category="detail"><![CDATA[University of Seville logo (remote)]]></markdownProperty>
-    <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object" traceType=":Proteus-dependency"/>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 

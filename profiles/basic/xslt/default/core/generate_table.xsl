@@ -54,7 +54,7 @@
     </xsl:variable>
 
     <!-- All objects are displayed inside a div with their IDs -->
-    <div id="{@id}" data-proteus-id="{@id}">
+    <div id="{@id}" data-proteus-id="{@id}" class="{$class}">
       <xsl:attribute name="class">
         <xsl:text>proteus_object</xsl:text>
         <xsl:if test="$image"> with_image</xsl:if>

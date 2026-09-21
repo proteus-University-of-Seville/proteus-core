@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object
   id="meeting"
-  classes="meeting"
+  classes="traceable-object meeting"
   acceptedChildren=":Proteus-none"
 >
   <properties>
@@ -14,6 +14,7 @@
     <stringProperty name="place" category="detail"><![CDATA[]]></stringProperty>
     <traceProperty name="attenders" category="detail" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
     <markdownProperty name="results" category="results"><![CDATA[]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 

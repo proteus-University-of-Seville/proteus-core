@@ -39,9 +39,9 @@ archetype.class.symbolic-link: "Symbolic\nlink"
 
 archetype.prop_category.general: "General"
 archetype.prop_category.detail: "Detail"
-archetype.prop_category.details: "Detail"
-archetype.prop_category.comments: "Comments"
+archetype.prop_category.results: "Results"
 archetype.prop_category.dependencies: "Dependencies"
+archetype.prop_category.comments: "Comments"
 
 # -----------------------------------------------------------------------
 # Archetype enum choices
@@ -88,6 +88,7 @@ archetype.prop_name.prepared-by: "Prepared by"
 archetype.prop_name.prepared-for: "Prepared for"
 archetype.prop_name.publication_authors: "Authors"
 archetype.prop_name.publication_details: "Publication details"
+archetype.prop_name.results: "Results"
 archetype.prop_name.role: "Role"
 archetype.prop_name.sources: "Sources"
 archetype.prop_name.specificdata: "Specific data"

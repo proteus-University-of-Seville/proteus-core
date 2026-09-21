@@ -50,6 +50,8 @@
   <!-- Advanced archetype modules -->
   <xsl:include href="archetypes/advanced/organization.xsl" />
   <xsl:include href="archetypes/advanced/stakeholder.xsl" />
+  <xsl:include href="archetypes/advanced/meeting.xsl" />
+  <xsl:include href="archetypes/advanced/traceability_matrix.xsl" />
 
   <!-- Default archetype module -->
   <xsl:include href="archetypes/any_archetype.xsl" />

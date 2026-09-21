@@ -63,7 +63,13 @@ archetype.prop_name.urgency: "Urgency"
 xslt.empty_paragraph: "Empty paragraph"
 xslt.tbd_expanded: "To Be Determined"
 xslt.figure: "Figure"
+xslt.traceability_matrix: "Traceability matrix"
+xslt.traceability_matrix_missing_class: "Cannot display traceability matrix. Make sure at least one class is selected for rows and columns."
+xslt.traceability_matrix_missing_item: "Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns."
 
 xslt.text.project: "Project"
 xslt.text.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
 xslt.text.toc: "Table of contents"
+
+
+

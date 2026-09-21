@@ -193,7 +193,7 @@ What this shows:
 ```xml
 <object
   id="paragraph"
-  classes="general-traceable-object paragraph"
+  classes="traceable-object paragraph"
   acceptedChildren=":Proteus-none"
   acceptedParents=":Proteus-document section"
   selectedCategory="detail"
@@ -205,7 +205,7 @@ What this shows:
     <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
     <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
     <markdownProperty name="text" category="detail"><![CDATA[]]></markdownProperty>
-    <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object" traceType=":Proteus-dependency"/>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 </object>
@@ -256,7 +256,7 @@ What this shows:
 ```xml
 <object
   id="local-figure"
-  classes="general-traceable-object figure"
+  classes="traceable-object figure"
   acceptedChildren=":Proteus-none"
 >
   <properties>
@@ -269,7 +269,7 @@ What this shows:
     <urlProperty name="url" category="detail"><![CDATA[]]></urlProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">20</integerProperty>
     <markdownProperty name="description" category="detail"><![CDATA[University of Seville logo]]></markdownProperty>
-    <traceProperty name="dependencies" category="dependencies" acceptedTargets="general-traceable-object" traceType=":Proteus-dependency"/>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 </object>
@@ -389,7 +389,7 @@ This text may contain **Markdown** and multiple lines.
   <traceProperty
     name="depends-on"
     category="dependencies"
-    acceptedTargets="general-traceable-object"
+    acceptedTargets="traceable-object"
     excludedTargets="stakeholder"
     traceType=":Proteus-dependency"
     maxTargetsNumber="3"

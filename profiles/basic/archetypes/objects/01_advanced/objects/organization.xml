@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object
   id="organization"
-  classes="organization"
+  classes="traceable-object organization"
   acceptedChildren=":Proteus-none"
 >
   <properties>
