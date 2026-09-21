@@ -80,7 +80,7 @@ def test_create_project(app):
 
     # Page 1
     page1: ArchetypePage = dialog.currentPage()
-    combo_index = page1.archetype_combo.findData("BASIC")
+    combo_index = page1.archetype_combo.findData("empty")
     page1.archetype_combo.setCurrentIndex(combo_index)
     dialog.next()
 

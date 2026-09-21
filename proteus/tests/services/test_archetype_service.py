@@ -175,7 +175,7 @@ def test_archetype_index_load(archetype_service: ArchetypeService):
 
 # test_get_archetype_by_id -------------------------------------------------
 @pytest.mark.parametrize(
-    "id", ["paragraph", "BASIC", "empty-doc"]
+    "id", ["paragraph", "empty", "empty-doc"]
 )
 def test_get_archetype_by_id(id: str, archetype_service: ArchetypeService):
     """
