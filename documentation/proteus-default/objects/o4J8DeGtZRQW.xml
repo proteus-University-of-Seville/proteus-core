@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="o4J8DeGtZRQW" classes="section appendix" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-document">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Glosario de acrónimos y abreviaturas]]></stringProperty>
+    <markdownProperty name="comments" category="general"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>
