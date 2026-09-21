@@ -24,7 +24,7 @@ from proteus.app import ProteusApplication
 def print_banner() -> None:
     console = Console()
     content = (
-        f"[bold cyan]Proteus Application[/bold cyan] [dim]v{PROTEUS_VERSION} ({PROTEUS_VERSION_YEAR})[/dim]\n\n"
+        f"[bold cyan]Proteus Application[/bold cyan] [dim]{PROTEUS_VERSION} ({PROTEUS_VERSION_YEAR})[/dim]\n\n"
         f"University of Seville (Andalucía, Spain)\n"
         f"[dim]Distributed under the BSD 3-Clause License[/dim]\n\n"
         f"[bold]Developers:[/bold] José María Delgado Sánchez & other students\n"

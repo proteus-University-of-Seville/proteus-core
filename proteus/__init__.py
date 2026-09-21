@@ -46,6 +46,9 @@ def _resolve_version() -> str:
 
 PROTEUS_VERSION = str(_resolve_version())
 
+# Year shown alongside the version in the startup banner (see proteus/__main__.py)
+PROTEUS_VERSION_YEAR = str('2026')
+
 # --------------------------------------------------------------------------
 # Constant declarations for PROTEUS logger
 # --------------------------------------------------------------------------
