@@ -26,15 +26,13 @@ from lxml import etree as ET
 # --------------------------------------------------------------------------
 
 from proteus.application.utils.abstract_meta import SingletonMeta
+from proteus.application.resources.language_config import (
+    LANGUAGE_CONFIG_FILE,
+    resolve_language_directory,
+)
 
 # logging configuration
 log = logging.getLogger(__name__)
-
-# --------------------------------------------------------------------------
-# Constants
-# --------------------------------------------------------------------------
-
-LANGUAGE_CONFIG_FILE = "languages.xml"
 
 
 # --------------------------------------------------------------------------
@@ -172,44 +170,7 @@ class Translator(metaclass=SingletonMeta):
 
         :return: Path to the translations directory/file or None if not found any.
         """
-        # Check if the language configuration file exists
-        if not language_config_file.exists():
-            log.error(f"Language configuration file not found: {language_config_file}")
-            return None
-
-        # Read the language configuration file
-        languages_tree: ET._ElementTree = ET.parse(language_config_file)
-        languages_root: ET._Element = languages_tree.getroot()
-
-        # Get the default language directory if exists
-        default_language_directory: str = languages_root.get("default")
-
-        # Iterate over the language tags
-        for language in languages_root:
-            # If the key if the current language
-            if language.get("key").lower() == self.current_language.lower():
-                log.debug(
-                    f"Configuration for language '{self.current_language}' found in file '{language_config_file}'"
-                )
-
-                # Get the language directory
-                language_directory: str = language.get("path")
-
-                # Check if the language directory exists
-                if language_directory is not None:
-                    language_directory_path: Path = (
-                        language_config_file.parent / language_directory
-                    )
-                    if language_directory_path.exists():
-                        return language_directory_path
-
-        # If the current language is not found, return the default language if exists
-        if default_language_directory is not None:
-            default_language_directory_path: Path = Path(default_language_directory)
-            if default_language_directory_path.exists():
-                return default_language_directory_path
-        else:
-            return None
+        return resolve_language_directory(language_config_file, self.current_language)
 
     # --------------------------------------------------------------------------
     # Method: _load_translations

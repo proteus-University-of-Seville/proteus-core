@@ -161,7 +161,7 @@ Important consequence:
 
 ## Example Object Types
 
-The default `basic` profile defines its object archetypes in `profiles/basic/archetypes/objects/00_general/objects.xml` and the concrete XML templates in the sibling `objects/` directory.
+The default `basic` profile ships one archetype set per language under `profiles/basic/archetypes/{language}` (see `profiles/basic/archetypes/languages.xml`, same convention as the profile's `i18n` directory). For example, the English set defines its object archetypes in `profiles/basic/archetypes/en_us/objects/00_general/objects.xml` and the concrete XML templates in the sibling `objects/` directory.
 
 ### Section
 

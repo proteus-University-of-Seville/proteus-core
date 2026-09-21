@@ -11,7 +11,7 @@
 # --------------------------------------------------------------------------
 
 import logging
-from typing import List, Dict
+from typing import List, Dict, Optional
 from pathlib import Path
 from dataclasses import dataclass
 from configparser import ConfigParser
@@ -20,6 +20,8 @@ from configparser import ConfigParser
 # Third-party library imports
 # --------------------------------------------------------------------------
 
+from lxml import etree as ET
+
 # --------------------------------------------------------------------------
 # Project specific imports
 # --------------------------------------------------------------------------
@@ -27,6 +29,10 @@ from configparser import ConfigParser
 import proteus
 from proteus.model.template import Template
 from proteus.model.archetype_repository import ArchetypeRepository
+from proteus.application.resources.language_config import (
+    LANGUAGE_CONFIG_FILE,
+    resolve_language_directory,
+)
 
 # --------------------------------------------------------------------------
 # Constants
@@ -70,6 +76,14 @@ class ProfileSettings:
 
     # Directory settings
     archetypes_directory: Path = None
+    # Language of the resolved archetypes directory, if the profile ships one
+    # archetype set per language (None for a single-language archetypes directory)
+    archetypes_language: str | None = None
+    # Every other declared archetypes language directory found on disk, keyed
+    # by language code (empty if the archetypes directory is single-language).
+    # Used to validate that all the shipped translations are structurally
+    # loadable, not only the one currently in use.
+    other_archetypes_language_directories: Dict[str, Path] = None
     xslt_directory: Path = None
     # Other directories (optional)
     plugins_directory: Path | None = None
@@ -90,10 +104,17 @@ class ProfileSettings:
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
     @staticmethod
-    def load(profile_path: Path) -> "ProfileSettings":
+    def load(profile_path: Path, language: Optional[str] = None) -> "ProfileSettings":
         """
         Loads the profile settings from the configuration file located in the
         profile directory. If the file does not exist, error is raised.
+
+        :param profile_path: Path to the profile directory.
+        :param language: Application language (e.g. 'es_ES') used to resolve
+            the archetypes directory when the profile ships one archetype set
+            per language (see '_load_directories'). If None, or if the
+            language is not available in the profile, the profile's default
+            archetypes language is used instead.
         """
         config_file_path: Path = profile_path / CONFIG_FILE
 
@@ -114,7 +135,7 @@ class ProfileSettings:
             config_parser=config_parser,
         )
 
-        profile_settings._load_directories()
+        profile_settings._load_directories(language)
         profile_settings._validate_profile_basic_content()
         profile_settings._load_preference_settings()
 
@@ -127,9 +148,12 @@ class ProfileSettings:
     # Version: 0.1
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
-    def _load_directories(self) -> None:
+    def _load_directories(self, language: Optional[str] = None) -> None:
         """
         Load directory settings from the configuration file.
+
+        :param language: Application language used to resolve the archetypes
+            directory (see '_resolve_archetypes_directory').
         """
         # Directories section
         directories = self.config_parser[DIRECTORIES]
@@ -172,6 +196,10 @@ class ProfileSettings:
             self.xslt_directory.exists()
         ), f"XSLT directory '{self.xslt_directory}' does not exist in profile '{self.profile_path}'!"
 
+        # Resolve the archetypes directory to a language-specific subdirectory,
+        # if the profile ships one archetype set per language
+        self._resolve_archetypes_directory(language)
+
         # Check existence of optional directories
         if self.plugins_directory is not None:
             if not self.plugins_directory.exists():
@@ -196,10 +224,76 @@ class ProfileSettings:
 
         log.info(f"Directories loaded from '{self.settings_file_path}'.")
         log.info(f"{self.archetypes_directory = }")
+        log.info(f"{self.archetypes_language = }")
         log.info(f"{self.xslt_directory = }")
         log.info(f"{self.plugins_directory = }")
         log.info(f"{self.icons_directory = }")
         log.info(f"{self.i18n_directory = }")
+
+    # --------------------------------------------------------------------------
+    # Method: _resolve_archetypes_directory
+    # Description: Resolves the archetypes directory to a language-specific
+    #              subdirectory, if the profile ships one archetype set per
+    #              language
+    # Date: 21/09/2026
+    # Version: 0.1
+    # Author: Amador Durán Toro
+    # --------------------------------------------------------------------------
+    def _resolve_archetypes_directory(self, language: Optional[str]) -> None:
+        """
+        Resolves 'self.archetypes_directory' to a language-specific
+        subdirectory when the archetypes directory contains a 'languages.xml'
+        configuration file, following the same convention already used by
+        the i18n directories.
+
+        A profile is not required to translate its archetypes: if no
+        'languages.xml' file is found directly inside the archetypes
+        directory, it is used as-is (single-language/legacy layout).
+
+        When 'languages.xml' is present, the subdirectory for 'language' is
+        used if declared and available; otherwise, the subdirectory declared
+        as the profile's default archetypes language is used instead.
+
+        :param language: Application language (e.g. 'es_ES'), or None to
+            resolve the default archetypes language directly.
+        """
+        self.other_archetypes_language_directories = {}
+
+        languages_config_file: Path = self.archetypes_directory / LANGUAGE_CONFIG_FILE
+
+        if not languages_config_file.exists():
+            # Single-language archetypes directory: nothing to resolve
+            return
+
+        resolved_directory = resolve_language_directory(
+            languages_config_file, language
+        )
+
+        assert resolved_directory is not None, (
+            f"Could not resolve an archetypes language directory for language "
+            f"'{language}' using '{languages_config_file}'. Check the 'default' "
+            f"attribute and the declared language directories exist."
+        )
+
+        self.archetypes_directory = resolved_directory
+        self.archetypes_language = resolved_directory.name
+
+        # Collect every other declared language directory that exists on
+        # disk, so the caller can optionally validate that all the shipped
+        # translations are structurally sound (see '_validate_profile_basic_content')
+        languages_tree = ET.parse(languages_config_file)
+        for language_element in languages_tree.getroot():
+            language_key: str = language_element.get("key")
+            language_path: str = language_element.get("path")
+            if language_key is None or language_path is None:
+                continue
+            if language_key.lower() == self.archetypes_language.lower():
+                continue
+            language_directory: Path = languages_config_file.parent / language_path
+            if language_directory.exists():
+                self.other_archetypes_language_directories[language_key] = (
+                    language_directory
+                )
 
     # --------------------------------------------------------------------------
     # Method: _load_preference_settings
@@ -280,6 +374,23 @@ class ProfileSettings:
                 f"Could not load archetype repository from '{self.archetypes_directory}'. It will be ignored in profile settings. Error: {e}"
             )
             raise e
+
+        # Every other archetypes language shipped by the profile must also be
+        # structurally loadable, otherwise switching the application language
+        # would break at runtime instead of at profile load time
+        for language_key, language_directory in (
+            self.other_archetypes_language_directories or {}
+        ).items():
+            try:
+                ArchetypeRepository.load_object_archetypes(language_directory)
+                ArchetypeRepository.load_document_archetypes(language_directory)
+                ArchetypeRepository.load_project_archetypes(language_directory)
+            except Exception as e:
+                log.error(
+                    f"Could not load archetype repository for language '{language_key}' "
+                    f"from '{language_directory}'. It will be ignored in profile settings. Error: {e}"
+                )
+                raise e
 
 
 @dataclass

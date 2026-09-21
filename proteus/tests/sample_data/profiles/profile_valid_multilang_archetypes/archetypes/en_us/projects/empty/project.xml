@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project id="empty-project">
+  <properties>
+    <stringProperty name=":Proteus-name"><![CDATA[Empty project]]></stringProperty>
+    <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
+	  <dateProperty name=":Proteus-date">2000-12-31</dateProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Empty project with only one empty document.]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <documents>
+    <document id="7SvZwfdo5gPQ" />
+  </documents>
+</project>

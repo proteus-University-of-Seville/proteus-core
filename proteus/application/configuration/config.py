@@ -136,7 +136,9 @@ class Config(metaclass=SingletonMeta):
         # Try to load the profile settings
         try:
             self.current_profile_metadata = ProfileBasicMetadata.load(profile_path)
-            self.profile_settings = ProfileSettings.load(profile_path)
+            self.profile_settings = ProfileSettings.load(
+                profile_path, self.app_settings.language
+            )
         except Exception as e:
             log.error(f"Error loading profile settings from {profile_path}. Error: {e}")
 
@@ -155,7 +157,8 @@ class Config(metaclass=SingletonMeta):
 
                 self.profile_settings = ProfileSettings.load(
                     self.app_settings.profiles_directory
-                    / self.app_settings.selected_profile
+                    / self.app_settings.selected_profile,
+                    self.app_settings.language,
                 )
 
                 self.app_settings.using_default_profile = True

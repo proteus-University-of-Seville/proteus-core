@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- First-level objects for the basic profile (advanced category)-->
+<objects>
+  <object id="organization" />
+  <object id="stakeholder" />
+  <object id="meeting" />
+  <object id="traceability-matrix" />
+</objects>

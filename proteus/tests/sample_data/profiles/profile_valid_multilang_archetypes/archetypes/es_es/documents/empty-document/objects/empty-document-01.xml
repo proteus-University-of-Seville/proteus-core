@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object id="empty-document-01" classes=":Proteus-document" acceptedChildren=":Proteus-any">
+  <properties>
+    <stringProperty name=":Proteus-acronym"><![CDATA[EDOC]]></stringProperty>
+    <stringProperty name=":Proteus-name"><![CDATA[Documento vacío]]></stringProperty>
+    <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
+	  <dateProperty name=":Proteus-date">2000-12-31</dateProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+    <traceProperty name="prepared-for" acceptedTargets="organization" traceType=":Proteus-dependency"/>
+    <traceProperty name="prepared-by" acceptedTargets="organization" traceType=":Proteus-author"/>
+  </properties>
+  <children />
+</object>

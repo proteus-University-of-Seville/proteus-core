@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object
+  id="meeting"
+  classes="traceable-object meeting"
+  acceptedChildren=":Proteus-none"
+>
+  <properties>
+    <stringProperty name=":Proteus-name"><![CDATA[Reunión]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="detail">2024-09-01</dateProperty>
+    <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <timeProperty name="time" category="detail">12:00:00</timeProperty>
+    <stringProperty name="place" category="detail"><![CDATA[]]></stringProperty>
+    <traceProperty name="attenders" category="detail" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <markdownProperty name="results" category="results"><![CDATA[]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+
+</object>

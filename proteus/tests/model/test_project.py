@@ -50,7 +50,10 @@ from proteus.tests.fixtures import SampleData
 
 # NOTE: This is a sample project that is used for testing purposes.
 SAMPLE_PROJECT_PATH = PROTEUS_SAMPLE_PROJECTS_PATH / "example_project"
-ARCHETYPE_REPOSITORY_PATH = PROTEUS_APP_PATH / "profiles/basic/archetypes/"
+# NOTE: the 'basic' profile ships one archetype set per language (see
+# profiles/basic/archetypes/languages.xml). This must match the language
+# used by the test configuration file (proteus.tests.ini).
+ARCHETYPE_REPOSITORY_PATH = PROTEUS_APP_PATH / "profiles/basic/archetypes/en_us"
 
 # --------------------------------------------------------------------------
 # Fixtures and helpers

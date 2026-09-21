@@ -24,6 +24,7 @@ import pytest
 
 from proteus.tests import PROTEUS_SAMPLE_PROFILES_PATH
 from proteus.application.configuration.profile_settings import ProfileSettings
+from proteus.model.archetype_repository import ArchetypeRepository
 
 
 # --------------------------------------------------------------------------
@@ -266,3 +267,156 @@ def test_load_profile_settings_no_valid_archetype_repository():
 
     with pytest.raises(AssertionError):
         ProfileSettings.load(profile_path)
+
+
+# --------------------------------------------------------------------------
+# Multi-language archetypes tests
+# --------------------------------------------------------------------------
+# Profiles may ship one archetype set per language (archetypes/languages.xml,
+# same convention already used by the i18n directories). These tests check
+# that ProfileSettings resolves the archetypes directory accordingly.
+
+
+def test_load_profile_settings_multilang_archetypes_default_language():
+    """
+    Check that the profile's default archetypes language is used when no
+    language is requested.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    profile_path = PROTEUS_SAMPLE_PROFILES_PATH / "profile_valid_multilang_archetypes"
+
+    # --------------------
+    # Act
+    # --------------------
+
+    profile_settings = ProfileSettings.load(profile_path)
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert (
+        profile_settings.archetypes_directory == profile_path / "archetypes" / "en_us"
+    ), f"Expected: {profile_path / 'archetypes' / 'en_us'}, Actual: {profile_settings.archetypes_directory}"
+    assert (
+        profile_settings.archetypes_language == "en_us"
+    ), f"Expected: en_us, Actual: {profile_settings.archetypes_language}"
+    assert list(profile_settings.other_archetypes_language_directories.keys()) == [
+        "es_ES"
+    ], f"Expected: ['es_ES'], Actual: {list(profile_settings.other_archetypes_language_directories.keys())}"
+
+
+def test_load_profile_settings_multilang_archetypes_requested_language():
+    """
+    Check that the requested language's archetypes are used when declared
+    and available.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    profile_path = PROTEUS_SAMPLE_PROFILES_PATH / "profile_valid_multilang_archetypes"
+
+    # --------------------
+    # Act
+    # --------------------
+
+    profile_settings = ProfileSettings.load(profile_path, "es_ES")
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert (
+        profile_settings.archetypes_directory == profile_path / "archetypes" / "es_es"
+    ), f"Expected: {profile_path / 'archetypes' / 'es_es'}, Actual: {profile_settings.archetypes_directory}"
+    assert (
+        profile_settings.archetypes_language == "es_es"
+    ), f"Expected: es_es, Actual: {profile_settings.archetypes_language}"
+
+    # The archetype content itself must reflect the resolved language
+    object_archetypes = ArchetypeRepository.load_object_archetypes(
+        profile_settings.archetypes_directory
+    )
+    paragraph_archetype = object_archetypes["general"]["paragraph"][0]
+    assert (
+        paragraph_archetype.get_property(":Proteus-name").value == "Párrafo vacío"
+    ), f"Expected: 'Párrafo vacío', Actual: {paragraph_archetype.get_property(':Proteus-name').value}"
+
+
+def test_load_profile_settings_multilang_archetypes_unavailable_language_falls_back():
+    """
+    Check that the default archetypes language is used when the requested
+    language is not declared/available in the profile.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    profile_path = PROTEUS_SAMPLE_PROFILES_PATH / "profile_valid_multilang_archetypes"
+
+    # --------------------
+    # Act
+    # --------------------
+
+    profile_settings = ProfileSettings.load(profile_path, "fr_FR")
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert (
+        profile_settings.archetypes_directory == profile_path / "archetypes" / "en_us"
+    ), f"Expected: {profile_path / 'archetypes' / 'en_us'}, Actual: {profile_settings.archetypes_directory}"
+
+
+def test_load_profile_settings_multilang_archetypes_unresolvable():
+    """
+    Check that an error is raised when neither the requested language nor
+    the profile's default archetypes language can be resolved.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    profile_path = PROTEUS_SAMPLE_PROFILES_PATH / "profile_invalid_multilang_archetypes"
+
+    # --------------------
+    # Act
+    # --------------------
+
+    with pytest.raises(AssertionError):
+        ProfileSettings.load(profile_path, "es_ES")
+
+
+def test_load_profile_settings_single_language_archetypes_ignore_language():
+    """
+    Check that profiles without an archetypes/languages.xml file (legacy,
+    single-language layout) keep using the archetypes directory as-is,
+    regardless of the requested language.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    profile_path = PROTEUS_SAMPLE_PROFILES_PATH / "profile_valid_min"
+
+    # --------------------
+    # Act
+    # --------------------
+
+    profile_settings = ProfileSettings.load(profile_path, "es_ES")
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert (
+        profile_settings.archetypes_directory == profile_path / "archetypes"
+    ), f"Expected: {profile_path / 'archetypes'}, Actual: {profile_settings.archetypes_directory}"
+    assert (
+        profile_settings.archetypes_language is None
+    ), f"Expected: None, Actual: {profile_settings.archetypes_language}"

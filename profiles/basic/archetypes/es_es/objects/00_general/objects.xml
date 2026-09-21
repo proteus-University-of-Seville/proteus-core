@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- First-level objects for the basic profile (general category) -->
+<objects>
+  <object id="section" />
+  <object id="appendix" />
+  <object id="paragraph" />
+  <object id="comment" />
+  <object id="local-figure" />
+  <object id="remote-figure" />
+  <object id="glossary-item" />
+  <object id="bibliography-item" />
+  <object id="symbolic-link" />
+</objects>
