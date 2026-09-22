@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+    <object id="subsystem" />
+    <object id="general-requirement" />
+    <object id="system-actor" />
+    <object id="use-case" />
+    <object id="use-case-step" />
+    <object id="information-requirement" />
+    <object id="specific-data" />
+    <object id="business-rule" />
+    <object id="functional-requirement" />
+    <object id="nonfunctional-requirement" />
+</objects>

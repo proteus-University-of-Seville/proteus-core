@@ -17,49 +17,49 @@ Consequences of this design:
 * Labels are shared with the GUI, so an archetype class, property or
   enumeration choice is translated once and shown the same way in the object
   form and in the rendered document.
-* Missing translations are logged by the `Translator` and rendered as `!key!`
-  (or as the raw value, see `i18n_or()` below), instead of silently producing
-  an empty cell.
+* Missing translations are logged by the `Translator` and rendered as `!key!`,
+  instead of silently producing an empty cell, so a missing label is easy to
+  spot in the rendered document regardless of where it comes from.
 
 How it works
 ------------
 
-`RenderService` registers two built-in functions in the `proteus-utils` XSLT
+`RenderService` registers a built-in function in the `proteus-utils` XSLT
 namespace (`proteus/services/render_service.py`):
 
 | Function | Behaviour when the key is missing |
 | --- | --- |
 | `proteus-utils:i18n(key, ...)` | returns `!key!` |
-| `proteus-utils:i18n_or(key, alternative)` | returns `alternative` |
 
-Both call `proteus.application.resources.translator.translate()`, which looks
+It calls `proteus.application.resources.translator.translate()`, which looks
 the key up in the translations of the current application language, loaded from
 the application `resources/i18n/<lang>/` and the profile `<profile>/i18n/<lang>/`
-directories. Optional arguments of `i18n()` are formatted into the translation
+directories. Optional arguments are formatted into the translation
 (`{0}` placeholders), as in the rest of the application.
 
 Fixed keys are written literally:
 
 ```xml
-<xsl:value-of select="proteus-utils:i18n('xslt.text.figure')"/>
+<xsl:value-of select="proteus-utils:i18n('xslt.figure')"/>
 ```
 
-Keys which depend on the object being rendered are computed with `concat()`,
-using `i18n_or()` so that the raw value is shown when a profile defines
-something the templates know nothing about:
+Keys which depend on the object being rendered are computed with `concat()`.
+A profile defining a class, property, enumeration choice or trace type must
+also provide its translation, otherwise `!key!` is shown, which is deliberate:
+it flags a profile i18n gap instead of masking it with a raw value.
 
 ```xml
 <!-- class label, e.g. archetype.class.organization -->
-<xsl:value-of select="proteus-utils:i18n_or(concat('archetype.class.', $class), $class)"/>
+<xsl:value-of select="proteus-utils:i18n(concat('archetype.class.', $class))"/>
 
 <!-- property label, e.g. archetype.prop_name.address -->
-<xsl:param name="label" select="proteus-utils:i18n_or(concat('archetype.prop_name.', current()/@name), current()/@name)"/>
+<xsl:param name="label" select="proteus-utils:i18n(concat('archetype.prop_name.', current()/@name))"/>
 
 <!-- enumeration choice, e.g. archetype.enum_choices.developer -->
-<xsl:value-of select="proteus-utils:i18n_or(concat('archetype.enum_choices.', current()/text()), current()/text())"/>
+<xsl:value-of select="proteus-utils:i18n(concat('archetype.enum_choices.', current()/text()))"/>
 
 <!-- trace type, e.g. xslt.trace_type.:Proteus-works-for -->
-<xsl:value-of select="proteus-utils:i18n_or(concat('xslt.trace_type.', current()/text()), current()/text())"/>
+<xsl:value-of select="proteus-utils:i18n(concat('xslt.trace_type.', current()/text()))"/>
 ```
 
 Note that keys are case-insensitive: `Translator.text()` lowercases them, so
@@ -75,7 +75,7 @@ Key conventions
 | `archetype.prop_name.<property>` | label of a property | yes |
 | `archetype.enum_choices.<choice>` | label of an enumeration choice | yes |
 | `xslt.trace_type.<trace type>` | label of a trace type | no |
-| `xslt.text.<name>` | literal text used by a template | no |
+| `xslt.<name>` | literal text used by a template | no |
 
 Punctuation (`:`, brackets, etc.) belongs to the template, not to the label.
 

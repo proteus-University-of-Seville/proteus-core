@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="Ldeom2WLnucA" classes="parameter" acceptedChildren=":Proteus-none" acceptedParents="system-operation">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[bookId]]></stringProperty>
+    <stringProperty name="type" category="general"><![CDATA[string]]></stringProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Identifier of the book to be loaned.]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>

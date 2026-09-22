@@ -58,6 +58,18 @@ SETTING_DEVELOPER_FEATURES: str = "developer_features"
 # fallback chain when this key does not match an installed theme.
 DEFAULT_THEME: str = "light"
 
+# Embedded MCP server settings (own section, not exposed in the Settings
+# dialog; edited by hand in the configuration file like the advanced
+# settings above).
+SETTINGS_MCP: str = "mcp"
+SETTING_MCP_ENABLED: str = "enabled"
+SETTING_MCP_HOST: str = "host"
+SETTING_MCP_PORT: str = "port"
+
+DEFAULT_MCP_ENABLED: bool = False
+DEFAULT_MCP_HOST: str = "127.0.0.1"
+DEFAULT_MCP_PORT: int = 8731
+
 # User session data
 SESSION: str = "session"
 SESSION_LAST_PROJECT_OPENED: str = "last_project_opened"
@@ -98,6 +110,11 @@ class AppSettings:
     # These settings must be set manually in the configuration file
     xslt_debug_mode: bool = False
     developer_features: bool = False
+
+    # Embedded MCP server settings (not editable by the user, [mcp] section)
+    mcp_server_enabled: bool = DEFAULT_MCP_ENABLED
+    mcp_server_host: str = DEFAULT_MCP_HOST
+    mcp_server_port: int = DEFAULT_MCP_PORT
 
     # --------------------------------------------------------------------------
     # Method: load
@@ -280,6 +297,27 @@ class AppSettings:
         # Raw model editor ------------------------
         self.developer_features = settings.getboolean(SETTING_DEVELOPER_FEATURES, False)
 
+        # Embedded MCP server ------------------------
+        # Own [mcp] section, possibly entirely absent in older configuration
+        # files: config_parser.get*(section, option, fallback=...) covers
+        # both a missing section and a missing option within it.
+        self.mcp_server_enabled = self.config_parser.getboolean(
+            SETTINGS_MCP, SETTING_MCP_ENABLED, fallback=DEFAULT_MCP_ENABLED
+        )
+        self.mcp_server_host = self.config_parser.get(
+            SETTINGS_MCP, SETTING_MCP_HOST, fallback=DEFAULT_MCP_HOST
+        )
+        try:
+            self.mcp_server_port = self.config_parser.getint(
+                SETTINGS_MCP, SETTING_MCP_PORT, fallback=DEFAULT_MCP_PORT
+            )
+        except ValueError:
+            log.error(
+                f"Invalid '{SETTING_MCP_PORT}' value in '[{SETTINGS_MCP}]' section of "
+                f"'{self.settings_file_path}'. Using default port {DEFAULT_MCP_PORT}."
+            )
+            self.mcp_server_port = DEFAULT_MCP_PORT
+
         log.info(f"Loaded app user settings from '{self.settings_file_path}'.")
         log.info(f"{self.language = }")
         log.info(f"{self.default_view = }")
@@ -291,6 +329,9 @@ class AppSettings:
         log.info(f"{self.theme = }")
         log.info(f"{self.xslt_debug_mode = }")
         log.info(f"{self.developer_features = }")
+        log.info(f"{self.mcp_server_enabled = }")
+        log.info(f"{self.mcp_server_host = }")
+        log.info(f"{self.mcp_server_port = }")
 
     # --------------------------------------------------------------------------
     # Method: _validate_profile_path

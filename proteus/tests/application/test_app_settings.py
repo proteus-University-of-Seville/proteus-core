@@ -94,6 +94,51 @@ def test_load_app_settings_min(mocker):
         app_settings.custom_profile_path == None
     ), f"Expected custom profile path 'None', but got '{app_settings.custom_profile_path}'"
 
+    # init_min/proteus.ini doesn't declare a [mcp] section at all; the loader
+    # must fall back to the documented defaults (server disabled).
+    assert (
+        app_settings.mcp_server_enabled == False
+    ), f"Expected mcp_server_enabled 'False' (default), but got '{app_settings.mcp_server_enabled}'"
+    assert (
+        app_settings.mcp_server_host == "127.0.0.1"
+    ), f"Expected mcp_server_host '127.0.0.1' (default), but got '{app_settings.mcp_server_host}'"
+    assert (
+        app_settings.mcp_server_port == 8731
+    ), f"Expected mcp_server_port '8731' (default), but got '{app_settings.mcp_server_port}'"
+
+
+def test_load_app_settings_mcp_section(mocker):
+    """
+    Check that an explicit [mcp] section overrides the defaults.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    app_settings_path = PROTEUS_SAMPLE_INIT_FILES_PATH / "init_mcp_enabled"
+
+    mocker.patch("pathlib.Path.cwd", return_value=app_settings_path)
+
+    # --------------------
+    # Act
+    # --------------------
+
+    app_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert (
+        app_settings.mcp_server_enabled == True
+    ), f"Expected mcp_server_enabled 'True', but got '{app_settings.mcp_server_enabled}'"
+    assert (
+        app_settings.mcp_server_host == "0.0.0.0"
+    ), f"Expected mcp_server_host '0.0.0.0', but got '{app_settings.mcp_server_host}'"
+    assert (
+        app_settings.mcp_server_port == 9999
+    ), f"Expected mcp_server_port '9999', but got '{app_settings.mcp_server_port}'"
+
 
 def test_load_settings_custom_profile_none_path(mocker):
     """

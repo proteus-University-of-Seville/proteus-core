@@ -22,7 +22,6 @@
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
 >
-
   <!-- Output -->
   <xsl:output
     method="html"

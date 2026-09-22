@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="Xqg2ir4FVBwx" classes=":Proteus-document" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-any">
+  <properties>
+    <stringProperty name=":Proteus-acronym" category="general">SRS</stringProperty>
+    <stringProperty name=":Proteus-name" category="general">System Requirements Specification</stringProperty>
+    <stringProperty name="version" category="general">1.0</stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-22</dateProperty>
+    <markdownProperty name="description" category="detail">Requirements Specification for the Library Loan System, showcasing the General, Business Analysis and System/Software Requirements archetype categories of the madeja profile.</markdownProperty>
+    <traceProperty name="prepared-for" category="dependencies" acceptedTargets="organization" traceType=":Proteus-dependency"/>
+    <traceProperty name="prepared-by" category="dependencies" acceptedTargets="organization" traceType=":Proteus-author"/>
+    <markdownProperty name="comments" category="comments"></markdownProperty>
+  </properties>
+  <children>
+    <child id="FJBN3vKSLBKQ"/>
+    <child id="jq9YRWEX4oJ4"/>
+    <child id="gRPztB9PTp4x"/>
+    <child id="3tivJmJz6y9W"/>
+    <child id="puqyXhb2RJZ7"/>
+    <child id="NaiNATDFNUH2"/>
+    <child id="48ZfAaYqZPYw"/>
+    <child id="tkky8fMFFm3q"/>
+    <child id="GUgCNycb9sWE"/>
+    </children>
+</object>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<icons>
+    <!-- ===================== Example icons XML file ====================== -->
+    <!-- Documents and archetypes icons can be found by default if they      -->
+    <!-- are located in profile icons directory root and they are named      -->
+    <!-- classname.png where 'classname' is the archetype's main class name  -->
+    <!-- (e.g. section.png, paragraph.png, etc.).                            -->
+    <!-- App, main menu and any other default icons can be overriden using   -->
+    <!-- profile icons configuration.                                        -->
+
+    <!-- <type name="document"/> -->
+    <!-- <type name="archetype"> -->
+        <!-- <icon key="section" file="section.png" /> -->
+        <!-- <icon key="appendix" file="appendix.png" /> -->
+        <!-- <icon key="paragraph" file="paragraph.png" /> -->
+    <!-- </type> -->
+    <!-- <type name="main_menu"/> -->
+    <!-- <type name="app" default="proteus_logo.png"/> -->
+</icons>

@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="7QYhH9ieEmVo" classes="section" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-document section">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Requisitos funcionales del sistema]]></stringProperty>
+    <markdownProperty name="comments" category="general"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children>
+    <child id="5c6oV9TunFjk"/>
+    <child id="3s4nJupKn9eG"/>
+    <child id="3avMeuEfU9zr"/>
+  </children>
+</object>

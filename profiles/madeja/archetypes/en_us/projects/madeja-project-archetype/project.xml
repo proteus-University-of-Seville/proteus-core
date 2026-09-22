@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project id="MADEJA-RE">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[MADEJA RE]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2024-09-17</dateProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Project archetype for the Requirements Engineering course.]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <documents>
+    <document id="ers"/>
+    <document id="das"/>
+  </documents>
+</project>

@@ -2,7 +2,7 @@
 # File: en_us/xslt_labels.yaml
 # Description: XSLT template labels (English)
 # Date: 2026/09/16
-# Version: 1.0
+# Version: 1.1
 # Author: Amador Durán Toro
 # ==========================================================================
 #
@@ -26,40 +26,17 @@
 # -----------------------------------------------------------------------
 
 "archetype.prop_name.:proteus-date": "Date"
-archetype.prop_name.analysis: "Analysis"
 archetype.prop_name.attenders: "Attenders"
-archetype.prop_name.diagram: "Diagram"
-archetype.prop_name.directly-affected-objects: "Directly affects"
-archetype.prop_name.importance: "Importance"
-archetype.prop_name.inherits-from: "Inherits from"
 archetype.prop_name.logo: "Logo"
-archetype.prop_name.ordered: "Ordered"
-archetype.prop_name.participates-in: "Participates in"
 archetype.prop_name.photo: "Photo"
 archetype.prop_name.place: "Place"
-archetype.prop_name.priority: "Priority"
-archetype.prop_name.results: "Results"
-archetype.prop_name.solution: "Solution"
-archetype.prop_name.stability: "Stability"
-archetype.prop_name.status: "Status"
 archetype.prop_name.time: "Time"
-archetype.prop_name.trace-type: "Trace type"
-archetype.prop_name.urgency: "Urgency"
 
 # -----------------------------------------------------------------------
-# Trace type labels (key: xslt.trace_type.<trace type name>)
+# Literal texts used by the templates (key: xslt.<name>)
 # -----------------------------------------------------------------------
 
-"xslt.trace_type.:proteus-affected": "Affected item"
-"xslt.trace_type.:proteus-author": "Author"
-"xslt.trace_type.:proteus-dependency": "Dependency"
-"xslt.trace_type.:proteus-information-source": "Information source"
-"xslt.trace_type.:proteus-works-for": "Works for"
-
-# -----------------------------------------------------------------------
-# Literal texts used by the templates (key: xslt.text.<name>)
-# -----------------------------------------------------------------------
-
+xslt.children: "Children"
 xslt.empty_paragraph: "Empty paragraph"
 xslt.tbd_expanded: "To Be Determined"
 xslt.figure: "Figure"
@@ -67,9 +44,6 @@ xslt.traceability_matrix: "Traceability matrix"
 xslt.traceability_matrix_missing_class: "Cannot display traceability matrix. Make sure at least one class is selected for rows and columns."
 xslt.traceability_matrix_missing_item: "Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns."
 
-xslt.text.project: "Project"
-xslt.text.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
-xslt.text.toc: "Table of contents"
-
-
-
+xslt.project: "Project"
+xslt.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
+xslt.toc: "Table of contents"

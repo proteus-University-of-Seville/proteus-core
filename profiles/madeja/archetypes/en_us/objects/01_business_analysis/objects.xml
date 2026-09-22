@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+    <object id="strength" />
+    <object id="weakness" />
+    <object id="business-actor" />
+    <object id="business-process" />
+    <object id="business-objective" />    
+    <object id="user-story" />
+</objects>

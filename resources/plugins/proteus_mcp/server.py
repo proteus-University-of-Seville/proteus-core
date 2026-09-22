@@ -25,6 +25,7 @@ from fastmcp import FastMCP
 # Proteus imports
 # --------------------------------------------------------------------------
 
+from proteus.application.configuration.config import Config
 from proteus.views.components.abstract_component import ProteusComponent
 
 # --------------------------------------------------------------------------
@@ -37,11 +38,6 @@ from proteus_mcp import tools as tools_module
 
 # Module configuration
 log = logging.getLogger(__name__)
-
-# Server configuration.
-# TODO: read host/port/enabled from proteus.ini ([mcp] section), as the prototype did.
-HOST = "127.0.0.1"
-PORT = 8731
 
 
 # --------------------------------------------------------------------------
@@ -77,6 +73,10 @@ class McpServerComponent(ProteusComponent):
     def __init__(self, parent=None, *args, **kwargs) -> None:
         super().__init__(parent, *args, **kwargs)
 
+        # Host/port come from proteus.ini ([mcp] section); see AppSettings.
+        self._host: str = Config().app_settings.mcp_server_host
+        self._port: int = Config().app_settings.mcp_server_port
+
         # Create the bridge on the GUI thread (this component's thread affinity).
         self._bridge = QtBridge(self)
         self._mcp = build_server(self._bridge, self._controller, self._state_manager)
@@ -104,8 +104,8 @@ class McpServerComponent(ProteusComponent):
         self._thread.start()
         log.info(
             "ProteusMCP server starting at http://%s:%s/mcp/ (daemon thread)",
-            HOST,
-            PORT,
+            self._host,
+            self._port,
         )
 
     # ----------------------------------------------------------------------
@@ -113,7 +113,7 @@ class McpServerComponent(ProteusComponent):
     # ----------------------------------------------------------------------
     def _run(self) -> None:
         try:
-            self._mcp.run(transport="http", host=HOST, port=PORT)
+            self._mcp.run(transport="http", host=self._host, port=self._port)
         except Exception as exc:  # noqa: BLE001
             log.error("ProteusMCP server failed to start: %s", exc)
 

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object
+    id="association"
+    classes="model-element association"
+    acceptedChildren="role attribute"
+>
+  <properties>
+    <codeProperty name=":Proteus-code" category="general" inmutable="true">
+      <prefix><![CDATA[ASSO-]]></prefix>
+      <number>001</number>
+      <suffix><![CDATA[]]></suffix>
+    </codeProperty>
+    <stringProperty name=":Proteus-name" category="general">Asociación</stringProperty>
+    <dateProperty name=":Proteus-date">2024-10-01</dateProperty>
+    <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <booleanProperty name="is-composition" category="detail" tooltip="is-composition">false</booleanProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Esta asociación representa _[relación del dominio del problema representada por la asociación]_]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object business-requirement software-requirement model-element" traceType=":Proteus-dependency"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+
+  <children>
+    <object id="role"/>
+    <object id="role"/>
+  </children>
+
+</object>

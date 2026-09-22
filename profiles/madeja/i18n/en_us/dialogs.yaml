@@ -1,0 +1,13 @@
+# ==========================================================================
+# File: dialogs.yaml
+# Description: Profile dialogs translations
+# Date: 18/03/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+# ---------------------------------------------------------------------------
+# WebChannel document interaction plugin dialog
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "The selected item is not in the current document"
+document.navigation.request.text: "The selected item '{}'' is in the document '{}', do you want to navigate to it?"

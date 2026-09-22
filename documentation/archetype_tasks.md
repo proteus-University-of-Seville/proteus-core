@@ -14,7 +14,7 @@ The tasks are the following:
 
 **NOTE**: _Second-level archetypes_, e.g., objects that only accept specific classes of objects as parents (apart from _:Proteus-document_), such as use case steps, must also be declared in the **objects.xml** file.
 
-**Q**: considering that all XML files in the _objects_ directory are going to be processed, is the **objects.xml** file actually necessary? 
+**Q**: considering that all XML files in the _objects_ directory are going to be processed, is the **objects.xml** file actually necessary?
 
 **A**: The **objects.xml** file is used to specify the order of the archetypes in the category tab of the creation toolbar. Second-level objects are ignored for that purpose.
 
@@ -59,7 +59,7 @@ Create i18n-ed labels for the new archetype in any YAML file in the **&lt;profil
 Class labels, property labels and enumeration choices are also used by the XSLT templates to render the archetype, so they are written only once. Names used exclusively by the templates are:
 
 * xslt.trace_type.&lt;trace type name&gt;
-* xslt.text.&lt;literal text name&gt;
+* xslt.&lt;literal text name&gt;
 
 See **documentation/i18n_design.md** for the details of the XSLT i18n design.
 

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<objects>
+    <object id="entity-class"/>
+    <object id="attribute"/>
+    <object id="enumeration"/>
+    <object id="enum-value"/>
+    <object id="association"/>
+    <object id="role"/>
+    <object id="constraint"/>
+    <object id="system-operation"/>
+    <object id="parameter"/>
+    <object id="mockup"/>
+</objects>

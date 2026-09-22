@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="SQy5JZ9MHvic" classes="section" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-document section">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Current business process models]]></stringProperty>
+    <markdownProperty name="comments" category="general"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children>
+    <child id="Cze9DFPVV4fy"/>
+    <child id="workDcA4ygVb"/>
+  </children>
+</object>

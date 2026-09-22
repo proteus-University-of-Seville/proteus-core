@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="X5ubvVuj2toG" classes=":Proteus-document" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-any">
+  <properties>
+    <stringProperty name=":Proteus-acronym" category="general">SAD</stringProperty>
+    <stringProperty name=":Proteus-name" category="general">System Analysis Document</stringProperty>
+    <stringProperty name="version" category="general">1.0</stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-22</dateProperty>
+    <markdownProperty name="description" category="detail">System Analysis Document for the Library Loan System, showcasing the Conceptual Modeling and Requirements Management archetype categories of the madeja profile.</markdownProperty>
+    <traceProperty name="prepared-for" category="dependencies" acceptedTargets="organization" traceType=":Proteus-dependency"/>
+    <traceProperty name="prepared-by" category="dependencies" acceptedTargets="organization" traceType=":Proteus-author"/>
+    <markdownProperty name="comments" category="comments"></markdownProperty>
+  </properties>
+  <children>
+    <child id="DMMCiHHK6KBs"/>
+    <child id="6SJq8QYDFefC"/>
+    <child id="xMEot2X6n6pR"/>
+    <child id="pGtfCJZjgEVw"/>
+    <child id="gwCgoYNeL64Y"/>
+    <child id="9t7f5Z3T3Fig"/>
+    <child id="dBcvPyM95xhy"/>
+    <child id="98pwXBHfuwUt"/>
+    </children>
+</object>

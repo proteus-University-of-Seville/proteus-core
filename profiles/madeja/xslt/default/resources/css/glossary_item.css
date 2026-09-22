@@ -1,0 +1,25 @@
+/* ======================================================= */
+/* File    : glossary_item.css                             */
+/* Content : Default CSS for Proteus (glossary items)      */
+/* Author  : Amador Durán Toro                             */
+/* Date    : 2026/09/14                                    */
+/* Version : 2.0                                           */
+/* ======================================================= */
+
+.glossary_item p {
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+.glossary_item_name {
+  font-weight: bold;
+}
+
+/*
+.glossary_item_description {}
+.glossary_item_synonyms {}
+*/
+
+.glossary_item_figure {
+  padding-left: 2em;
+}

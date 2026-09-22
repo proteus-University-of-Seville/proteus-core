@@ -3,24 +3,15 @@
 <!-- ======================================================== -->
 <!-- File    : cover.xsl                                      -->
 <!-- Content : PROTEUS default XSLT for document cover at US  -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2023/06/09                                     -->
-<!-- Version : 1.0                                            -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/05/05 (Amador Durán)                      -->
-<!-- Refactored.                                              -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
+<!-- Author  : Amador Durán Toro                              -->
+<!-- Date    : 2026/09/22                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:proteus="http://proteus.us.es"
   xmlns:proteus-utils="http://proteus.us.es/utils"
-  exclude-result-prefixes="proteus proteus-utils"
 >
   <xsl:template name="document_cover">
 
@@ -29,7 +20,7 @@
       <div id="document_cover">
 
         <div id="project_name">
-          <xsl:value-of select="proteus-utils:i18n('xslt.text.project')"/>
+          <xsl:value-of select="proteus-utils:i18n('xslt.project')"/>
           <xsl:text> </xsl:text>
           <xsl:value-of select="parent::*/parent::*/properties/stringProperty[@name=':Proteus-name']"/>
         </div>

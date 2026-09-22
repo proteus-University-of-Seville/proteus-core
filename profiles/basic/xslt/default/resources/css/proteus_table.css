@@ -2,8 +2,8 @@
 /* File    : proteus_table.css                             */
 /* Content : Default CSS for Proteus (tables)              */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/20                                    */
-/* Version : 3.0                                           */
+/* Date    : 2026/09/22                                    */
+/* Version : 3.1                                           */
 /* ======================================================= */
 /* Update  : 2026/09/20 (Amador Durán & Claude Code)       */
 /* Redesigned: every object is a framed card with a left   */
@@ -114,15 +114,15 @@ div.with_image table.proteus_table > thead > tr > th.value_column {
 /* same hue as the background                              */
 /* ------------------------------------------------------- */
 
-table.proteus_table > thead > tr {
-  background: color-mix(in srgb, var(--accent) 12%, white);
-}
-
+/* the tint is applied per cell, not on the row: a <tr> background is not  */
+/* painted reliably once the table is nested inside another table's cell  */
+/* (e.g. a child object rendered by renderChildren)                       */
 table.proteus_table > thead > tr > th {
   padding: calc(var(--pad-y) + 1px) var(--pad-x);
   text-align: left;
   vertical-align: middle;
   color: color-mix(in srgb, var(--accent) 82%, black);
+  background: color-mix(in srgb, var(--accent) 12%, white);
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, white);
 }
 
@@ -166,8 +166,11 @@ span.class_pill > img {
 /* Property rows                                           */
 /* ------------------------------------------------------- */
 
-table.proteus_table tbody th,
-table.proteus_table tbody td,
+/* every combinator below is a direct-child one (">"): a plain descendant   */
+/* combinator (space) would also match a nested table's own cells, since   */
+/* they sit inside *an* ancestor tbody too, just not their own table's one */
+table.proteus_table > tbody > tr > th,
+table.proteus_table > tbody > tr > td,
 table.proteus_table > tr > th,
 table.proteus_table > tr > td {
   padding: var(--pad-y) var(--pad-x);
@@ -176,13 +179,13 @@ table.proteus_table > tr > td {
   border-bottom: 1px solid var(--line-soft);
 }
 
-table.proteus_table tbody tr:last-child > *,
+table.proteus_table > tbody > tr:last-child > *,
 table.proteus_table > tr:last-child > * {
   border-bottom: none;
 }
 
 /* label column */
-table.proteus_table tbody th:first-child,
+table.proteus_table > tbody > tr > th:first-child,
 table.proteus_table > tr > th:first-child {
   font-weight: 600;
   color: var(--ink-soft);
@@ -190,9 +193,19 @@ table.proteus_table > tr > th:first-child {
   border-right: 1px solid var(--line);
 }
 
-table.proteus_table tbody tr:hover > td,
+table.proteus_table > tbody > tr:hover > td,
 table.proteus_table > tr:hover > td {
   background: var(--row-hover);
+}
+
+/* ------------------------------------------------------- */
+/* Children row: nested object cards                       */
+/* ------------------------------------------------------- */
+
+/* the last nested card does not need the spacing meant to separate it */
+/* from its next sibling, since the cell padding already does that job */
+td.children_column > div.proteus_object:last-child > table.proteus_table {
+  margin-bottom: 0;
 }
 
 /* ------------------------------------------------------- */

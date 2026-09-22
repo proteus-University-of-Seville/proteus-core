@@ -1,0 +1,141 @@
+# ==========================================================================
+# File: en_us/xslt_pending_labels.yaml
+# Description: XSLT labels of archetypes not migrated yet (English)
+# Date: 2026/09/16
+# Version: 1.0
+# Author: Amador Durán Toro
+# ==========================================================================
+#
+# These strings are looked up from the XSLT templates using the
+# proteus-utils:i18n() extension function, e.g.
+#
+#   <xsl:value-of select="proteus-utils:i18n(concat('xslt.property.', @name))"/>
+#
+# Adding labels for a new archetype does not require modifying any XSLT file
+# or any other translation file: just add a new .yaml file to this directory.
+
+
+# NOTE: these strings belong to archetypes that have not been migrated to the
+# basic profile yet (requirements, use cases, traceability matrices, etc.).
+# They are kept here so that no translation work is lost. When one of those
+# archetypes is added, its strings should be moved to its own .yaml file.
+
+# -----------------------------------------------------------------------
+# Enumeration choices not used by any current archetype
+# -----------------------------------------------------------------------
+
+archetype.enum_choices.awaiting-qa: "Awaiting quality verification"
+archetype.enum_choices.awaiting-validation: "Awaiting validation"
+archetype.enum_choices.critical: "Critical"
+archetype.enum_choices.draft: "Draft"
+archetype.enum_choices.high: "High"
+archetype.enum_choices.low: "Low"
+archetype.enum_choices.medium: "Medium"
+archetype.enum_choices.optional: "Optional"
+archetype.enum_choices.validated: "Validated"
+
+# -----------------------------------------------------------------------
+# Literal texts (key: xslt.<name>)
+# -----------------------------------------------------------------------
+
+xslt.abstract: "abstract"
+xslt.action: "Action"
+xslt.alternatives: "Alternatives"
+xslt.as_a: "As a"
+xslt.attribute: "Attribute"
+xslt.average: "Average"
+xslt.child_requirements: "Child requirements"
+xslt.code_attributes: "// attributes"
+xslt.code_components: "// components"
+xslt.code_exception: "exception"
+xslt.code_exceptions: "// exceptions"
+xslt.code_invariants: "// invariants"
+xslt.code_postconditions: "// postconditions"
+xslt.code_preconditions: "// preconditions"
+xslt.code_roles: "// roles"
+xslt.components: "Components"
+xslt.condition: "Condition"
+xslt.constant_attribute: "Constant attribute"
+xslt.constant_role: "Constant rol"
+xslt.defect_type_ambiguity: "Ambiguity"
+xslt.defect_type_design_dependence: "Design dependence"
+xslt.defect_type_imprecision: "Imprecision"
+xslt.defect_type_no_achievability: "No achievability"
+xslt.defect_type_no_completeness: "No completeness"
+xslt.defect_type_no_consistency: "No consistency"
+xslt.defect_type_no_necessity: "No necessity"
+xslt.defect_type_no_priority: "No priority"
+xslt.defect_type_no_stability: "No stability"
+xslt.defect_type_no_traceability: "No traceability"
+xslt.defect_type_no_understanding: "No understanding"
+xslt.defect_type_no_verificability: "No verificability"
+xslt.defect_type_other: "Other"
+xslt.defect_type_redundancy: "Redundancy"
+xslt.defect_type_verbosity: "Verbosity"
+xslt.defect_type_wrong_lod: "Wrong level of detail"
+xslt.defect_type_wrong_org: "Wrong organization"
+xslt.definition: "Definition"
+xslt.dependencies: "Dependencies"
+xslt.derived_attribute: "Derived attribute"
+xslt.derived_role: "Derived role"
+xslt.disjoint_subtypes: "Subtypes (disjoint)"
+xslt.exception: "Exception"
+xslt.exceptions: "Exceptions"
+xslt.expected_frequency: "Expected frequency"
+xslt.expression: "Expression"
+xslt.fax: "Fax"
+xslt.freelance: "Freelance"
+xslt.i_want_to: "I want to"
+xslt.if: "If"
+xslt.indirectly_affected_objects: "Indirectly affects"
+xslt.initialvalue: "Initial value"
+xslt.invariant: "Invariant expression"
+xslt.iscustomer: "Is customer"
+xslt.isdeveloper: "Is developer"
+xslt.isuser: "Is user"
+xslt.lifetime: "Lifetime"
+xslt.maximum: "Maximum"
+xslt.maximum_time: "Maximum time"
+xslt.meeting: "Meeting"
+xslt.multiplicity: "Multiplicity"
+xslt.no: "No"
+xslt.none: "None"
+xslt.ocl_condition: "Condition (OCL)"
+xslt.ocl_expression: "OCL expression"
+xslt.ocl_postconditions: "Postcondition expressions (OCL)"
+xslt.ocl_preconditions: "Precondition expressions (OCL)"
+xslt.ordinary_sequence: "Ordinary sequence"
+xslt.overlapping_subtypes: "Subtypes (overlapping)"
+xslt.parameters: "Parameters"
+xslt.part: "Part"
+xslt.performance: "Performance"
+xslt.possible_solution: "Possible solution"
+xslt.postconditions: "Postcondition expressions"
+xslt.preconditions: "Precondition expressions"
+xslt.related_objectives: "Traced-to objectives"
+xslt.related_requirements: "Traced-to requirements"
+xslt.result_type: "Result type"
+xslt.simultaneous_occurrences: "Simultaneous occurrences"
+xslt.so_that: "So that"
+xslt.specific_data: "Specific data"
+xslt.step: "Step"
+xslt.strength: "Strength"
+xslt.subobjectives: "Subobjectives"
+xslt.subtypes: "Subtypes"
+xslt.superclass: "superclass"
+xslt.system: "system"
+xslt.tbd: "TBD"
+xslt.the: "the"
+xslt.the_capitalized: "The"
+xslt.the_actor: "actor"
+xslt.the_actor_capitalized: "Actor"
+xslt.the_system_shall: "The system shall"
+xslt.then_this_use_case: "then this use case"
+xslt.this_actor_represents: "This actor represents"
+xslt.times_per: "times per"
+xslt.type: "Type"
+xslt.variable_attribute: "Variable attribute"
+xslt.variable_role: "Variable role"
+xslt.warnings: "Warnings"
+xslt.weakness: "Weakness"
+xslt.yes: "Yes"

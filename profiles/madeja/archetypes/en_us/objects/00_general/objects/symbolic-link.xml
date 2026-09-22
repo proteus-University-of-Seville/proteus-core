@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object 
+  id="symbolic-link" 
+  classes="symbolic-link" 
+  acceptedChildren=":Proteus-none" 
+>
+  <properties>
+    <stringProperty name=":Proteus-name"><![CDATA[Symbolic link]]></stringProperty>
+    <traceProperty name="link" category="general" acceptedTargets=":Proteus-any" excludedTargets="section appendix symbolic-link" traceType=":Proteus-link"/>    
+  </properties>
+
+  <children />
+</object>

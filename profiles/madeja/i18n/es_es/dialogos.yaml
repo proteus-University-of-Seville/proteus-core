@@ -1,0 +1,14 @@
+# ==========================================================================
+# File: dialogos.yaml
+# Description: Traducciones de los diálogos de los plugins
+# Date: 18/03/2024
+# Version: 0.1
+# Author: José María Delgado Sánchez
+# ==========================================================================
+
+
+# ---------------------------------------------------------------------------
+# Diálogo del plugin de interacción con documentos | WebChannel
+# ---------------------------------------------------------------------------
+document.navigation.request.title: "El objeto seleccionado está en otro documento"
+document.navigation.request.text: "El objeto '{}' está en el documento '{}'. ¿Desea navegar al documento para ver el objeto?"

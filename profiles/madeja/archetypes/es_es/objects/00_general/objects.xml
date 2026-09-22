@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+    <object id="section" />
+    <object id="appendix" />
+    <object id="information" />    
+    <object id="paragraph" />
+    <object id="glossary-item" />
+    <object id="local-figure" />
+    <object id="remote-figure" />
+    <object id="organization" />
+    <object id="stakeholder" />
+    <object id="meeting" />
+    <object id="symbolic-link" />
+</objects>

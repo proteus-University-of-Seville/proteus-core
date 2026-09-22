@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object
+  id="information"
+  classes="information"
+  acceptedChildren=":Proteus-none"
+  acceptedParents=":Proteus-document section"
+>
+  <properties>
+    <stringProperty name=":Proteus-name"><![CDATA[Information]]></stringProperty>
+    <dateProperty name=":Proteus-date">2024-09-01</dateProperty>
+    <stringProperty name="version"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <markdownProperty name="text" category="detail"><![CDATA[]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+
+</object>

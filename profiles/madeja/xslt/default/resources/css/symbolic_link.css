@@ -1,0 +1,21 @@
+/* ======================================================= */
+/* File    : symbolic_link.css                             */
+/* Content : Default CSS for Proteus (symbolic links)      */
+/* Author  : Amador Durán Toro                             */
+/* Date    : 2026/09/14                                    */
+/* Version : 2.0                                           */
+/* ======================================================= */
+
+/*
+.linked-object {}
+*/
+
+.symbolic-link {
+  outline: 2px dashed black;
+  padding-top: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-bottom: 0.25em;
+
+  background-color: rgb(250, 250, 250);
+}
