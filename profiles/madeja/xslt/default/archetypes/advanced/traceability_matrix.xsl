@@ -200,7 +200,7 @@
 
     <xsl:for-each select="$col-items">
       <td>
-        <xsl:variable name="has-dependency" select="proteus-utils:traceabilityMatrixHelper.check_dependency($row-item-id, @id)"/>
+        <xsl:variable name="has-dependency" select="proteus-utils:traceabilityMatrixHelper.check_trace($row-item-id, @id, ':Proteus-dependency')"/>
         <xsl:choose>
           <xsl:when test="$has-dependency = 'True'">
             <xsl:attribute name="class">trace</xsl:attribute>

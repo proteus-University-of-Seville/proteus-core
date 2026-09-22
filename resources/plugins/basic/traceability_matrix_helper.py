@@ -31,7 +31,6 @@ from proteus.model import (
     ProteusID,
     PROTEUS_CODE,
     PROTEUS_NAME,
-    PROTEUS_DEPENDENCY,
 )
 from proteus.model.object import Object
 from proteus.model.properties.code_property import ProteusCode
@@ -58,7 +57,8 @@ class TraceabilityMatrixHelper(ProteusComponent):
 
     The class provides two methods to be used in the traceability
     matrix XSLT file. The first one gets the objects from a list of classes
-    and the second one checks if a dependency exists between two objects.
+    and the second one checks if a trace of one of the given types exists
+    between two objects.
     """
 
     # --------------------------------------------------------------------------
@@ -129,29 +129,38 @@ class TraceabilityMatrixHelper(ProteusComponent):
         return node_set
 
     # --------------------------------------------------------------------------
-    # Method: check_dependency
-    # Description: This method (XSLT function) checks if a dependency exists between
-    #              two objects.
+    # Method: check_trace
+    # Description: This method (XSLT function) checks if a trace of one of the
+    #              given types exists between two objects.
     # Date: 08/02/2024
-    # Version: 0.1
+    # Version: 0.2
     # Author: José María Delgado Sánchez
+    #         Amador Durán Toro (generalized from a single hardcoded
+    #         dependency trace type to a caller-provided list of types)
     # --------------------------------------------------------------------------
-    def check_dependency(
-        self, context, source_id: ProteusID, target_id: ProteusID
+    def check_trace(
+        self, context, source_id: ProteusID, target_id: ProteusID, trace_types: List[str]
     ) -> str:
         """
-        This method (XSLT function) checks if a dependency exists between
-        two objects.
+        This method (XSLT function) checks if a trace of one of the given
+        types exists from the source object to the target object.
 
         :param context: The XSLT context (no need to be present in the function signature)
         :param source_id: The id of the source object
         :param target_id: The id of the target object
+        :param trace_types: The trace types to consider, space-separated if
+            passed as a single string (as XSLT does for a text node)
 
-        :return: True if a dependency exists, False otherwise. The result is
+        :return: True if such a trace exists, False otherwise. The result is
                  returned as string to be used in the XSLT file.
         """
         source_id = source_id[0]
         target_id = target_id[0]
+
+        # XSLT passes a single-string list for a text node; split it into
+        # individual trace type names
+        if len(trace_types) == 1:
+            trace_types = trace_types[0].split()
 
         # Get the source and target objects
         try:
@@ -168,9 +177,9 @@ class TraceabilityMatrixHelper(ProteusComponent):
         # Get source traces
         source_traces = source_obj.get_traces()
         for trace in source_traces:
-            # Check if the trace is a dependency type
-            if trace.traceType == PROTEUS_DEPENDENCY:
-                # Check if the target object is the target of the dependency
+            # Check if the trace is one of the requested types
+            if trace.traceType in trace_types:
+                # Check if the target object is the target of the trace
                 if target_id in trace.value:
                     return str(True)
 

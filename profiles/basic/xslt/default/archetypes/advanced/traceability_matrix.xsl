@@ -4,8 +4,8 @@
 <!-- File    : traceability_matrix.xsl                                  -->
 <!-- Content : PROTEUS default XSLT for traceability matrix             -->
 <!-- Author  : Amador Durán Toro                                        -->
-<!-- Date    : 2026/09/21                                               -->
-<!-- Version : 2.0                                                      -->
+<!-- Date    : 2026/09/22                                               -->
+<!-- Version : 2.1                                                      -->
 <!-- ================================================================== -->
 
 <xsl:stylesheet version="1.0"
@@ -49,11 +49,24 @@
         <xsl:apply-templates select="properties/classListProperty[@name='row-classes']/class"/>
       </xsl:variable>
 
+      <!-- Trace types to consider, :Proteus-dependency if none were selected -->
+      <xsl:variable name="trace-types">
+        <xsl:choose>
+          <xsl:when test="properties/traceTypeListProperty[@name='trace-types']/type">
+            <xsl:apply-templates select="properties/traceTypeListProperty[@name='trace-types']/type" mode="matrix-trace-type"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>:Proteus-dependency </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
       <xsl:choose>
         <xsl:when test="string-length($col-classes) &gt; 1 and string-length($row-classes) &gt; 1">
           <xsl:call-template name="matrix-from-classes">
             <xsl:with-param name="col-classes" select="$col-classes"/>
             <xsl:with-param name="row-classes" select="$row-classes"/>
+            <xsl:with-param name="trace-types" select="$trace-types"/>
           </xsl:call-template>
         </xsl:when>
         <xsl:otherwise>
@@ -94,6 +107,14 @@
     <xsl:text> </xsl:text>
   </xsl:template>
 
+  <!-- Same idea for trace type names. A dedicated mode is used because    -->
+  <!-- <type> is not exclusive to this property: matching it unmoded would -->
+  <!-- apply this template to any other <type> element in the document.    -->
+  <xsl:template match="type" mode="matrix-trace-type">
+    <xsl:value-of select="normalize-space(.)"/>
+    <xsl:text> </xsl:text>
+  </xsl:template>
+
   <!-- ================================================================== -->
   <!-- matrix-from-classes auxiliary template                             -->
   <!-- ================================================================== -->
@@ -103,6 +124,7 @@
   <xsl:template name="matrix-from-classes">
     <xsl:param name="col-classes" select="' '"/>
     <xsl:param name="row-classes" select="' '"/>
+    <xsl:param name="trace-types" select="':Proteus-dependency '"/>
 
     <!-- Get column and row items using Python -->
     <xsl:variable name="col-items" select="proteus-utils:traceabilityMatrixHelper.get_objects_from_classes($col-classes)"/>
@@ -119,6 +141,7 @@
         <xsl:call-template name="generate-traceability-matrix-table">
           <xsl:with-param name="col-items" select="$col-items"/>
           <xsl:with-param name="row-items" select="$row-items"/>
+          <xsl:with-param name="trace-types" select="$trace-types"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
@@ -131,6 +154,7 @@
   <xsl:template name="generate-traceability-matrix-table">
     <xsl:param name="col-items"/>
     <xsl:param name="row-items"/>
+    <xsl:param name="trace-types"/>
 
     <table class="proteus_table traceability_matrix">
       <thead>
@@ -144,6 +168,7 @@
           <tr>
             <xsl:call-template name="generate-traceability-matrix-row">
               <xsl:with-param name="col-items" select="$col-items"/>
+              <xsl:with-param name="trace-types" select="$trace-types"/>
             </xsl:call-template>
           </tr>
         </xsl:for-each>
@@ -188,6 +213,7 @@
 
   <xsl:template name="generate-traceability-matrix-row">
     <xsl:param name="col-items"/>
+    <xsl:param name="trace-types"/>
 
     <xsl:variable name="label" select="label"/>
     <xsl:variable name="row-item-id" select="@id"/>
@@ -200,7 +226,7 @@
 
     <xsl:for-each select="$col-items">
       <td>
-        <xsl:variable name="has-dependency" select="proteus-utils:traceabilityMatrixHelper.check_dependency($row-item-id, @id)"/>
+        <xsl:variable name="has-dependency" select="proteus-utils:traceabilityMatrixHelper.check_trace($row-item-id, @id, $trace-types)"/>
         <xsl:choose>
           <xsl:when test="$has-dependency = 'True'">
             <xsl:attribute name="class">trace</xsl:attribute>

@@ -50,5 +50,5 @@ def register(register_xslt_function, register_qwebchannel_class, register_proteu
     register_proteus_component("glossaryHandler", GlossaryHandler)
 
     # Traceability Matrix
-    register_proteus_component("traceabilityMatrixHelper", TraceabilityMatrixHelper, ["get_objects_from_classes", "check_dependency"])
+    register_proteus_component("traceabilityMatrixHelper", TraceabilityMatrixHelper, ["get_objects_from_classes", "check_trace"])
 
