@@ -15,36 +15,10 @@
 # or any other translation file: just add a new .yaml file to this directory.
 
 
-# NOTE: the templates share their labels with the application GUI: class
-# labels (archetype.class.*), property labels (archetype.prop_name.*) and
-# enumeration choices (archetype.enum_choices.*) are looked up with the same
-# keys used by the GUI, most of them already defined in basic_archetypes.yaml.
-# Only the property labels missing there are defined below.
-
-# -----------------------------------------------------------------------
-# Property labels (key: archetype.prop_name.<property name>)
-# -----------------------------------------------------------------------
-
-"archetype.prop_name.:proteus-date": "Fecha"
-archetype.prop_name.analysis: "Análisis"
-archetype.prop_name.attenders: "Asistentes"
-archetype.prop_name.diagram: "Diagrama"
-archetype.prop_name.directly-affected-objects: "Afecta directamente"
-archetype.prop_name.importance: "Importancia"
-archetype.prop_name.inherits-from: "Hereda de"
-archetype.prop_name.logo: "Logotipo"
-archetype.prop_name.ordered: "Ordenado"
-archetype.prop_name.participates-in: "Participa en"
-archetype.prop_name.photo: "Fotografía"
-archetype.prop_name.place: "Lugar"
-archetype.prop_name.priority: "Prioridad"
-archetype.prop_name.results: "Resultados"
-archetype.prop_name.solution: "Solución"
-archetype.prop_name.stability: "Estabilidad"
-archetype.prop_name.status: "Estado"
-archetype.prop_name.time: "Hora"
-archetype.prop_name.trace-type: "Tipo de traza"
-archetype.prop_name.urgency: "Urgencia"
+# NOTE: archetype labels (archetype.class.*, archetype.prop_name.*,
+# archetype.enum_choices.*, ...) are shared with the application GUI and
+# live in arquetipos.yaml, not here: this file is only for keys (xslt.*)
+# used exclusively by the XSLT templates.
 
 # -----------------------------------------------------------------------
 # Trace type labels (key: xslt.trace_type.<trace type name>)
@@ -60,6 +34,7 @@ archetype.prop_name.urgency: "Urgencia"
 # Literal texts used by the templates (key: xslt.<name>)
 # -----------------------------------------------------------------------
 
+xslt.children: "Hijos"
 xslt.empty_paragraph: "Párrafo vacío"
 xslt.tbd_expanded: "Por determinar"
 xslt.figure: "Figura"

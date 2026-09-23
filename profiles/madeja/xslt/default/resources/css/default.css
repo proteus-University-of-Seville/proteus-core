@@ -2,22 +2,62 @@
 /* File    : default.css                                   */
 /* Content : Default CSS for Proteus                       */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/21                                    */
-/* Version : 2.0                                           */
+/* Date    : 2026/09/23                                    */
+/* Version : 2.1                                           */
 /* ======================================================= */
 
 @import url('printing.css');
 @import url('cover.css');
 @import url('toc.css');
+@import url('proteus_table.css');
+
+/* 00_general */
 @import url('comment.css');
 @import url('glossary_item.css');
 @import url('bibliography_item.css');
 @import url('figure.css');
-@import url('proteus_table.css');
+@import url('symbolic_link.css');
 @import url('stakeholder.css');
 @import url('organization.css');
 @import url('meeting.css');
-@import url('symbolic_link.css');
+
+/* 01_business_analysis */
+@import url('business_actor.css');
+@import url('business_objective.css');
+@import url('business_process.css');
+@import url('strength.css');
+@import url('weakness.css');
+@import url('user_story.css');
+
+/* 02_requirements */
+@import url('business_rule.css');
+@import url('functional_requirement.css');
+@import url('general_requirement.css');
+@import url('information_requirement.css');
+@import url('nonfunctional_requirement.css');
+@import url('specific_data.css');
+@import url('subsystem.css');
+@import url('system_actor.css');
+@import url('use_case.css');
+@import url('use_case_diagram.css');
+@import url('use_case_step.css');
+
+/* 03_conceptual_modeling */
+@import url('association.css');
+@import url('attribute.css');
+@import url('constraint.css');
+@import url('entity_class.css');
+@import url('enum_value.css');
+@import url('enumeration.css');
+@import url('mockup.css');
+@import url('parameter.css');
+@import url('role.css');
+@import url('system_operation.css');
+
+/* 04_req_management */
+@import url('change_request.css');
+@import url('conflict.css');
+@import url('defect.css');
 @import url('traceability_matrix.css');
 
 /* general styles */
@@ -33,171 +73,7 @@ body>div {
   margin-bottom: 1.5em;
 }
 
-/*
-  p {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-  }
-  */
-
 span.tbd {
   color: red;
   font-weight: bold;
-}
-
-code {
-  font-size: small;
-}
-
-
-
-/* parts */
-
-div.part {
-  font-size: xx-large;
-  font-weight: bold;
-  text-align: center;
-  line-height: 150%;
-  margin-top: 200pt;
-  margin-bottom: 200pt;
-}
-
-/* MADEJA objects */
-
-/* Each family declares only its accent colour: the header tint, the left  */
-/* edge, the class pill and the links are derived from it in               */
-/* proteus_table.css.                                                      */
-
-/* business analysis objects */
-
-.proteus_table.business_actor,
-.proteus_table.business_objective,
-.proteus_table.business_process,
-.proteus_table.strength,
-.proteus_table.weakness,
-.proteus_table.user_story {
-  --accent: #15803d;
-}
-
-/* requirements objects */
-
-.proteus_table.subsystem,
-.proteus_table.general_requirement,
-.proteus_table.system_actor,
-.proteus_table.information_requirement,
-.proteus_table.business_rule,
-.proteus_table.use_case,
-.proteus_table.functional_requirement,
-.proteus_table.nonfunctional_requirement {
-  --accent: #1d4ed8;
-}
-
-/* use case tables */
-
-table.use_case th.step_action_column,
-table.use_case th.exception_action_column {
-  width: 100%;
-}
-
-table.use_case th.step_number_column {
-  text-align: center;
-}
-
-table.use_case th.step_number {
-  text-align: center;
-  font-weight: normal;
-}
-
-/*  modeling objects */
-
-.proteus_table.entity_class,
-.proteus_table.association,
-.proteus_table.enumeration,
-.proteus_table.constraint,
-.proteus_table.mockup,
-.proteus_table.value_type,
-.proteus_table.system_operation {
-  --accent: #475569;
-}
-
-div.code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 11pt;
-}
-
-div.code_description,
-div.code_ocl {
-  /*text-indent: 2em;*/
-  padding-left: 1.25em;
-}
-
-span.keyword {
-  color: purple;
-  font-weight: bold;
-}
-
-span.abstract {
-  font-style: italic;
-}
-
-span.class_name {
-  font-weight: bold;
-}
-
-div.code_comment,
-span.code_comment {
-  color: darkgreen;
-  font-style: italic;
-}
-
-div.code_header {
-  /*text-indent: 2em;*/
-  padding-left: 1.5em;
-  font-weight: bold;
-}
-
-ul.properties {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 1.5em;
-  padding-left: 0px;
-}
-
-li.property {
-  list-style: none;
-  padding-left: 0px;
-  margin-left: 0px;
-}
-
-/*  management objects */
-
-.proteus_table.conflict,
-.proteus_table.defect,
-.proteus_table.change_request {
-  --accent: #be123c;
-}
-
-/* information icon in defect table header */
-table.defect>thead>tr th img.info_icon {
-  vertical-align: text-bottom;
-  width: 18px;
-}
-
-span.alternative_name {
-  font-weight: bold;
-}
-
-table.remus_table td ol.alternatives {
-  margin-top: 0em;
-  margin-bottom: 0em;
-  margin-left: 1.5em;
-  padding-left: 0em;
-}
-
-table.remus_table td ol.alternatives li.alternative {
-  margin-bottom: 1em;
-}
-
-.alternative_description {
-  font-style: italic;
 }

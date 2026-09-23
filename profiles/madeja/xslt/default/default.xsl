@@ -37,19 +37,62 @@
   <xsl:include href="core/cover.xsl" />
   <xsl:include href="core/document.xsl" />
 
-  <!-- General archetype modules -->
+  <!-- Archetype modules, one per archetype, grouped by the same category -->
+  <!-- folders used in archetypes/<lang>/objects/. Files with no template -->
+  <!-- uncommented are extension points: the object falls back to        -->
+  <!-- any_archetype.xsl until someone gives it a custom rendering.       -->
+
+  <!-- 00_general -->
   <xsl:include href="archetypes/general/section.xsl" />
   <xsl:include href="archetypes/general/appendix.xsl" />
   <xsl:include href="archetypes/general/paragraph.xsl" />
+  <xsl:include href="archetypes/general/comment.xsl" />
   <xsl:include href="archetypes/general/glossary_item.xsl" />
+  <xsl:include href="archetypes/general/bibliography_item.xsl" />
   <xsl:include href="archetypes/general/figure.xsl" />
   <xsl:include href="archetypes/general/symbolic_link.xsl" />
+  <xsl:include href="archetypes/general/organization.xsl" />
+  <xsl:include href="archetypes/general/stakeholder.xsl" />
+  <xsl:include href="archetypes/general/meeting.xsl" />
 
-  <!-- Advanced archetype modules -->
-  <xsl:include href="archetypes/advanced/organization.xsl" />
-  <xsl:include href="archetypes/advanced/stakeholder.xsl" />
-  <xsl:include href="archetypes/advanced/meeting.xsl" />
-  <xsl:include href="archetypes/advanced/traceability_matrix.xsl" />
+  <!-- 01_business_analysis -->
+  <xsl:include href="archetypes/business_analysis/business_actor.xsl" />
+  <xsl:include href="archetypes/business_analysis/business_objective.xsl" />
+  <xsl:include href="archetypes/business_analysis/business_process.xsl" />
+  <xsl:include href="archetypes/business_analysis/strength.xsl" />
+  <xsl:include href="archetypes/business_analysis/weakness.xsl" />
+  <xsl:include href="archetypes/business_analysis/user_story.xsl" />
+
+  <!-- 02_requirements -->
+  <xsl:include href="archetypes/requirements/business_rule.xsl" />
+  <xsl:include href="archetypes/requirements/functional_requirement.xsl" />
+  <xsl:include href="archetypes/requirements/general_requirement.xsl" />
+  <xsl:include href="archetypes/requirements/information_requirement.xsl" />
+  <xsl:include href="archetypes/requirements/nonfunctional_requirement.xsl" />
+  <xsl:include href="archetypes/requirements/specific_data.xsl" />
+  <xsl:include href="archetypes/requirements/subsystem.xsl" />
+  <xsl:include href="archetypes/requirements/system_actor.xsl" />
+  <xsl:include href="archetypes/requirements/use_case.xsl" />
+  <xsl:include href="archetypes/requirements/use_case_diagram.xsl" />
+  <xsl:include href="archetypes/requirements/use_case_step.xsl" />
+
+  <!-- 03_conceptual_modeling -->
+  <xsl:include href="archetypes/conceptual_modeling/association.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/attribute.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/constraint.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/entity_class.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/enum_value.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/enumeration.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/mockup.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/parameter.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/role.xsl" />
+  <xsl:include href="archetypes/conceptual_modeling/system_operation.xsl" />
+
+  <!-- 04_req_management -->
+  <xsl:include href="archetypes/req_management/change_request.xsl" />
+  <xsl:include href="archetypes/req_management/conflict.xsl" />
+  <xsl:include href="archetypes/req_management/defect.xsl" />
+  <xsl:include href="archetypes/req_management/traceability_matrix.xsl" />
 
   <!-- Default archetype module -->
   <xsl:include href="archetypes/any_archetype.xsl" />

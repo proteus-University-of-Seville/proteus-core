@@ -1,0 +1,11 @@
+/* ======================================================= */
+/* File    : use_case.css                                 */
+/* Content : Default CSS for Proteus (use-case)           */
+/* Author  : Amador Durán Toro                            */
+/* Date    : 2026/09/23                                   */
+/* Version : 1.0                                          */
+/* ======================================================= */
+
+.proteus_table.use-case {
+  --accent: #00ACC1;
+}

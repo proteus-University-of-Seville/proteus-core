@@ -1,0 +1,11 @@
+/* ======================================================= */
+/* File    : change_request.css                           */
+/* Content : Default CSS for Proteus (change-request)     */
+/* Author  : Amador Durán Toro                            */
+/* Date    : 2026/09/23                                   */
+/* Version : 1.0                                          */
+/* ======================================================= */
+
+.proteus_table.change-request {
+  --accent: #FB8C00;
+}

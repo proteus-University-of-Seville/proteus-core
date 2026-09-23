@@ -15,22 +15,10 @@
 # or any other translation file: just add a new .yaml file to this directory.
 
 
-# NOTE: the templates share their labels with the application GUI: class
-# labels (archetype.class.*), property labels (archetype.prop_name.*) and
-# enumeration choices (archetype.enum_choices.*) are looked up with the same
-# keys used by the GUI, most of them already defined in basic_archetypes.yaml.
-# Only the property labels missing there are defined below.
-
-# -----------------------------------------------------------------------
-# Property labels (key: archetype.prop_name.<property name>)
-# -----------------------------------------------------------------------
-
-"archetype.prop_name.:proteus-date": "Date"
-archetype.prop_name.attenders: "Attenders"
-archetype.prop_name.logo: "Logo"
-archetype.prop_name.photo: "Photo"
-archetype.prop_name.place: "Place"
-archetype.prop_name.time: "Time"
+# NOTE: archetype labels (archetype.class.*, archetype.prop_name.*,
+# archetype.enum_choices.*, ...) are shared with the application GUI and
+# live in basic_archetypes.yaml, not here: this file is only for keys
+# (xslt.*) used exclusively by the XSLT templates.
 
 # -----------------------------------------------------------------------
 # Literal texts used by the templates (key: xslt.<name>)

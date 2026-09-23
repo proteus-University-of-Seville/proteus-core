@@ -2,8 +2,8 @@
 /* File    : proteus_table.css                             */
 /* Content : Default CSS for Proteus (tables)              */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/22                                    */
-/* Version : 3.1                                           */
+/* Date    : 2026/09/23                                    */
+/* Version : 3.3                                           */
 /* ======================================================= */
 /* Update  : 2026/09/20 (Amador Durán & Claude Code)       */
 /* Redesigned: every object is a framed card with a left   */
@@ -160,6 +160,25 @@ span.class_pill {
 span.class_pill > img {
   width: 15px;
   height: 15px;
+}
+
+/* object code (:Proteus-code), e.g. FRQ-001: a small badge next to the   */
+/* name. Same treatment as class_pill (surface background + border)      */
+/* rather than a tinted fill, since a tint here would be the same 12%     */
+/* accent-on-white already used for the header's own background and the  */
+/* badge would disappear into it.                                        */
+span.object_code {
+  display: inline-block;
+  margin-right: .5em;
+  padding: 1px 8px;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, white);
+  border-radius: 999px;
+  font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+  font-size: .82em;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------- */

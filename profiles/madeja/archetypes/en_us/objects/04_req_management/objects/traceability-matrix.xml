@@ -18,6 +18,7 @@
     <markdownProperty name="description" category="detail"><![CDATA[Description of the traceaility matrix]]></markdownProperty>
     <classListProperty name="row-classes" category="detail"/>
     <classListProperty name="col-classes" category="detail"/>
+    <traceTypeListProperty name="trace-types" category="detail"><type>:Proteus-dependency</type></traceTypeListProperty>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
 

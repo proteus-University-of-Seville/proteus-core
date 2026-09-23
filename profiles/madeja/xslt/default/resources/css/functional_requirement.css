@@ -1,0 +1,11 @@
+/* ======================================================= */
+/* File    : functional_requirement.css                   */
+/* Content : Default CSS for Proteus (functional-requirement)*/
+/* Author  : Amador Durán Toro                            */
+/* Date    : 2026/09/23                                   */
+/* Version : 1.0                                          */
+/* ======================================================= */
+
+.proteus_table.functional-requirement {
+  --accent: #00897B;
+}

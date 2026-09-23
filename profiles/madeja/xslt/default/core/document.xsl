@@ -3,26 +3,9 @@
 <!-- ======================================================== -->
 <!-- File    : document.xsl                                   -->
 <!-- Content : PROTEUS default XSLT for documents             -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2023/06/09                                     -->
-<!-- Version : 1.0                                            -->
-<!-- ======================================================== -->
-<!-- Update  : 2024/09/07 (Amador Durán)                      -->
-<!-- match for TOC must be object[contains(@classes,'section')]-->
-<!-- since appendix is a subclass of section.                 -->
-<!-- To check if an object is of a given class:               -->
-<!--    object[contains(@classes,class_name)]                 -->
-<!-- To check if an object is of a given final class:         -->
-<!--    object[ends-with(@classes,class_name)]                -->
-<!-- PROBLEM: XSLT 1.0 does not include ends-with             -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/05/05 (Amador Durán)                      -->
-<!-- Refactored.                                              -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
+<!-- Author  : Amador Durán Toro                              -->
+<!-- Date    : 2026/09/22                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"

@@ -3,17 +3,9 @@
 <!-- ======================================================== -->
 <!-- File    : cover.xsl                                      -->
 <!-- Content : PROTEUS default XSLT for document cover at US  -->
-<!-- Author  : José María Delgado Sánchez                     -->
-<!-- Date    : 2023/06/09                                     -->
-<!-- Version : 1.0                                            -->
-<!-- ======================================================== -->
-<!-- Update  : 2026/05/05 (Amador Durán)                      -->
-<!-- Refactored.                                              -->
-<!-- ======================================================== -->
-
-<!-- ======================================================== -->
-<!-- exclude-result-prefixes="proteus" must be set in all     -->
-<!-- files to avoid xmlsn:proteus="." to appear in HTML tags. -->
+<!-- Author  : Amador Durán Toro                              -->
+<!-- Date    : 2026/09/22                                     -->
+<!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"

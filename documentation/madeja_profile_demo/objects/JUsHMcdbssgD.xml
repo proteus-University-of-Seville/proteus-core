@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<object id="JUsHMcdbssgD" classes="information" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section">
+<object id="JUsHMcdbssgD" classes="traceable-object paragraph comment" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section">
   <properties>
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Document conventions]]></stringProperty>
     <dateProperty name=":Proteus-date" category="general">2026-09-22</dateProperty>

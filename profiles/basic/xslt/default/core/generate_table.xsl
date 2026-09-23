@@ -4,8 +4,8 @@
 <!-- File    : generate_table.xsl                             -->
 <!-- Content : PROTEUS default XSLT for generating tables     -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/22                                     -->
-<!-- Version : 2.1                                            -->
+<!-- Date    : 2026/09/23                                     -->
+<!-- Version : 2.3                                            -->
 <!-- ======================================================== -->
 
 <!-- ________________________________________________________ -->
@@ -35,8 +35,13 @@
     <xsl:param name="icon" select="concat($class,'.png')"/>
     <xsl:param name="postfix"/>
     <xsl:param name="span" select="1"/>
-    <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-date,version,authors,sources,'"/>
+    <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-code,:Proteus-date,version,authors,sources,'"/>
     <xsl:param name="included_properties"/>
+
+    <!-- Objects with a :Proteus-code (e.g. madeja's requirements engineering -->
+    <!-- archetypes) show it in brackets before the name, instead of as a     -->
+    <!-- separate property row, to keep the pill compact.                     -->
+    <xsl:param name="code" select="properties/*[@name=':Proteus-code']"/>
 
     <!-- Image shown in the upper right corner of the object, if any.     -->
     <!-- Organizations use 'logo' and stakeholders use 'photo'. An        -->
@@ -82,6 +87,9 @@
                   src="{concat('assets:///', normalize-space($image[1]))}"
                   alt="{$name}"
                 />
+              </xsl:if>
+              <xsl:if test="$code">
+                <span class="object_code"><xsl:value-of select="$code"/></span>
               </xsl:if>
               <xsl:value-of select="$name"/>
               <xsl:if test="$postfix">
