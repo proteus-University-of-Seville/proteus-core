@@ -1,8 +1,8 @@
 # ==========================================================================
 # File: en_us/xslt_labels.yaml
 # Description: XSLT template labels (English)
-# Date: 2026/09/16
-# Version: 1.1
+# Date: 2026/09/23
+# Version: 2.0
 # Author: Amador Durán Toro
 # ==========================================================================
 #
@@ -13,7 +13,6 @@
 #
 # Adding labels for a new archetype does not require modifying any XSLT file
 # or any other translation file: just add a new .yaml file to this directory.
-
 
 # NOTE: archetype labels (archetype.class.*, archetype.prop_name.*,
 # archetype.enum_choices.*, ...) are shared with the application GUI and
@@ -26,12 +25,11 @@
 
 xslt.children: "Children"
 xslt.empty_paragraph: "Empty paragraph"
-xslt.tbd_expanded: "To Be Determined"
 xslt.figure: "Figure"
-xslt.traceability_matrix: "Traceability matrix"
-xslt.traceability_matrix_missing_class: "Cannot display traceability matrix. Make sure at least one class is selected for rows and columns."
-xslt.traceability_matrix_missing_item: "Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns."
-
 xslt.project: "Project"
 xslt.symlink_tooltip: "This is a representation of the original object. Modifying this object will modify the original."
+xslt.tbd_expanded: "To Be Determined"
 xslt.toc: "Table of contents"
+xslt.traceability_matrix_missing_class: "Cannot display traceability matrix. Make sure at least one class is selected for rows and columns."
+xslt.traceability_matrix_missing_item: "Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns."
+xslt.traceability_matrix: "Traceability matrix"

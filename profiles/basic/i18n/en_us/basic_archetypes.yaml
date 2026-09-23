@@ -1,7 +1,7 @@
 # ==========================================================================
 # File: en_us/basic_archetypes.yaml
 # Description: Archetype translations for basic profile (English)
-# Date: 2026/09/14
+# Date: 2026/09/23
 # Version: 2.0
 # Author: Amador Durán Toro
 # ==========================================================================
@@ -60,7 +60,7 @@ archetype.tooltip.file-info: "Select a graphic file from your local system to co
 archetype.tooltip.width-info: "Percentage of the page width that the image will occupy."
 
 # -----------------------------------------------------------------------
-# Archetype property names
+# Archetype property labels (key: archetype.prop_name.<property name>)
 # -----------------------------------------------------------------------
 
 "archetype.prop_name.:proteus-code": "Code"
