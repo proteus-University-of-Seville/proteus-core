@@ -1,7 +1,7 @@
 # ==========================================================================
 # File: es_es/basic_archetypes.yaml
 # Description: Traducciones de los arquetipos del perfil básico (español)
-# Date: 2026/09/14
+# Date: 2026/09/23
 # Version: 2.0
 # Author: Amador Durán Toro
 # ==========================================================================
@@ -63,7 +63,9 @@ archetype.tooltip.width-info: "Porcentaje del ancho de la página que ocupará e
 # Nombre de propiedades de arquetipos
 # -----------------------------------------------------------------------
 
+"archetype.prop_name.:proteus-date": "Fecha"
 archetype.prop_name.address: "Dirección"
+archetype.prop_name.attenders: "Asistentes"
 archetype.prop_name.authors: "Autores"
 archetype.prop_name.category: "Categoría"
 archetype.prop_name.col-classes: "Clases destino (columnas)"
@@ -75,7 +77,10 @@ archetype.prop_name.email: "Correo-e"
 archetype.prop_name.file: "Archivo"
 archetype.prop_name.image: "Imagen"
 archetype.prop_name.link: "Enlace"
+archetype.prop_name.logo: "Logotipo"
 archetype.prop_name.phone-number: "Teléfono"
+archetype.prop_name.photo: "Fotografía"
+archetype.prop_name.place: "Lugar"
 archetype.prop_name.plural-form: "Forma plural"
 archetype.prop_name.prepared-by: "Preparado por"
 archetype.prop_name.prepared-for: "Preparado para"
@@ -87,6 +92,7 @@ archetype.prop_name.row-classes: "Clases origen (filas)"
 archetype.prop_name.sources: "Fuentes"
 archetype.prop_name.synonyms: "Sinónimos"
 archetype.prop_name.text: "Texto"
+archetype.prop_name.time: "Hora"
 archetype.prop_name.trace-types: "Tipos de traza"
 archetype.prop_name.url: "URL"
 archetype.prop_name.version: "Versión"

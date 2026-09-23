@@ -1,8 +1,8 @@
 # ==========================================================================
 # File: es_es/xslt_labels.yaml
 # Description: XSLT template labels (Spanish)
-# Date: 2026/09/16
-# Version: 1.1
+# Date: 2026/09/23
+# Version: 2.0
 # Author: Amador Durán Toro
 # ==========================================================================
 #
@@ -14,7 +14,6 @@
 # Adding labels for a new archetype does not require modifying any XSLT file
 # or any other translation file: just add a new .yaml file to this directory.
 
-
 # NOTE: the templates share their labels with the application GUI: class
 # labels (archetype.class.*), property labels (archetype.prop_name.*) and
 # enumeration choices (archetype.enum_choices.*) are looked up with the same
@@ -22,28 +21,16 @@
 # Only the property labels missing there are defined below.
 
 # -----------------------------------------------------------------------
-# Property labels (key: archetype.prop_name.<property name>)
-# -----------------------------------------------------------------------
-
-"archetype.prop_name.:proteus-date": "Fecha"
-archetype.prop_name.attenders: "Asistentes"
-archetype.prop_name.logo: "Logotipo"
-archetype.prop_name.photo: "Fotografía"
-archetype.prop_name.place: "Lugar"
-archetype.prop_name.time: "Hora"
-
-# -----------------------------------------------------------------------
 # Literal texts used by the templates (key: xslt.<name>)
 # -----------------------------------------------------------------------
 
 xslt.children: "Hijos"
 xslt.empty_paragraph: "Párrafo vacío"
-xslt.tbd_expanded: "Por determinar"
 xslt.figure: "Figura"
-xslt.traceability_matrix: "Matriz de trazabilidad"
-xslt.traceability_matrix_missing_class: "No se puede visualizar la matriz de trazabilidad. Compruebe que hay al menos una clase seleccionada para las filas y columnas de la matriz."
-xslt.traceability_matrix_missing_item: "No se puede visualizar la matriz de trazabilidad. Compruebe que existe al menos un objeto de las clases seleccionadas para las filas y columnas de la matriz."
-
 xslt.project: "Proyecto"
 xslt.symlink_tooltip: "Esta es una representación del objeto original. Modificar este objeto supone modificar el objeto original."
+xslt.tbd_expanded: "Por determinar"
 xslt.toc: "Índice"
+xslt.traceability_matrix_missing_class: "No se puede visualizar la matriz de trazabilidad. Compruebe que hay al menos una clase seleccionada para las filas y columnas de la matriz."
+xslt.traceability_matrix_missing_item: "No se puede visualizar la matriz de trazabilidad. Compruebe que existe al menos un objeto de las clases seleccionadas para las filas y columnas de la matriz."
+xslt.traceability_matrix: "Matriz de trazabilidad"

@@ -1,7 +1,7 @@
 # ==========================================================================
 # File: en_us/basic_archetypes.yaml
 # Description: Archetype translations for basic profile (English)
-# Date: 2026/09/14
+# Date: 2026/09/23
 # Version: 2.0
 # Author: Amador Durán Toro
 # ==========================================================================
@@ -60,10 +60,12 @@ archetype.tooltip.file-info: "Select a graphic file from your local system to co
 archetype.tooltip.width-info: "Percentage of the page width that the image will occupy."
 
 # -----------------------------------------------------------------------
-# Archetype property names
+# Archetype property labels (key: archetype.prop_name.<property name>)
 # -----------------------------------------------------------------------
 
+"archetype.prop_name.:proteus-date": "Date"
 archetype.prop_name.address: "Address"
+archetype.prop_name.attenders: "Attenders"
 archetype.prop_name.authors: "Authors"
 archetype.prop_name.category: "Category"
 archetype.prop_name.col-classes: "Target classes (columns)"
@@ -75,7 +77,10 @@ archetype.prop_name.email: "E-mail"
 archetype.prop_name.file: "File"
 archetype.prop_name.image: "Image"
 archetype.prop_name.link: "Link"
+archetype.prop_name.logo: "Logo"
 archetype.prop_name.phone-number: "Phone number"
+archetype.prop_name.photo: "Photo"
+archetype.prop_name.place: "Place"
 archetype.prop_name.plural-form: "Plural form"
 archetype.prop_name.prepared-by: "Prepared by"
 archetype.prop_name.prepared-for: "Prepared for"
@@ -87,6 +92,7 @@ archetype.prop_name.row-classes: "Source classes (rows)"
 archetype.prop_name.sources: "Sources"
 archetype.prop_name.synonyms: "Synonyms"
 archetype.prop_name.text: "Text"
+archetype.prop_name.time: "Time"
 archetype.prop_name.trace-types: "Trace types"
 archetype.prop_name.url: "URL"
 archetype.prop_name.version: "Version"
