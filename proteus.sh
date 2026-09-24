@@ -39,13 +39,13 @@ else
     exit 1
 fi
 
-venv_dir="$script_dir/proteus_env"
+venv_dir="$script_dir/.venv"
 
-echo "PROTEUS: Checking for the existence of virtual environment 'proteus_env'"
+echo "PROTEUS: Checking for the existence of virtual environment '.venv'"
 if [ -d "$venv_dir" ]; then
-    echo "PROTEUS: Environment 'proteus_env' was found."
+    echo "PROTEUS: Environment '.venv' was found."
 else
-    echo "PROTEUS: Environment 'proteus_env' was not found."
+    echo "PROTEUS: Environment '.venv' was not found."
     echo "PROTEUS: Creating a virtual environment using $python_executable..."
 
     $python_executable -m venv "$venv_dir"
@@ -67,7 +67,7 @@ source "$venv_dir/bin/activate"
 # Check if the virtual environment is activated
 if [ $? -ne 0 ]; then
     echo "PROTEUS: Failed to activate the virtual environment. Check if python venv package is installed."
-    # Delete proteus_env if it exists
+    # Delete .venv if it exists
     if [ -d "$venv_dir" ]; then
         rm -rf "$venv_dir"
     fi

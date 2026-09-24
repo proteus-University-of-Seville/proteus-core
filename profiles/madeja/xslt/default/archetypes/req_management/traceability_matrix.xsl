@@ -4,8 +4,8 @@
 <!-- File    : traceability_matrix.xsl                                  -->
 <!-- Content : PROTEUS default XSLT for traceability matrix             -->
 <!-- Author  : Amador Durán Toro                                        -->
-<!-- Date    : 2026/09/22                                               -->
-<!-- Version : 2.1                                                      -->
+<!-- Date    : 2026/09/24                                               -->
+<!-- Version : 2.2                                                      -->
 <!-- ================================================================== -->
 
 <xsl:stylesheet version="1.0"
@@ -180,31 +180,48 @@
   <!-- generate-traceability-matrix-header auxiliary template             -->
   <!-- ================================================================== -->
 
-  <!-- Table header -->
+  <!-- Table header: same name_column/value_column shape as every other -->
+  <!-- object's card (icon pill, code badge, name), plus a second row    -->
+  <!-- for the column items. The font-size buttons still ride along,    -->
+  <!-- just repositioned into the corner of the card instead of sharing -->
+  <!-- a cell with the code.                                            -->
   <xsl:template name="generate-traceability-matrix-header">
     <xsl:param name="col-items"/>
 
-    <th class="matrix_header">
-      <span class="class_pill">
-        <img src="{concat($base_url_icons, 'traceability-matrix.png')}"/>
-        <xsl:value-of select="properties/*[@name=':Proteus-code']"/>
-      </span>
+    <xsl:variable name="code" select="properties/*[@name=':Proteus-code']"/>
+    <xsl:variable name="name" select="properties/*[@name=':Proteus-name']"/>
 
-      <div class="matrix_font_buttons">
-        <button class="reduce_font">A-</button>
-        <button class="increase_font">A+</button>
-      </div>
-    </th>
-
-    <xsl:for-each select="$col-items">
-      <xsl:variable name="label" select="label"/>
-
-      <th class="matrix_column">
-        <a href="#{@id}" onclick="selectAndNavigate(`{@id}`, event)" title="{$label}">
-          <xsl:value-of select="$label"/>
-        </a>
+    <tr class="header_row traceability_matrix">
+      <th class="name_column">
+        <span class="class_pill">
+          <img src="{concat($base_url_icons, 'traceability-matrix.png')}"/>
+          <xsl:value-of select="proteus-utils:i18n('archetype.class.traceability-matrix')"/>
+        </span>
       </th>
-    </xsl:for-each>
+      <th class="value_column" colspan="{count($col-items)}">
+        <div class="matrix_font_buttons">
+          <button class="reduce_font">A-</button>
+          <button class="increase_font">A+</button>
+        </div>
+        <xsl:if test="$code">
+          <span class="object_code"><xsl:value-of select="$code"/></span>
+        </xsl:if>
+        <xsl:value-of select="$name"/>
+      </th>
+    </tr>
+
+    <tr>
+      <th class="matrix_corner"></th>
+      <xsl:for-each select="$col-items">
+        <xsl:variable name="label" select="label"/>
+
+        <th class="matrix_column">
+          <a href="#{@id}" onclick="selectAndNavigate(`{@id}`, event)" title="{$label}">
+            <xsl:value-of select="$label"/>
+          </a>
+        </th>
+      </xsl:for-each>
+    </tr>
   </xsl:template>
 
   <!-- ================================================================== -->

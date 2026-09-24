@@ -2,8 +2,8 @@
 /* File    : traceability_matrix.css                       */
 /* Content : Default CSS for Proteus (traceability matrix) */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/21                                    */
-/* Version : 3.0                                           */
+/* Date    : 2026/09/24                                    */
+/* Version : 3.1                                           */
 /* ======================================================= */
 
 /* the header tint, left edge and code pill are derived from  */
@@ -28,24 +28,29 @@ table.traceability_matrix {
   margin-bottom: 1em;
 }
 
-/* first row, first column: code pill + font-size buttons.       */
-/* An explicit width (not min-width) keeps this column out of    */
-/* the browser's auto-layout surplus-space redistribution, so    */
-/* the extra table width goes to the item columns instead.       */
-table.traceability_matrix>thead>tr>th:first-child {
-  width: 8.5em;
-  text-align: center;
+/* empty corner cell above the row-item column, under the name_column */
+th.matrix_corner {
+  background: var(--label-bg);
+}
+
+/* room for the font-size buttons, so a long name never slides under them */
+table.traceability_matrix > thead > tr > th.value_column {
+  padding-right: 4.5em;
 }
 
 /* ------------------------------------------------------- */
 /* Font-size buttons                                        */
 /* ------------------------------------------------------- */
 
+/* positioned like generate_table's corner image: in the top-right of  */
+/* the card, out of the name's text flow regardless of how long it is  */
 .matrix_font_buttons {
+  position: absolute;
+  top: .5em;
+  right: var(--pad-x);
+  z-index: 1;
   display: flex;
-  justify-content: center;
   gap: 4px;
-  margin-top: 6px;
 }
 
 .matrix_font_buttons button {

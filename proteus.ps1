@@ -54,14 +54,14 @@ if ($execution_policy -ne 'Unrestricted') {
 
 # Set the script directory and virtual environment directory
 $script_dir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$venv_dir = Join-Path $script_dir "proteus_env"
+$venv_dir = Join-Path $script_dir ".venv"
 
 # Check for the existence of the virtual environment
-Write-Output "PROTEUS: Checking for the existence of virtual environment 'proteus_env'"
+Write-Output "PROTEUS: Checking for the existence of virtual environment '.venv'"
 if (Test-Path $venv_dir) {
-    Write-Output "PROTEUS: Environment 'proteus_env' was found."
+    Write-Output "PROTEUS: Environment '.venv' was found."
 } else {
-    Write-Output "PROTEUS: Environment 'proteus_env' was not found."
+    Write-Output "PROTEUS: Environment '.venv' was not found."
     Write-Output "PROTEUS: Creating a virtual environment using $python_executable..."
     
     & $python_executable @python_args -m venv $venv_dir

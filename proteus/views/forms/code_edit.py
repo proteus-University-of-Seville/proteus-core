@@ -55,6 +55,11 @@ class CodeEdit(QWidget):
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
+    # Minimum number of characters the prefix/number/suffix inputs stay
+    # wide enough to show in full, regardless of their current content
+    # (prefixes/suffixes are often 3-4 letters, e.g. 'MEET-').
+    MIN_CHARS = 4
+
     def __init__(self, *args, **kwargs):
         """
         Object initialization.
@@ -92,10 +97,12 @@ class CodeEdit(QWidget):
         self.number_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.suffix_input.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Initial fixed width
-        self.prefix_input.setFixedWidth(30)
-        self.number_input.setFixedWidth(30)
-        self.suffix_input.setFixedWidth(30)
+        # Initial fixed width: wide enough for MIN_CHARS characters from the
+        # start, regardless of the text that will be loaded into it
+        min_width = self._min_width(self.prefix_input)
+        self.prefix_input.setFixedWidth(min_width)
+        self.number_input.setFixedWidth(min_width)
+        self.suffix_input.setFixedWidth(min_width)
  
         # Set size policy
         self.prefix_input.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
@@ -166,17 +173,40 @@ class CodeEdit(QWidget):
         self.number_input.setEnabled(enabled)
         self.suffix_input.setEnabled(enabled)
 
-    
+
+    # ----------------------------------------------------------------------
+    # Method     : _min_width
+    # Description: Computes the width that fits MIN_CHARS characters in the
+    #              given input's font, so the field never starts out (or
+    #              shrinks back down to) something narrower than that.
+    # Date       : 24/09/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _min_width(self, input: QLineEdit) -> int:
+        """
+        Returns the pixel width needed to comfortably show MIN_CHARS
+        characters in the given input's font, including the QLineEdit's
+        own frame margins.
+        """
+        font_metrics = QFontMetrics(input.font())
+        # 'W' is used as a wide reference character so the minimum is never
+        # too tight for narrower text such as digits or most letters.
+        return font_metrics.horizontalAdvance("W" * self.MIN_CHARS) + 16
+
     # ======================================================================
     # Slots (connected to signals)
     # ======================================================================
-        
+
     # ----------------------------------------------------------------------
     # Method     : update_input_width
     # Description: Updates the input width.
     # Date       : 13/02/2024
-    # Version    : 0.1
+    # Version    : 0.2
     # Author     : José María Delgado Sánchez
+    #              Amador Durán Toro (use the text's actual rendered width
+    #              instead of an average-character estimate, and never go
+    #              narrower than MIN_CHARS characters)
     # ----------------------------------------------------------------------
     def update_input_width(self, text: str, input: QLineEdit) -> None:
         """
@@ -184,6 +214,7 @@ class CodeEdit(QWidget):
         size of the input widget.
         """
         font_metrics = QFontMetrics(input.font())
-        text_width = int(font_metrics.averageCharWidth() * 1.5) * len(text)
-        text_width = max(text_width, 30)
-        input.setFixedWidth(text_width)
+        # +16 accounts for the QLineEdit's own frame/margins, which
+        # horizontalAdvance() (the text's exact rendered width) excludes
+        text_width = font_metrics.horizontalAdvance(text) + 16
+        input.setFixedWidth(max(text_width, self._min_width(input)))

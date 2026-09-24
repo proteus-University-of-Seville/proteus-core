@@ -21,13 +21,6 @@ archetype.copy-of: "Copia de"
 'archetype.class.:proteus-none': "Ninguna"
 
 # -----------------------------------------------------------------------
-# Categorías
-# -----------------------------------------------------------------------
-archetype.prop_category.general: "General"
-archetype.prop_category.dependencies: "Dependencias"
-
-
-# -----------------------------------------------------------------------
 # Nombres de propiedades
 # -----------------------------------------------------------------------
 'archetype.prop_name.:proteus-name': "Nombre"

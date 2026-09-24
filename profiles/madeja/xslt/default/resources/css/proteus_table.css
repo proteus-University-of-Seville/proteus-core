@@ -2,8 +2,8 @@
 /* File    : proteus_table.css                             */
 /* Content : Default CSS for Proteus (tables)              */
 /* Author  : Amador Durán Toro                             */
-/* Date    : 2026/09/23                                    */
-/* Version : 3.3                                           */
+/* Date    : 2026/09/24                                    */
+/* Version : 3.7                                           */
 /* ======================================================= */
 /* Update  : 2026/09/20 (Amador Durán & Claude Code)       */
 /* Redesigned: every object is a framed card with a left   */
@@ -153,7 +153,12 @@ span.class_pill {
   font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
-  white-space: nowrap;
+  /* class labels may embed a literal newline (e.g. "Nonfunctional\n       */
+  /* requirement") precisely to keep long pills from forcing the header's  */
+  /* name column wide; pre-line respects that break while still collapsing */
+  /* and wrapping normally otherwise.                                      */
+  white-space: pre-line;
+  text-align: center;
   color: var(--accent);
 }
 
@@ -210,6 +215,24 @@ table.proteus_table > tr > th:first-child {
   color: var(--ink-soft);
   background: var(--label-bg);
   border-right: 1px solid var(--line);
+}
+
+/* step-by-step sequence (e.g. madeja's use-case "ordinary sequence"): the */
+/* step number column shrinks to fit its own header/content ("Step" or    */
+/* "Paso", or the number itself, whichever is narrower) via the standard  */
+/* width:1% + white-space:nowrap trick, and the action column claims all  */
+/* the space it gives up.                                                 */
+table.proteus_table th.step_number_column,
+table.proteus_table td.step_number_column,
+table.proteus_table th.step_number {
+  width: 1%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+th.step_action_column,
+td.step_action_column {
+  width: 100%;
 }
 
 table.proteus_table > tbody > tr:hover > td,

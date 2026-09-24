@@ -34,8 +34,11 @@
 # Literal texts used by the templates (key: xslt.<name>)
 # -----------------------------------------------------------------------
 
+xslt.action: "Action"
 xslt.children: "Children"
 xslt.empty_paragraph: "Empty paragraph"
+xslt.ordinary_sequence: "Ordinary sequence"
+xslt.step: "Step"
 xslt.tbd_expanded: "To Be Determined"
 xslt.figure: "Figure"
 xslt.traceability_matrix: "Traceability matrix"

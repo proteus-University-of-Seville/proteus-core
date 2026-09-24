@@ -20,13 +20,6 @@ archetype.copy-of: "Copy of"
 'archetype.class.:proteus-none': "None"
 
 # -----------------------------------------------------------------------
-# Archetype categories
-# -----------------------------------------------------------------------
-archetype.prop_category.general: "General"
-archetype.prop_category.dependencies: "Dependencies"
-
-
-# -----------------------------------------------------------------------
 # Archetype property names
 # -----------------------------------------------------------------------
 'archetype.prop_name.:proteus-name': "Name"

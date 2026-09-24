@@ -4,8 +4,8 @@
 <!-- File    : generate_table.xsl                             -->
 <!-- Content : PROTEUS default XSLT for generating tables     -->
 <!-- Author  : Amador Durán Toro                              -->
-<!-- Date    : 2026/09/23                                     -->
-<!-- Version : 2.3                                            -->
+<!-- Date    : 2026/09/24                                     -->
+<!-- Version : 2.5                                            -->
 <!-- ======================================================== -->
 
 <!-- ________________________________________________________ -->
@@ -42,6 +42,24 @@
     <!-- archetypes) show it in brackets before the name, instead of as a     -->
     <!-- separate property row, to keep the pill compact.                     -->
     <xsl:param name="code" select="properties/*[@name=':Proteus-code']"/>
+
+    <!-- Extension points for archetypes that need extra rows the generic    -->
+    <!-- property loop cannot produce (e.g. a reordered subset of properties -->
+    <!-- interleaved with a custom block, or children rendered as something  -->
+    <!-- other than nested cards). Both are markup (result tree fragments),  -->
+    <!-- built by the caller before calling this template.                  -->
+    <!-- - extra_rows_before: inserted right before the automatic property   -->
+    <!--   loop, e.g. to show some properties out of their declaration order -->
+    <!--   and/or interleaved with a custom block (see madeja's use_case.xsl -->
+    <!--   for the "ordinary sequence" step table).                         -->
+    <!-- - extra_rows: inserted where the children row normally goes, e.g.   -->
+    <!--   to show children in a compact list instead of full nested cards  -->
+    <!--   (see madeja's information_requirement.xsl).                     -->
+    <!-- - show_children: set to false() when extra_rows already covers the  -->
+    <!--   children, so the default nested-card rendering is skipped.       -->
+    <xsl:param name="extra_rows_before"/>
+    <xsl:param name="extra_rows"/>
+    <xsl:param name="show_children" select="true()"/>
 
     <!-- Image shown in the upper right corner of the object, if any.     -->
     <!-- Organizations use 'logo' and stakeholders use 'photo'. An        -->
@@ -100,6 +118,8 @@
           </tr>
         </thead>
 
+        <xsl:copy-of select="$extra_rows_before"/>
+
         <!-- Table body with properties -->
         <!-- By wrapping both the list and the current property name with commas, we    -->
         <!-- ensure we're matching whole names and not partial strings.                 -->
@@ -107,14 +127,19 @@
         <xsl:for-each select="properties/*[not(contains($all_excluded_properties,concat(',', @name, ',')))]">
           <xsl:call-template name="generate_property_row">
             <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
+            <xsl:with-param name="span" select="$span"/>
           </xsl:call-template>
         </xsl:for-each>
 
+        <xsl:copy-of select="$extra_rows"/>
+
         <!-- Render the children objects recursively -->
-        <xsl:call-template name="renderChildren">
-          <xsl:with-param name="children" select="children/*" />
-          <xsl:with-param name="span" select="$span" />
-        </xsl:call-template>
+        <xsl:if test="$show_children">
+          <xsl:call-template name="renderChildren">
+            <xsl:with-param name="children" select="children/*" />
+            <xsl:with-param name="span" select="$span" />
+          </xsl:call-template>
+        </xsl:if>
       </table>
     </div>
   </xsl:template>

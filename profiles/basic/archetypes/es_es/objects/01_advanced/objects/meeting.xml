@@ -6,7 +6,7 @@
 >
   <properties>
     <codeProperty name=":Proteus-code" category="general" inmutable="true">
-      <prefix><![CDATA[MTG-]]></prefix>
+      <prefix><![CDATA[MEET-]]></prefix>
       <number>001</number>
       <suffix><![CDATA[]]></suffix>
     </codeProperty>

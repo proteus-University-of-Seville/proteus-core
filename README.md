@@ -40,7 +40,7 @@ PROTEUS can be run using [`uv`](https://docs.astral.sh/uv/), an extremely fast P
 ```bash
 uv run proteus
 ```
-If you don't like using `uv`, you can use the installation scripts provided for Windows, Linux and MacOS. The scripts create a virtual environment called `proteus_env`, install the dependencies and run the application. The first time you run the script it will take a while to install the dependencies and create python cache files.
+If you don't like using `uv`, you can use the installation scripts provided for Windows, Linux and MacOS. The scripts create a virtual environment in `.venv` (the same directory `uv` itself uses, so either approach reuses it), install the dependencies and run the application. The first time you run the script it will take a while to install the dependencies and create python cache files.
 
 Scripts look for Python 3.14, 3.13, 3.12 and 3.11 in that order. On Windows the `py` launcher is used (`py -3.14`, `py -3.13`, ...); on Linux and MacOS the `python3.14`, `python3.13`, `python3.12` and `python3.11` aliases are tried, falling back to `python` or `python3` only if their reported version is within the supported 3.11 to 3.14 range. The selected interpreter and version are displayed before the virtual environment is created.
 
