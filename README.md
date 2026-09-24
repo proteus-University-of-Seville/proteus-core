@@ -97,3 +97,26 @@ Developer mode can be enabled by setting the following variable to `True` in the
 ```
 developer_features = True
 ```
+
+### MCP server (AI agent integration)
+
+PROTEUS embeds an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server, ProteusMCP, that lets AI coding assistants and agents (Claude Code, Claude Desktop and other MCP-compatible clients) inspect and edit the project currently open in the running application: searching, reading and editing objects and documents, managing traceability, etc.
+
+It is disabled by default and can be enabled in the `[mcp]` section of the `proteus.ini` file:
+```
+[mcp]
+enabled = True
+host = 127.0.0.1
+port = 8731
+```
+`host` and `port` default to `127.0.0.1` and `8731` and may be omitted if you are happy with the defaults. Once enabled, the server starts automatically in a background thread as soon as the application window opens, and stops when the application is closed; there is nothing else to launch.
+
+The server only serves the project currently open in that running PROTEUS instance, so it has to stay open for AI agents to be able to use it.
+
+#### Connecting Claude Code
+
+This repository ships a `.mcp.json` file at its root pointing at the local server (`http://127.0.0.1:8731/mcp/`). With PROTEUS running and `[mcp] enabled = True`, opening Claude Code inside this repository will offer to connect to the `proteus` MCP server, exposing its tools in the coding session.
+
+#### Connecting other MCP-compatible applications
+
+Any other MCP client (Claude Desktop, other agent frameworks, etc.) can connect to the same server by adding an HTTP MCP server entry pointing at `http://<host>:<port>/mcp/` (`http://127.0.0.1:8731/mcp/` with the default settings). Refer to your client's documentation on how to add a custom MCP server.
