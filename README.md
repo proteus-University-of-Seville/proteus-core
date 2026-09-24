@@ -115,7 +115,18 @@ The server only serves the project currently open in that running PROTEUS instan
 
 #### Connecting Claude Code
 
-This repository ships a `.mcp.json` file at its root pointing at the local server (`http://127.0.0.1:8731/mcp/`). With PROTEUS running and `[mcp] enabled = True`, opening Claude Code inside this repository will offer to connect to the `proteus` MCP server, exposing its tools in the coding session.
+`.mcp.json` is not tracked by the repository (each user may want to add their own MCP servers there, and a shared file would just cause conflicts), so create it at the repository root with the following content:
+```json
+{
+  "mcpServers": {
+    "proteus": {
+      "type": "http",
+      "url": "http://127.0.0.1:8731/mcp/"
+    }
+  }
+}
+```
+With PROTEUS running and `[mcp] enabled = True`, opening Claude Code inside this repository will offer to connect to the `proteus` MCP server, exposing its tools in the coding session.
 
 #### Connecting other MCP-compatible applications
 

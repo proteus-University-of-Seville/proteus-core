@@ -151,6 +151,10 @@ spellchecker/
 # test fixture files under proteus/tests/sample_data/)
 /proteus.ini
 
+# Per-user MCP client configuration (e.g. Claude Code's own connector list);
+# left untracked so everyone can customize it without causing conflicts.
+/.mcp.json
+
 # Local helper scripts (asset generators, one-off tooling)
 scripts/
 
