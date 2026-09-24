@@ -154,6 +154,7 @@ spellchecker/
 # Per-user MCP client configuration (e.g. Claude Code's own connector list);
 # left untracked so everyone can customize it without causing conflicts.
 /.mcp.json
+/opencode.json
 
 # Local helper scripts (asset generators, one-off tooling)
 scripts/
