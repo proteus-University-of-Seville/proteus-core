@@ -66,8 +66,7 @@ git pull
 
 ## Profiles
 PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:
-- [profile-madeja-english](https://github.com/proteus-University-of-Seville/profile-madeja-english)
-- [profile-madeja-spanish](https://github.com/proteus-University-of-Seville/profile-madeja-spanish)
+- [profile-madeja](https://github.com/proteus-University-of-Seville/profile-madeja)
 
 We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu.
 
