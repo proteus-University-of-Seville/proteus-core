@@ -772,8 +772,10 @@ class Object(AbstractObject):
         :param object: Object to recalculate traces.
         :param ids_map: Dictionary with the ids of the objects that have been cloned and their new ids.
         """
-        # Iterate over traces
-        for trace in self.get_traces():
+        # Iterate over the traces of the cloned object being processed, not
+        # over self's traces: self is always the root of the clone operation,
+        # so using its traces would apply them to every descendant.
+        for trace in object.get_traces():
             # Variable to store possible new targets list
             new_targets: List[ProteusID] = []
 

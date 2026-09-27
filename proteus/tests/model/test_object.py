@@ -338,6 +338,87 @@ def test_clone_object(
         the original object {test_object_to_clone.id}"
 
 
+@pytest.mark.parametrize("root_has_traces", [False, True])
+def test_clone_object_recalculates_descendant_traces(
+    sample_object: Object,
+    sample_document: Object,
+    sample_project: Project,
+    root_has_traces: bool,
+):
+    """
+    Test Object clone_object recalculates the traces of every cloned
+    descendant, not only those of the cloned root.
+
+    The sample section has a child whose traces point to a sibling inside
+    the section and to an object outside it. After cloning, traces to
+    objects inside the cloned subtree must point to their clones, and
+    traces to objects outside it must be kept.
+
+    When the root also has trace properties (e.g. a document archetype
+    with 'prepared-for' traces), cloning used to apply the root's traces
+    to its descendants, failing with an AssertionError on children that
+    lack those properties.
+    """
+
+    # Helper to list an object and its descendants in depth-first order
+    def _flatten(object: Object) -> list[Object]:
+        objects = [object]
+        for child in object.children:
+            objects.extend(_flatten(child))
+        return objects
+
+    original_objects = _flatten(sample_object)
+
+    if root_has_traces:
+        # Give the root a trace property its children do not have, pointing
+        # to one of its own descendants
+        subtree_ids = {o.id for o in original_objects}
+        root_trace, target_id = next(
+            (trace, target)
+            for o in original_objects
+            for trace in o.get_traces()
+            for target in trace.value
+            if target in subtree_ids
+        )
+        sample_object.properties[root_trace.name] = root_trace.clone([target_id])
+
+    # Clone the section into the sample document
+    new_object = sample_object.clone_object(sample_document, sample_project)
+    cloned_objects = _flatten(new_object)
+
+    assert len(original_objects) == len(
+        cloned_objects
+    ), f"Cloned subtree has {len(cloned_objects)} objects, expected {len(original_objects)}"
+
+    # Map original ids to cloned ids (both lists are in the same order)
+    ids_map = {o.id: c.id for o, c in zip(original_objects, cloned_objects)}
+
+    # Every trace must point to the clone when the target is inside the
+    # cloned subtree, and to the original target otherwise
+    checked_targets = 0
+    for original, cloned in zip(original_objects, cloned_objects):
+        assert [t.name for t in original.get_traces()] == [
+            t.name for t in cloned.get_traces()
+        ], f"Trace properties of {cloned.id} differ from those of {original.id}"
+
+        for original_trace in original.get_traces():
+            expected = [ids_map.get(t, t) for t in original_trace.value]
+            actual = cloned.get_property(original_trace.name).value
+            assert (
+                actual == expected
+            ), f"Trace '{original_trace.name}' of {cloned.id}: expected {expected}, got {actual}"
+            checked_targets += len(expected)
+
+    # Make sure the sample data actually exercises inside and outside targets
+    assert checked_targets > 0, "Sample object has no traces to check"
+    assert any(
+        target in ids_map
+        for o in original_objects
+        for trace in o.get_traces()
+        for target in trace.value
+    ), "Sample object has no traces to objects inside the cloned subtree"
+
+
 def test_set_property(sample_object: Object):
     """
     Test Abstract Object set_property method
