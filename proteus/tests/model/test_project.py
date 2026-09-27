@@ -115,7 +115,7 @@ def cloned_project(sample_project: Project) -> Generator[Project, None, None]:
     "path",
     [
         SAMPLE_PROJECT_PATH / PROJECT_FILE_NAME,
-        ARCHETYPE_REPOSITORY_PATH / "projects" / "basic-project-archetype" / "project.xml",
+        ARCHETYPE_REPOSITORY_PATH / "projects" / "basic-profile-empty" / "project.xml",
     ],
 )
 def test_init(path):

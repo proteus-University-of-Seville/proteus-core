@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="kwjqPxyEYbDw" classes="symbolic-link" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-any">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Link to the definition of Loan]]></stringProperty>
+    <traceProperty name="link" category="general" acceptedTargets=":Proteus-any" excludedTargets="section appendix symbolic-link" traceType=":Proteus-link">
+      <trace target="SZsabFyyNMhU" traceType=":Proteus-link"/>
+    </traceProperty>
+  </properties>
+  <children/>
+</object>

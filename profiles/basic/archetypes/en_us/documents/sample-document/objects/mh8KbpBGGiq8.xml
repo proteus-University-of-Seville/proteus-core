@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="mh8KbpBGGiq8" classes="traceable-object organization" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-any">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[University of Seville Library]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <stringProperty name="address" category="detail"><![CDATA[C/ San Fernando, 4, 41004 Sevilla, Spain]]></stringProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[**Customer** of the BiblioUS project. The Library runs the university's network of library branches and is responsible for the loan, hold and interlibrary-loan services that BiblioUS will support.]]></markdownProperty>
+    <stringProperty name="phone-number" category="detail"><![CDATA[+34 954 000 100]]></stringProperty>
+    <stringProperty name="email" category="detail"><![CDATA[biblioteca@example.org]]></stringProperty>
+    <urlProperty name="web" category="detail"><![CDATA[https://bib.us.es]]></urlProperty>
+    <fileProperty name="logo" category="detail" tooltip="file-info"><![CDATA[us-logo.jpg]]></fileProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>

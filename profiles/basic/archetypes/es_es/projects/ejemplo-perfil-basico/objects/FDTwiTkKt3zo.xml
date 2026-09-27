@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="FDTwiTkKt3zo" classes="traceable-object paragraph" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section" selectedCategory="detail">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Renovación de préstamos en línea]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.1]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author">
+      <trace target="ATCoftLhzaCw" traceType=":Proteus-author"/>
+    </traceProperty>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source">
+      <trace target="FCZXbSnRe6vf" traceType=":Proteus-information-source"/>
+      <trace target="7yibW4RWaF5C" traceType=":Proteus-information-source"/>
+    </traceProperty>
+    <markdownProperty name="text" category="detail"><![CDATA[Los usuarios de la biblioteca deben poder **renovar sus préstamos en curso** desde el portal web de BiblioUS en cualquier momento, sin acudir a un mostrador de préstamo. Una renovación amplía la fecha de devolución en el periodo de préstamo correspondiente al tipo de usuario (véase el *Apéndice: Normativa de préstamo vigente*), contado desde la fecha de renovación.
+
+El sistema debe **rechazar** una renovación cuando:
+
+- el usuario haya agotado las renovaciones permitidas para su tipo,
+- el ejemplar tenga al menos una **reserva** activa, o
+- el préstamo ya haya vencido.
+
+Si se rechaza una renovación, el portal debe indicar al usuario el motivo. Tres días antes de cada fecha de devolución, el sistema debe enviar un **recordatorio por correo electrónico**.]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency">
+      <trace target="SZsabFyyNMhU" traceType=":Proteus-dependency"/>
+      <trace target="Z3s5iUqqVQ9p" traceType=":Proteus-dependency"/>
+      <trace target="YwtWfK8eWEMZ" traceType=":Proteus-dependency"/>
+      <trace target="8MemKvrjdkB4" traceType=":Proteus-dependency"/>
+    </traceProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>

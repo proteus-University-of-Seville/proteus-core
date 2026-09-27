@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project id="sample">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Basic Profile Sample]]></stringProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Sample project to show the usage of archetypes in the basic profile.]]></markdownProperty>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <documents>
+    <document id="empty-doc"/>
+  </documents>
+</project>

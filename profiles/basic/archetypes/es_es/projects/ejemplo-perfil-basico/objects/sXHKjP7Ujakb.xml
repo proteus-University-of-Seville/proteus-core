@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="sXHKjP7Ujakb" classes="traceable-object paragraph comment" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Acerca del arquetipo Reunión]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <markdownProperty name="text" category="detail"><![CDATA[Una **reunión** registra una sesión de elicitación, una revisión o cualquier otra reunión del proyecto. Tiene un **Código** generado automáticamente (`MEET-001`, `MEET-002`, ...), que no se puede modificar. Registra la *Fecha*, la *Hora* y el *Lugar* de la reunión, y sus *Resultados* en Markdown.
+
+**Trazabilidad**
+
+- *Puede ser trazado desde otros objetos:* **Sí**. Tiene la clase `traceable-object`, así que otros objetos pueden depender de una reunión para indicar de dónde procede su información (también puede ser destino de un enlace simbólico).
+- *Puede tener trazas hacia otros objetos:* **Sí**. *Autores*, *Fuentes* y *Asistentes* apuntan a participantes (*Asistentes* usa el tipo de traza `:Proteus-information-source`, igual que *Fuentes*), y *Dependencias* apunta a cualquier objeto trazable.]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>

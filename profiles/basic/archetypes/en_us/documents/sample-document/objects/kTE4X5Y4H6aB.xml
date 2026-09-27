@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="kTE4X5Y4H6aB" classes="traceable-object paragraph comment" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-document section">
+  <properties>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[About the Remote figure archetype]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author"/>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <markdownProperty name="text" category="detail"><![CDATA[A **Remote figure** shows an image that is **referenced by URL** instead of being copied into the project. It has the same properties as a local figure, but it fills in *URL* and leaves *File* empty. It is useful for images that are kept up to date elsewhere (corporate logos, published diagrams), at the cost of needing network access when the document is displayed.
+
+**Traceability**
+
+- *Can be traced from other objects:* **Yes**. It has the `traceable-object` class, so the *Dependencies* of other objects can point to it (it can also be the target of a symbolic link).
+- *Can have traces to other objects:* **Yes**. *Authors* and *Sources* point to stakeholders, and *Dependencies* point to any traceable object.]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>

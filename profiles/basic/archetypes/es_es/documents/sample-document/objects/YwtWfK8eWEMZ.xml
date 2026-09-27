@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<object id="YwtWfK8eWEMZ" classes="traceable-object meeting" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-any">
+  <properties>
+    <codeProperty name=":Proteus-code" category="general" inmutable="true">
+      <prefix><![CDATA[MEET-]]></prefix>
+      <number>001</number>
+      <suffix><![CDATA[]]></suffix>
+    </codeProperty>
+    <stringProperty name=":Proteus-name" category="general"><![CDATA[Sesión de elicitación sobre la renovación de préstamos]]></stringProperty>
+    <dateProperty name=":Proteus-date" category="general">2026-09-27</dateProperty>
+    <stringProperty name="version" category="general"><![CDATA[1.0]]></stringProperty>
+    <traceProperty name="authors" category="general" acceptedTargets="stakeholder" traceType=":Proteus-author">
+      <trace target="ATCoftLhzaCw" traceType=":Proteus-author"/>
+    </traceProperty>
+    <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
+    <dateProperty name="date" category="detail">2026-09-22</dateProperty>
+    <timeProperty name="time" category="detail">10:30:00</timeProperty>
+    <stringProperty name="place" category="detail"><![CDATA[Sala de reuniones 2, sede de los Servicios Centrales de la Biblioteca, Sevilla]]></stringProperty>
+    <traceProperty name="attenders" category="detail" acceptedTargets="stakeholder" traceType=":Proteus-information-source">
+      <trace target="FCZXbSnRe6vf" traceType=":Proteus-information-source"/>
+      <trace target="ATCoftLhzaCw" traceType=":Proteus-information-source"/>
+      <trace target="7yibW4RWaF5C" traceType=":Proteus-information-source"/>
+    </traceProperty>
+    <markdownProperty name="results" category="results"><![CDATA[- La Biblioteca confirmó los periodos de préstamo y los límites de renovación vigentes (véase el *Apéndice: Normativa de préstamo vigente*).
+- Los usuarios deben poder **renovar sus préstamos en línea** sin acudir a un mostrador de préstamo.
+- La renovación debe **bloquearse** cuando el ejemplar tenga una reserva activa, y debe indicarse al usuario el motivo.
+- La representante del alumnado pidió **recordatorios por correo electrónico** tres días antes de la fecha de devolución.
+- *Pendiente:* si sustituir las suspensiones del servicio de préstamo por multas económicas (lo debatirá la Comisión de Biblioteca).]]></markdownProperty>
+    <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
+    <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
+  </properties>
+  <children/>
+</object>
