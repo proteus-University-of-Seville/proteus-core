@@ -40,6 +40,7 @@ from proteus.application.metrics import Metrics
 from proteus.application.resources.translator import translate as _
 from proteus.application.configuration.config import Config
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.application.resources.plugins import Plugins
 from proteus.application.events import (
     ModifyObjectEvent,
@@ -52,6 +53,7 @@ from proteus.application.events import (
     SelectObjectEvent,
     SortChildrenEvent,
     ChangeObjectPositionEvent,
+    ThemeChangedEvent,
 )
 from proteus.views.components.dialogs.base_dialogs import MessageBox
 from proteus.views.components.abstract_component import ProteusComponent
@@ -253,7 +255,8 @@ class ViewsContainer(QTabWidget, ProteusComponent):
 
         icon = Icons().icon(ProteusIconType.App, "view_icon")
         self.setTabIcon(tab_index, icon)
-        self.setIconSize(QSize(32, 32))
+        icon_size: int = Themes().metric("icon_size_tab", 32)
+        self.setIconSize(QSize(icon_size, icon_size))
 
         # Store the browser in the tab dict
         self.tabs[xslt_name] = browser
@@ -283,6 +286,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
             - DELETE VIEW -> update_on_delete_view
             - SELECT OBJECT -> update_on_select_object
             - CURRENT VIEW CHANGED -> update_on_current_view_changed
+            - THEME CHANGED -> update_on_theme_changed
         """
         AddObjectEvent().connect(self.update_view_on_add_object)
         ModifyObjectEvent().connect(self.update_view)
@@ -295,6 +299,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         DeleteViewEvent().connect(self.update_on_delete_view)
         SelectObjectEvent().connect(self.update_on_select_object)
         CurrentViewChangedEvent().connect(self.update_on_current_view_changed)
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
 
     # ----------------------------------------------------------------------
     # Method     : display_view
@@ -556,6 +561,38 @@ class ViewsContainer(QTabWidget, ProteusComponent):
     # ======================================================================
     # Component methods
     # ======================================================================
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply tab icons and the corner buttons' icons when the
+        application theme changes. The rendered document content does not
+        depend on the theme (XSLT templates own their styling), and the
+        QWebEngineView chrome follows the application stylesheet
+        automatically, so no re-render is needed.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        icon_size: int = Themes().metric("icon_size_tab", 32)
+        view_icon = Icons().icon(ProteusIconType.App, "view_icon")
+
+        for view_name, browser in self.tabs.items():
+            if browser is None:
+                continue
+            tab_index: int = self.indexOf(browser)
+            if tab_index >= 0:
+                self.setTabIcon(tab_index, view_icon)
+        self.setIconSize(QSize(icon_size, icon_size))
+
+        if self.add_view_button is not None:
+            self.add_view_button.setIcon(
+                Icons().icon(ProteusIconType.App, "add_view_icon")
+            )
+        if self.export_view_button is not None:
+            self.export_view_button.setIcon(
+                Icons().icon(ProteusIconType.MainMenu, "export")
+            )
 
     # ----------------------------------------------------------------------
     # Method     : close_tab

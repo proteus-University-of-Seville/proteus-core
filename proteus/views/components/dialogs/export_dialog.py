@@ -16,7 +16,6 @@ from typing import Callable
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -93,7 +92,7 @@ class ExportDialog(ProteusDialog):
         # Set the dialog title and width
         current_view = self._state_manager.get_current_view()
         self.setWindowTitle(_("export_dialog.title",_(f"xslt_templates.{current_view}")))
-        self.sizeHint = lambda: QSize(400, 0)
+        self.setMinimumWidth(400)
 
         # Expand policy
         self.setSizePolicy(

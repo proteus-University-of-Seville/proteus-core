@@ -111,6 +111,10 @@ settings_dialog.default_profile.checkbox: "Check to use a custom profile"
 settings_dialog.error.profile.empty_path: "Please select a valid profile path"
 settings_dialog.error.profile.invalid_path: "The selected path does not exist"
 settings_dialog.error.profile.invalid_profile: "The selected path is not a valid profile, see log file for more information about the error. Error: {}"
+settings_dialog.error.theme.title: "Theme could not be applied"
+settings_dialog.error.theme.text: "The selected theme could not be loaded. Settings were not saved. Check the application log for details."
+settings_dialog.error.save.title: "Settings could not be saved"
+settings_dialog.error.save.text: "The settings file could not be written. Your changes were not saved."
 
 settings_dialog.profile_settings.group: "Profile specific settings"
 settings_dialog.default_view.label: "Default view:"
@@ -128,7 +132,7 @@ settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project w
 settings_dialog.edit_on_clone.checkbox: "Edit on object archetype clone"
 settings_dialog.edit_on_clone.tooltip: "When creating a new object from an archetype, open the new object for editing. If edit dialog is canceled, the clone operation will be undone."
 
-settings_dialog.info.label: "The changes will be applied once the application is restarted"
+settings_dialog.info.label: "Theme changes apply immediately. Other settings may require a restart."
 
 settings_dialog.descriptions.empty: "No description available"
 

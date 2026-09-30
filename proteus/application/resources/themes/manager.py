@@ -1,7 +1,7 @@
 # ==========================================================================
-# File: themes.py
+# File: manager.py
 # Description: Manage the visual themes for PROTEUS application.
-# Date: 03/05/2026
+# Date: 13/09/2026
 # Version: 0.2
 # Author: José María Delgado Sánchez
 # ==========================================================================
@@ -10,7 +10,6 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
-import json
 import logging
 from pathlib import Path
 from typing import Dict, List
@@ -20,13 +19,20 @@ from typing import Dict, List
 # --------------------------------------------------------------------------
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QColor
+from PyQt6.QtGui import QColor, QPalette
 
 # --------------------------------------------------------------------------
 # Project specific imports
 # --------------------------------------------------------------------------
 
 from proteus.application.utils.abstract_meta import SingletonMeta
+from proteus.application.resources.themes.manifest import (
+    ThemeManifest,
+    THEME_MANIFEST_FILE,
+    DEFAULT_STATE_COLORS,
+    TOKEN_PATTERN,
+    render_qss,
+)
 
 # logging configuration
 log = logging.getLogger(__name__)
@@ -37,19 +43,14 @@ log = logging.getLogger(__name__)
 
 THEMES_DIRECTORY: str = "themes"
 THEME_QSS_FILE: str = "theme.qss"
-THEME_STATE_COLORS_FILE: str = "state_colors.json"
 THEME_ICONS_MANIFEST: str = "icons.xml"
 
 # Theme key used as the fallback default when AppSettings.theme is unset or
 # refers to a theme that no longer exists.
 DEFAULT_THEME_KEY: str = "light"
 
-DEFAULT_STATE_COLORS: Dict[str, str] = {
-    "fresh": "#006400",
-    "dirty": "#B8860B",
-    "dead":  "#8B0000",
-    "clean": "#000000",
-}
+# Legacy v1 file, superseded by the "state_colors" section of theme.json.
+_LEGACY_STATE_COLORS_FILE: str = "state_colors.json"
 
 
 # --------------------------------------------------------------------------
@@ -75,10 +76,10 @@ def _derive_color_scheme(key: str) -> str:
 
     A folder whose name contains "dark" (case-insensitive) is treated as a
     dark theme; one containing "light" is treated as light. Anything else
-    returns None — palette is left to the OS.
+    returns None, so no color scheme is requested for that theme.
 
-    This lets community themes named like "gruvbox-dark" or "solarized-light"
-    pick up the correct QPalette without any metadata file.
+    This lets themes named like "gruvbox-dark" or "solarized-light" pick up
+    a color scheme when their manifest does not specify one.
     """
     lower = key.lower()
     if "dark" in lower:
@@ -95,19 +96,26 @@ class ThemeMetadata:
     """
     In-memory record describing a discovered theme.
 
-    All fields are derived from the theme's folder; there is no metadata
-    file in v1. ``color_scheme`` is a string ("light", "dark") or None
-    when the folder name doesn't suggest one. Use Themes.qt_color_scheme()
-    to resolve to a Qt.ColorScheme enum value.
+    ``name`` and ``color_scheme`` come from the theme.json manifest, falling
+    back to folder-name derivation when the manifest omits them. ``manifest``
+    holds the parsed ThemeManifest (tokens, metrics, state colors, palette).
     """
 
-    __slots__ = ("key", "path", "name", "color_scheme")
+    __slots__ = ("key", "path", "name", "color_scheme", "manifest")
 
-    def __init__(self, key: str, path: Path, name: str, color_scheme: str = None):
+    def __init__(
+        self,
+        key: str,
+        path: Path,
+        name: str,
+        manifest: ThemeManifest,
+        color_scheme: str = None,
+    ):
         self.key: str = key
         self.path: Path = path
         self.name: str = name
         self.color_scheme: str = color_scheme
+        self.manifest: ThemeManifest = manifest
 
 
 # --------------------------------------------------------------------------
@@ -119,28 +127,30 @@ class Themes(metaclass=SingletonMeta):
     Singleton that discovers themes shipped under resources/themes and
     resolves the active theme based on the user setting (with fallbacks).
 
-    Discovery is convention-based — there is no manifest. Any subdirectory
-    of the configured themes root that contains ``theme.qss`` is treated
-    as a theme; the folder name is the stable id used in proteus.ini and
-    in the Settings dialog. Themes are listed in alphabetical order.
+    Discovery is convention-based. Any subdirectory of the configured themes
+    root that contains a valid ``theme.json`` manifest AND a ``theme.qss``
+    template is treated as a theme; the folder name is the stable id used in
+    proteus.ini and in the Settings dialog. Themes are listed in alphabetical
+    order.
 
     A theme directory may also contain:
-        - state_colors.json      document-tree state colors
-        - icons.xml + icons/...  icon overrides (delta against the
-                                 baseline theme)
+        - icons/icons.xml + icons/...  icon overrides against the
+                                       baseline theme
+
+    The manifest provides the token namespace used to render the QSS
+    template (see manifest.py for the schema), plus state colors,
+    metrics and an optional QPalette mapping.
 
     Resolution order on select_theme(requested_key):
         1. The requested key, if present.
         2. The hardcoded default ("light"), if present.
         3. The first theme in alphabetical order.
 
-    color_scheme is inferred from the folder name (substring "dark" or
-    "light"); themes with neither leave the palette to the OS.
+    color_scheme comes from the manifest, falling back to a folder-name
+    heuristic (substring "dark" or "light"); themes with neither do not
+    request a Qt color scheme.
     """
 
-    # ----------------------------------------------------------------------
-    # Method: __init__
-    # ----------------------------------------------------------------------
     def __init__(self):
         self._themes_directory: Path = None
         self._available_themes: Dict[str, ThemeMetadata] = {}
@@ -150,13 +160,11 @@ class Themes(metaclass=SingletonMeta):
     # Public API
     # ==========================================================================
 
-    # ----------------------------------------------------------------------
-    # Method: load_themes
-    # ----------------------------------------------------------------------
     def load_themes(self, themes_directory: Path) -> bool:
         """
         Discover themes by scanning the given directory. A subdirectory
-        is treated as a theme if and only if it contains ``theme.qss``.
+        is treated as a theme if and only if it contains a valid
+        ``theme.json`` manifest AND a ``theme.qss`` template.
 
         Repeated calls reset the discovered themes (does not stack).
 
@@ -191,12 +199,32 @@ class Themes(metaclass=SingletonMeta):
                 )
                 continue
 
+            # A QSS-only directory is not a valid theme in format v2.
+            manifest = ThemeManifest.load(entry / THEME_MANIFEST_FILE)
+            if manifest is None:
+                log.warning(
+                    f"Skipping '{entry.name}' — a valid {THEME_MANIFEST_FILE} "
+                    "is required since theme format v2."
+                )
+                continue
+
+            # Legacy state_colors.json is ignored; state colors live in the
+            # manifest now.
+            if (entry / _LEGACY_STATE_COLORS_FILE).exists():
+                log.info(
+                    f"Theme '{entry.name}' ships a legacy "
+                    f"'{_LEGACY_STATE_COLORS_FILE}' file. It is ignored — "
+                    f"move its colors into the 'state_colors' section of "
+                    f"{THEME_MANIFEST_FILE}."
+                )
+
             key = entry.name
             self._available_themes[key] = ThemeMetadata(
                 key=key,
                 path=entry,
-                name=_derive_display_name(key),
-                color_scheme=_derive_color_scheme(key),
+                name=manifest.name or _derive_display_name(key),
+                color_scheme=manifest.color_scheme or _derive_color_scheme(key),
+                manifest=manifest,
             )
 
         if not self._available_themes:
@@ -206,9 +234,6 @@ class Themes(metaclass=SingletonMeta):
         log.info(f"Discovered themes: {list(self._available_themes.keys())}")
         return True
 
-    # ----------------------------------------------------------------------
-    # Method: select_theme
-    # ----------------------------------------------------------------------
     def select_theme(self, requested_key: str) -> ThemeMetadata:
         """
         Choose the active theme using the documented resolution order.
@@ -217,16 +242,21 @@ class Themes(metaclass=SingletonMeta):
         :param requested_key: User-requested theme key (typically from
             proteus.ini). May be None or unknown — fallbacks apply.
         """
+        self._current_theme = self.resolve_theme(requested_key)
+        return self._current_theme
+
+    def activate_theme(self, metadata: ThemeMetadata | None) -> None:
+        """Commit a prepared theme, or restore a previous selection on failure."""
+        self._current_theme = metadata
+
+    def resolve_theme(self, requested_key: str) -> ThemeMetadata | None:
+        """Resolve a theme using the normal fallback order without selecting it."""
         if not self._available_themes:
             log.error("select_theme called but no themes have been loaded.")
-            self._current_theme = None
             return None
 
-        # 1) Requested key
         if requested_key and requested_key in self._available_themes:
-            self._current_theme = self._available_themes[requested_key]
-            log.info(f"Selected theme '{self._current_theme.key}' (requested).")
-            return self._current_theme
+            return self._available_themes[requested_key]
 
         if requested_key:
             log.warning(
@@ -234,94 +264,67 @@ class Themes(metaclass=SingletonMeta):
                 f"Trying default '{DEFAULT_THEME_KEY}'."
             )
 
-        # 2) Hardcoded default ("light")
         if DEFAULT_THEME_KEY in self._available_themes:
-            self._current_theme = self._available_themes[DEFAULT_THEME_KEY]
-            log.info(f"Selected theme '{self._current_theme.key}' (default).")
-            return self._current_theme
+            return self._available_themes[DEFAULT_THEME_KEY]
 
-        # 3) First available, alphabetical
         first_key = next(iter(self._available_themes))
-        self._current_theme = self._available_themes[first_key]
-        log.info(
-            f"Selected theme '{self._current_theme.key}' (first available)."
-        )
-        return self._current_theme
+        return self._available_themes[first_key]
 
-    # ----------------------------------------------------------------------
-    # Property: available_themes
-    # ----------------------------------------------------------------------
     @property
     def available_themes(self) -> Dict[str, ThemeMetadata]:
         """Return a dict of all discovered themes keyed by theme key."""
         return dict(self._available_themes)
 
-    # ----------------------------------------------------------------------
-    # Property: current_theme
-    # ----------------------------------------------------------------------
     @property
     def current_theme(self) -> ThemeMetadata:
         """The currently selected ThemeMetadata, or None."""
         return self._current_theme
 
-    # ----------------------------------------------------------------------
-    # Property: themes_directory
-    # ----------------------------------------------------------------------
     @property
     def themes_directory(self) -> Path:
         """The root themes directory passed to load_themes."""
         return self._themes_directory
 
-    # ----------------------------------------------------------------------
-    # Method: stylesheet
-    # ----------------------------------------------------------------------
     def stylesheet(self) -> str:
         """
-        Read theme.qss for the current theme and return its content.
-        Returns empty string if no current theme is selected or the file
-        cannot be read (errors are logged).
+        Read theme.qss for the current theme and render it with the theme's
+        token namespace (@token substitution). Returns empty string if no
+        current theme is selected or the file cannot be read (errors are
+        logged).
         """
         if self._current_theme is None:
             log.error("stylesheet() called but no theme is selected.")
             return ""
+        return self.render_stylesheet(self._current_theme)
 
-        qss_path: Path = self._current_theme.path / THEME_QSS_FILE
+    def render_stylesheet(self, metadata: ThemeMetadata) -> str:
+        """Render a candidate without selecting it; return empty on invalid QSS."""
+        qss_path: Path = metadata.path / THEME_QSS_FILE
         try:
-            return qss_path.read_text(encoding="utf-8")
-        except Exception as e:
+            template = qss_path.read_text(encoding="utf-8")
+        except OSError as e:
             log.error(f"Error reading theme stylesheet '{qss_path}': {e}")
             return ""
 
-    # ----------------------------------------------------------------------
-    # Method: state_colors
-    # ----------------------------------------------------------------------
+        if not template.strip():
+            log.error(f"Theme stylesheet '{qss_path}' is empty.")
+            return ""
+        stylesheet = render_qss(template, metadata.manifest.tokens())
+        if TOKEN_PATTERN.search(stylesheet):
+            log.error(f"Theme stylesheet '{qss_path}' contains unresolved tokens.")
+            return ""
+        return stylesheet
+
     def state_colors(self) -> Dict[str, QColor]:
         """
         Return the document-tree state colors for the current theme as
         {state_name: QColor}. Falls back to DEFAULT_STATE_COLORS for any
-        missing key (so a partial state_colors.json is still safe).
+        missing key (so a partial state_colors section is still safe).
         """
         merged: Dict[str, str] = dict(DEFAULT_STATE_COLORS)
 
         if self._current_theme is not None:
-            colors_path: Path = self._current_theme.path / THEME_STATE_COLORS_FILE
-            if colors_path.exists():
-                try:
-                    raw = json.loads(colors_path.read_text(encoding="utf-8"))
-                    if isinstance(raw, dict):
-                        for k, v in raw.items():
-                            if isinstance(k, str) and isinstance(v, str):
-                                merged[k.lower()] = v
-                    else:
-                        log.error(
-                            f"State colors file '{colors_path}' is not a JSON "
-                            "object. Using defaults."
-                        )
-                except Exception as e:
-                    log.error(
-                        f"Error parsing state colors file '{colors_path}': {e}. "
-                        "Using defaults."
-                    )
+            merged.update(self._current_theme.manifest.state_colors)
 
         result: Dict[str, QColor] = {}
         for k, v in merged.items():
@@ -334,9 +337,75 @@ class Themes(metaclass=SingletonMeta):
             result[k] = color
         return result
 
-    # ----------------------------------------------------------------------
-    # Method: icons_directory
-    # ----------------------------------------------------------------------
+    def tokens(self) -> Dict[str, str]:
+        """
+        Return the flat token namespace of the current theme (colors +
+        metrics, merged over defaults). Empty dict if no theme is selected.
+        """
+        if self._current_theme is None:
+            log.error("tokens() called but no theme is selected.")
+            return {}
+        return self._current_theme.manifest.tokens()
+
+    def token(self, name: str, fallback: str | None = None) -> str | None:
+        """
+        Return the value of a single token of the current theme, or the
+        given fallback if the theme is not selected or the token is unknown.
+        """
+        value = self.tokens().get(name, None)
+        if value is None:
+            log.warning(f"Token '{name}' not found in current theme.")
+            return fallback
+        return value
+
+    def color(self, name: str, fallback: str = "#000000") -> QColor:
+        """
+        Return a token of the current theme as a QColor. Returns the
+        fallback color if the token is unknown or not a valid color.
+        """
+        raw: str | None = self.token(name, fallback=fallback)
+        color = QColor(raw if raw is not None else fallback)
+        if not color.isValid():
+            log.warning(f"Token '{name}' value '{raw}' is not a valid color.")
+            color = QColor(fallback)
+        return color
+
+    def metrics(self) -> Dict[str, int | float | str]:
+        """
+        Return the metrics of the current theme merged over DEFAULT_METRICS.
+        Empty dict if no theme is selected.
+        """
+        if self._current_theme is None:
+            log.error("metrics() called but no theme is selected.")
+            return {}
+        return self._current_theme.manifest.merged_metrics()
+
+    def metric(self, name: str, fallback: int = 0) -> int:
+        """
+        Return a single metric of the current theme as int. Returns the
+        fallback if the metric is unknown or not numeric.
+        """
+        value = self.metrics().get(name, None)
+        if value is None:
+            log.warning(f"Metric '{name}' not found in current theme.")
+            return fallback
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            log.warning(f"Metric '{name}' value '{value}' is not numeric.")
+            return fallback
+
+    def build_palette(self) -> "QPalette | None":
+        """
+        Build a QPalette from the current theme's manifest "palette" section.
+        Returns None when no explicit palette is defined. The Qt color scheme
+        can still affect the platform palette independently of this section.
+        """
+        if self._current_theme is None:
+            log.error("build_palette() called but no theme is selected.")
+            return None
+        return self._current_theme.manifest.build_palette()
+
     def icons_directory(self) -> Path:
         """
         Return the icons directory of the current theme — the ``icons/``
@@ -356,14 +425,11 @@ class Themes(metaclass=SingletonMeta):
             return None
         return icons_dir
 
-    # ----------------------------------------------------------------------
-    # Method: qt_color_scheme
-    # ----------------------------------------------------------------------
     def qt_color_scheme(self) -> "Qt.ColorScheme":
         """
         Resolve the current theme's color_scheme to a Qt.ColorScheme enum.
         Returns Qt.ColorScheme.Unknown when the heuristic could not infer
-        a scheme — caller should treat this as "do not force the palette".
+        a scheme — the caller should not request a color-scheme change.
         """
         if self._current_theme is None or self._current_theme.color_scheme is None:
             return Qt.ColorScheme.Unknown
@@ -375,9 +441,6 @@ class Themes(metaclass=SingletonMeta):
             return Qt.ColorScheme.Dark
         return Qt.ColorScheme.Unknown
 
-    # ----------------------------------------------------------------------
-    # Property: baseline_theme
-    # ----------------------------------------------------------------------
     @property
     def baseline_theme(self) -> ThemeMetadata:
         """
@@ -388,9 +451,6 @@ class Themes(metaclass=SingletonMeta):
         """
         return self._available_themes.get(DEFAULT_THEME_KEY)
 
-    # ----------------------------------------------------------------------
-    # Method: baseline_icons_directory
-    # ----------------------------------------------------------------------
     def baseline_icons_directory(self) -> Path:
         """
         Return the icons directory of the baseline theme, or None if the
@@ -405,9 +465,6 @@ class Themes(metaclass=SingletonMeta):
             return None
         return icons_dir
 
-    # ----------------------------------------------------------------------
-    # Method: search_path_directories
-    # ----------------------------------------------------------------------
     def search_path_directories(self) -> List[str]:
         """
         Return the directories to register under the "theme:" Qt search

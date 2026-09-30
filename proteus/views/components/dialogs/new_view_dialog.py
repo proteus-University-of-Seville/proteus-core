@@ -16,7 +16,6 @@ from typing import List
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -84,7 +83,7 @@ class NewViewDialog(ProteusDialog):
 
         # Set the dialog title and width
         self.setWindowTitle(_("new_view_dialog.title"))
-        self.sizeHint = lambda: QSize(400, 0)
+        self.setMinimumWidth(400)
 
         # Get available xls templates to create a new view
         xls_templates: List[str] = self._controller.get_available_xslt()

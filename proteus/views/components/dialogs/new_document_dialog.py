@@ -16,7 +16,6 @@ from typing import List
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -86,7 +85,7 @@ class NewDocumentDialog(ProteusDialog):
 
         # Set the window title
         self.setWindowTitle(_("new_document_dialog.title"))
-        self.sizeHint = lambda: QSize(450, 0)
+        self.setMinimumWidth(450)
 
         # Get document archetypes
         document_archetypes: List[Object] = self._controller.get_document_archetypes()

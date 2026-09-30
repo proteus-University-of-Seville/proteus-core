@@ -18,9 +18,6 @@ from typing import List, Tuple
 # --------------------------------------------------------------------------
 
 from spellchecker import SpellChecker
-from PyQt6.QtCore import (
-    Qt,
-)
 from PyQt6.QtGui import (
     QSyntaxHighlighter,
     QTextCharFormat,
@@ -32,6 +29,7 @@ from PyQt6.QtGui import (
 
 from proteus.application.utils.abstract_meta import SingletonMeta
 from proteus.application.utils.decorators import proteus_action
+from proteus.application.resources.themes import Themes
 
 
 # --------------------------------------------------------------------------
@@ -226,7 +224,9 @@ class SpellCheckHighlighter(QSyntaxHighlighter):
         highlight_format.setUnderlineStyle(
             QTextCharFormat.UnderlineStyle.SpellCheckUnderline
         )
-        highlight_format.setUnderlineColor(Qt.GlobalColor.red)
+        # Read the theme token on every highlight pass so the color follows
+        # live theme switches without any refresh wiring.
+        highlight_format.setUnderlineColor(Themes().color("spellcheck_error"))
 
         for match in self._spellchecker.tokenize(text):
             word = match.group()

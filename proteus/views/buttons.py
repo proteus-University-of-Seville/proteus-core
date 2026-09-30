@@ -34,6 +34,7 @@ from PyQt6.QtCore import Qt, QSize
 # --------------------------------------------------------------------------
 
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.model import ProteusClassTag
 from proteus.model.object import Object
 from proteus.application.resources.translator import translate as _
@@ -54,10 +55,15 @@ def main_menu_button(
     create_button = QToolButton(parent)
     create_button.setMinimumWidth(55)
 
+    # Store the icon key as a dynamic property so components can re-apply
+    # the icon when the theme changes (live theme switching).
+    create_button.setProperty("icon_key", icon_key)
+
     # Set file icon
     button_icon = Icons().icon(ProteusIconType.MainMenu, icon_key)
     create_button.setIcon(button_icon)
-    create_button.setIconSize(button_icon.actualSize(QSize(32, 32)))
+    icon_size: int = Themes().metric("icon_size_button", 32)
+    create_button.setIconSize(button_icon.actualSize(QSize(icon_size, icon_size)))
 
     # Set tooltip and status tip
     if tooltip:
@@ -184,6 +190,10 @@ class ArchetypeMenuButton(QToolButton):
         self.archetype: Object = None
         self.contains_only_one_archetype: bool = False
 
+        # Store the object class so the icon can be re-applied when the
+        # theme changes (live theme switching).
+        self.object_class: ProteusClassTag = object_class
+
         # Button settings
         self.setObjectName("archetype_menu_button")
         self.setSizePolicy(
@@ -197,7 +207,8 @@ class ArchetypeMenuButton(QToolButton):
         # Add icon
         archetype_icon = Icons().icon(ProteusIconType.Archetype, object_class)
         self.setIcon(archetype_icon)
-        self.setIconSize(QSize(32, 32))
+        icon_size: int = Themes().metric("icon_size_button", 32)
+        self.setIconSize(QSize(icon_size, icon_size))
 
         # Set tooltip
         translated_name = _(

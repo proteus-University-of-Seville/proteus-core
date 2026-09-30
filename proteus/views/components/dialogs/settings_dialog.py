@@ -12,6 +12,8 @@
 
 from typing import List
 from pathlib import Path
+from dataclasses import replace
+from copy import deepcopy
 import logging
 
 # --------------------------------------------------------------------------
@@ -41,6 +43,7 @@ from proteus.application.configuration.profile_settings import (
 from proteus.controller.command_stack import Controller
 from proteus.application.resources.icons import Icons, ProteusIconType
 from proteus.application.resources.themes import Themes
+from proteus.application.resources.themes import ThemeService
 from proteus.application.resources.translator import Translator, translate as _
 from proteus.views.buttons import get_separator
 from proteus.views.forms.directory_edit import DirectoryEdit
@@ -128,7 +131,7 @@ class SettingsDialog(ProteusDialog):
 
         # Setting message label
         setting_info_label: QLabel = QLabel(_("settings_dialog.info.label"))
-        setting_info_label.setStyleSheet("font-weight: bold")
+        setting_info_label.setObjectName("setting_info_label")
 
         # -------------------------------------------
         # Layouts
@@ -402,7 +405,7 @@ class SettingsDialog(ProteusDialog):
 
         Themes are discovered by the Themes singleton from
         resources/themes/ at startup. Selecting a different theme persists
-        to proteus.ini and triggers a restart-required notice on save.
+        to proteus.ini and is applied live on save (no restart required).
         """
         appearance_layout: QVBoxLayout = QVBoxLayout()
 
@@ -584,6 +587,10 @@ class SettingsDialog(ProteusDialog):
 
         config = Config()
 
+        # Compare this save with the previously staged values, not only with
+        # the boot-time settings snapshot.
+        settings_before_save = config.app_settings_copy
+
         custom_profile_path: Path = (
             Path(self.custom_profile_edit.directory())
             if self.custom_profile_edit.directory()
@@ -598,7 +605,7 @@ class SettingsDialog(ProteusDialog):
             else config.app_settings_copy.theme
         )
 
-        config.app_settings_copy = config.app_settings_copy.clone(
+        staged_settings = config.app_settings_copy.clone(
             language=self.language_combo.currentData(),
             spellchecker_language=self.spellchecker_combo.currentData(),
             default_view=self.default_view_combo.currentData(),
@@ -610,15 +617,52 @@ class SettingsDialog(ProteusDialog):
             theme=chosen_theme,
         )
 
-        # ---------------------
-        # Save settings
-        # ---------------------
-        config.app_settings_copy.save()
+        # Config.app_settings is a boot-time snapshot. Compare with the
+        # currently applied theme so successive saves can switch both ways.
+        current_theme_key: str | None = (
+            Themes().current_theme.key
+            if Themes().current_theme is not None
+            else None
+        )
+        theme_changed: bool = (
+            current_theme_key is not None and chosen_theme != current_theme_key
+        )
+        if theme_changed and not ThemeService().apply_theme(chosen_theme):
+            MessageBox.warning(
+                _("settings_dialog.error.theme.title"),
+                _("settings_dialog.error.theme.text"),
+            )
+            return
 
-        # Show warning dialog, the changes will be applied after restart
-        # Avoid showing the warning dialog if the settings are the same as the
-        # current loaded settings
-        if config.app_settings != config.app_settings_copy:
+        # AppSettings.save mutates its shared ConfigParser before writing the
+        # file, so restore that snapshot if the write fails.
+        previous_parser = deepcopy(settings_before_save.config_parser)
+        try:
+            staged_settings.save()
+        except Exception as exc:
+            log.error("Could not save settings: %s", exc)
+            config.app_settings.config_parser = previous_parser
+            settings_before_save.config_parser = previous_parser
+            if theme_changed and current_theme_key is not None:
+                ThemeService().apply_theme(current_theme_key)
+            MessageBox.warning(
+                _("settings_dialog.error.save.title"),
+                _("settings_dialog.error.save.text"),
+            )
+            return
+
+        config.app_settings_copy = staged_settings
+
+        # Exclude theme from both comparisons: other settings may still
+        # require a restart, but an unchanged save must not warn again.
+        settings_excluding_theme = staged_settings.clone(
+            theme=config.app_settings.theme
+        )
+        restart_needed: bool = config.app_settings != settings_excluding_theme
+        save_changed_settings: bool = replace(
+            settings_before_save, theme=""
+        ) != replace(staged_settings, theme="")
+        if restart_needed and save_changed_settings:
             MessageBox.warning(
                 _("settings_dialog_warning.title"),
                 _("settings_dialog_warning.text"),

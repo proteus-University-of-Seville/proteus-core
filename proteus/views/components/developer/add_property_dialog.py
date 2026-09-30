@@ -170,7 +170,7 @@ class AddPropertyDialog(ProteusDialog):
             _("add_property_dialog.message.property_specific_attributes")
         )
         message_label.setWordWrap(True)
-        message_label.setStyleSheet("font-weight: bold; ")
+        message_label.setObjectName("message_label")
         form_layout.addWidget(message_label)
 
         # Dialog final setup -------------------------------------------------

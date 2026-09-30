@@ -1,0 +1,61 @@
+{
+    "name": "Dark",
+    "color_scheme": "dark",
+    "colors": {
+        "error": "#ff7a7a",
+        "spellcheck_error": "#ff0000",
+
+        "text": "#f1f1f1",
+        "text_muted": "#d8d8d8",
+        "disabled_text": "#888888",
+
+        "selection_bg": "#094771",
+        "selection_text": "#ffffff",
+        "hover_bg": "#2d4a6d",
+        "hover_border": "#094771",
+        "hover_text": "#ffffff",
+        "pressed_bg": "#0f5fb3",
+
+        "border": "#555555",
+        "border_subtle": "#3e3e3e",
+        "border_strong": "#555555",
+
+        "window": "#2b2b2b",
+        "alternate_base": "#333333",
+        "button_surface": "#3c3c3c",
+        "input_surface": "#3c3c3c",
+        "header_surface": "#3c3c3c",
+        "tooltip_surface": "#3c3c3c",
+        "tab_surface": "#3c3c3c",
+        "tab_surface_inactive": "#2b2b2b",
+        "tab_surface_selected": "#4a4a4a",
+        "chrome_surface": "#2f2f2f",
+        "statusbar_surface": "#3c3c3c",
+        "splitter_surface": "#3c3c3c",
+        "scrollbar_handle": "#4a4a4a",
+        "scrollbar_handle_hover": "#5a5a5a",
+
+        "disabled_bg": "#353535",
+        "wizard_disabled_bg": "#353535",
+
+        "calendar_accent": "#0080ff",
+        "calendar_hover": "#004589",
+        "calendar_pressed": "#89c4ff",
+        "calendar_text": "white"
+    },
+    "metrics": {
+        "icon_size_button": 32,
+        "icon_size_tab": 32,
+        "icon_size_tree": 22,
+        "icon_size_statusbar": 16,
+        "profile_icon_height": 32,
+        "tree_min_width": 200,
+        "views_min_width": 400
+    },
+    "state_colors": {
+        "fresh": "#7FE07F",
+        "dirty": "#FFD966",
+        "dead": "#FF7B7B",
+        "clean": "#E6E6E6"
+    }
+}

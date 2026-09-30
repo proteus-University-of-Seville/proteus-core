@@ -110,6 +110,10 @@ settings_dialog.default_profile.checkbox: "Marque para usar un perfil personaliz
 settings_dialog.error.profile.empty_path: "Por favor, introduzca una ruta válida"
 settings_dialog.error.profile.invalid_path: "La ruta seleccionada no existe"
 settings_dialog.error.profile.invalid_profile: "El archivo seleccionado no es un perfil válido, más información en el archivo de registro de la aplicación. Error: {}"
+settings_dialog.error.theme.title: "No se pudo aplicar el tema"
+settings_dialog.error.theme.text: "No se pudo cargar el tema seleccionado. La configuración no se ha guardado. Consulte el registro de la aplicación para más detalles."
+settings_dialog.error.save.title: "No se pudo guardar la configuración"
+settings_dialog.error.save.text: "No se pudo escribir el archivo de configuración. Los cambios no se han guardado."
 
 settings_dialog.profile_settings.group: "Configuración del perfil"
 settings_dialog.default_view.label: "Vista por defecto:"
@@ -127,7 +131,7 @@ settings_dialog.open_project_on_startup.tooltip: "Preguntar si desea abrir el ú
 settings_dialog.edit_on_clone.checkbox: "Editar al clonar arquetipos de objeto"
 settings_dialog.edit_on_clone.tooltip: "Al crear un nuevo objeto a partir de un arquetipo, abre el nuevo objeto para editarlo. Si se cancela el diálogo de edición, la operación de clonación se deshará."
 
-settings_dialog.info.label: "Los cambios se aplicarán al reiniciar la aplicación"
+settings_dialog.info.label: "Los cambios de tema se aplican de inmediato. Otros ajustes pueden requerir reiniciar la aplicación."
 
 settings_dialog.descriptions.empty: "No hay descripción disponible"
 
