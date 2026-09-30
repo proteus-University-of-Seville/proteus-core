@@ -122,8 +122,11 @@ class MeasurementEdit(QWidget):
     def measurement(self) -> Tuple[str, str]:
         """
         Return the value and unit of the measurement.
+
+        The unit is the item data (the unit key, e.g. 'day'), not the text
+        shown in the combo box, which may be a translation (e.g. 'día').
         """
-        return self.value_edit.text(), self.unit_combo.currentText()
+        return self.value_edit.text(), self.unit_combo.currentData()
 
     # ----------------------------------------------------------------------
     # Method     : setMeasurement

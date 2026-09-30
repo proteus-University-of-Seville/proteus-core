@@ -412,3 +412,43 @@ def test_code_property_validation(qtbot: QtBot, prefix, number, suffix, expected
     assert (
         current_error == expected_error
     ), f"Error '{expected_error}' was expected but '{current_error}' was found"
+
+
+def test_unit_property_returns_unit_key_with_translated_units(qtbot: QtBot, mocker):
+    """
+    The unit combo box shows translated unit labels, but the property value
+    must keep the unit key (e.g. 'day', not 'día'). Otherwise the unit is
+    not found in the units list and silently replaced by the first one.
+    """
+    # --------------------------------------------
+    # Arrange
+    # --------------------------------------------
+    from proteus.model.properties.unit_property import UnitProperty, Measurement
+
+    # Translate every unit to a different label
+    mocker.patch(
+        "proteus.views.forms.measurement_edit._",
+        side_effect=lambda key, alternative_text=None: f"translated-{alternative_text}",
+    )
+    property = UnitProperty(
+        name="frequency",
+        units=["year", "day", "hour"],
+        value=Measurement(value=10, unit="day"),
+    )
+    property_input: PropertyInput = PropertyInputFactory.create(property)
+
+    # --------------------------------------------
+    # Act
+    # --------------------------------------------
+    combo = property_input.input.unit_combo
+    shown_unit = combo.currentText()
+    combo.setCurrentIndex(combo.findData("hour"))
+    value = property_input.get_value()
+
+    # --------------------------------------------
+    # Assert
+    # --------------------------------------------
+    assert shown_unit == "translated-day", f"Unexpected combo label '{shown_unit}'"
+    assert value == Measurement(
+        value=10, unit="hour"
+    ), f"Expected 10 hour, got {value.value} {value.unit}"
