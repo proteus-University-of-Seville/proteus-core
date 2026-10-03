@@ -94,7 +94,7 @@ same ids, classes and properties; only texts change.
 | File | Change |
 |---|---|
 | `archetypes/<lang>/objects/NN_<category>/objects.xml` | add `<object id="<id>" />` where it must appear in the tab; unlisted archetypes are **not loaded at all** (child-only archetypes must be listed too) |
-| `i18n/<lang>/archetypes.yaml` (basic: `basic_archetypes.yaml`) | `archetype.class.<class>` for **every** class tag used (also abstract ones: they appear in class lists, e.g. traceability matrix rows); `archetype.prop_name.<property>` for new property names; `archetype.enum_choices.<choice>`; `archetype.enum_units.<unit>` for unitProperty units; `archetype.tooltip.<tooltip>`; `archetype.prop_category.<category>` for a new form tab; `archetype.category.<category>` for a new toolbar tab |
+| `i18n/<lang>/archetypes.yaml` (basic: `basic_archetypes.yaml`) | `archetype.class.<class>` for **every** class tag used (also abstract ones: they appear in class lists, e.g. traceability matrix rows); `archetype.prop_name.<property>` for new property names; `archetype.enum_choices.<choice>`; `archetype.enum_choices.tooltip.<property>.<choice>` if `valueTooltips="true"`; `archetype.enum_units.<unit>` for unitProperty units; `archetype.tooltip.<tooltip>`; `archetype.prop_category.<category>` for a new form tab; `archetype.category.<category>` for a new toolbar tab |
 | `i18n/<lang>/xslt_labels.yaml` | `xslt.<name>` literal texts used by the new XSLT module (move them out of `xslt_pending_labels.yaml` if they were there) |
 | `xslt/default/default.xsl` | `<xsl:include href="archetypes/<category>/<id>.xsl" />` in its category block |
 | `xslt/default/resources/css/default.css` | `@import url('<id>.css');` if a CSS file was created |
@@ -157,10 +157,19 @@ same ids, classes and properties; only texts change.
 
 ### i18n rules
 
-- Keys are lowercase (lookups are case-insensitive); quote values; `\n` in class labels
-  breaks the toolbar button text.
+- Keys are lowercase with `_` instead of spaces (lookups normalize the key, loading does
+  not); quote values. `\n` in a class label breaks the toolbar button text; everywhere
+  else (forms, HTML) it is replaced by a space.
+- File names do not matter: every `*.yaml` and `*.yml` of `i18n/<lang>/` (subfolders too)
+  is loaded. An empty YAML file stops the loading of the remaining files (error in the log).
 - A key must be defined **once** across all YAML files of a language (later files silently
-  override earlier ones). Check with a script that counts keys over `i18n/<lang>/*.yaml`.
+  override earlier ones; inside one file YAML keeps the last). Check with a script that
+  counts keys over `i18n/<lang>/*.yaml`.
+- Profile translations are loaded after the application ones (`resources/i18n/<lang>/`)
+  and override keys with the same name; reuse application keys such as
+  `archetype.class.:proteus-document` instead of redefining them.
+- Template (view) names: `xslt_templates.<template>` and
+  `xslt_templates.description.<template>`.
 - A missing key renders as `!key!` in the HTML; in the GUI it shows the raw name or the
   key itself, depending on the widget, and the translator logs a warning.
 - `proteus-utils:i18n(key, arg...)`: extra arguments are `{0}` format arguments, **not** a
