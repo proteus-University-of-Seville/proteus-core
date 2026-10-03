@@ -122,10 +122,11 @@ same ids, classes and properties; only texts change.
 </object>
 ```
 
-- **Main class (last in `classes`)** decides: the toolbar button (archetypes with the same
-  main class become variants of one button, e.g. `use-case` and `abstract-use-case`), the
+- **Main class (last in `classes`)** decides: the toolbar button of first-level archetypes
+  or the context menu entry of second-level ones (archetypes with the same main class
+  become variants of one button/submenu, e.g. `use-case` and `abstract-use-case`), the
   icon file name, the class label in the HTML pill and the CSS class of the table. Give an
-  archetype its own main class if it must have its own button and icon.
+  archetype its own main class if it must have its own entry and icon.
 - **Abstract classes** are just class tags without archetype (e.g. `use-case-step`,
   `use-case-action`). Use them in `acceptedChildren`, `acceptedParents` and
   `acceptedTargets` to model generalizations, and in XSLT to match families of archetypes.
@@ -142,8 +143,13 @@ same ids, classes and properties; only texts change.
   what to replace. Prefer one archetype per pattern (concrete vs abstract use case).
 - Do not rely on the archetype id at run time: objects do not remember which archetype
   they come from. Use classes or properties (e.g. `is-abstract`) for behaviour.
-- Every loaded archetype gets a toolbar button, also child-only ones; a button is enabled
-  only when the selected object accepts it (`accept_descendant`).
+- **First-level** archetypes (`acceptedParents` contains `:Proteus-any` or
+  `:Proteus-document`) get a toolbar button, enabled only when the selected object accepts
+  them. **Second-level** archetypes (neither of those, e.g. use case steps, specific data)
+  have **no toolbar button**: they appear in the context menu of objects that accept them
+  **and** list one of their classes explicitly in `acceptedChildren`
+  (`ArchetypeService.get_first_level_object_archetypes` /
+  `get_accepted_object_archetypes`). Both kinds must be listed in `objects.xml`.
 - Developer features → context menu "store as archetype" writes the object into the
   category folder of the **current language only**, appends it to `objects.xml` and copies
   its assets, but keeps the object's random 12-character id and current values: rename
@@ -185,18 +191,23 @@ Use `C:\proteus\.venv\Scripts\python.exe` with `sys.path.insert(0, r"C:\proteus"
 
 ```python
 import pathlib, logging; logging.disable(logging.CRITICAL)
-from proteus.model.archetype_repository import ArchetypeRepository
-for lang in ("en_us", "es_es"):
-    arch = ArchetypeRepository.load_object_archetypes(pathlib.Path(rf"<profile>\archetypes\{lang}"))
-    for tab, groups in arch.items():                      # toolbar tabs and buttons
-        print(lang, tab, {cls: [a.id for a in lst] for cls, lst in groups.items()})
-objs = {a.id: a for g in arch.values() for lst in g.values() for a in lst}
-print(objs["use-case"].accept_descendant(objs["system-step"]))   # acceptance matrix
+from proteus.application.configuration.config import Config
+from proteus.application.configuration.profile_settings import ProfileSettings
+Config().profile_settings = ProfileSettings.load(pathlib.Path(r"<profile>"), "en_US")
+from proteus.services.archetype_service import ArchetypeService
+s = ArchetypeService()
+for tab, groups in s.get_first_level_object_archetypes().items():   # toolbar tabs/buttons
+    print(tab, {cls: [a.id for a in lst] for cls, lst in groups.items()})
+uc = s.archetype_index["use-case"]
+print({cls: [a.id for a in lst]                                      # context menu of a parent
+       for cls, lst in s.get_accepted_object_archetypes(uc).items()})
+print(uc.accept_descendant(s.archetype_index["system-step"]))       # acceptance matrix
 ```
 
-Then: YAML parses and has no duplicated keys; render a test project built from the new
-archetypes in both languages (see the render snippet in `proteus-project-format`) and check
-there is no `!key!`; finally look at it in the GUI (forms, tooltips, toolbar, tree).
+Repeat with the other languages (`"es_ES"`). Then: YAML parses and has no duplicated keys;
+render a test project built from the new archetypes in both languages (see the render
+snippet in `proteus-project-format`) and check there is no `!key!`; finally look at it in
+the GUI (forms, tooltips, toolbar, context menus, tree).
 
 ## Line endings and commits
 

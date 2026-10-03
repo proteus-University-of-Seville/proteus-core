@@ -65,10 +65,23 @@ last class of the archetype; `<id_>` is its ID with underscores):
   This file is **mandatory**: Proteus loads *only* the archetypes listed in it, in that
   order, which is the order of the buttons in the tab. An archetype file that is not
   listed does not exist for Proteus.
-* *Second-level archetypes*, i.e. archetypes that only accept specific parents (such as use
-  case steps), must be listed too, otherwise they cannot be created. They get a toolbar
-  button like any other archetype: buttons are enabled only when the selected object
-  accepts the archetype as a child, so they are disabled until a valid parent is selected.
+* Archetypes are offered to the user in two places, depending on their `acceptedParents`:
+  * **First-level archetypes** accept `:Proteus-any` or `:Proteus-document` as parent
+    (e.g. sections, paragraphs, requirements, use cases). They get a button in the toolbar
+    tab of their category, enabled only when the selected object accepts them as a child.
+  * **Second-level archetypes** do not accept a document as parent: they only make sense
+    inside specific objects (e.g. the specific data of an information requirement, or the
+    steps of a use case, whose `acceptedParents` is `use-case conditional-branch`). They
+    have **no toolbar button**: they appear in the context menu of the objects that accept
+    them, i.e. objects that accept them as children **and** list one of their classes
+    explicitly in `acceptedChildren` (objects accepting `:Proteus-any`, such as sections,
+    do not offer them).
+
+  Second-level archetypes **must be listed in `objects.xml` too**: the context menu is
+  built from the loaded archetypes, so an archetype missing from `objects.xml` cannot be
+  created at all. (Precisely, an archetype is second-level when its `acceptedParents`
+  contains neither `:Proteus-any` nor `:Proteus-document`; e.g. an archetype accepting only
+  `section` as parent would be second-level too.)
 
 **Alternative**: with the developer features enabled, an existing object can be stored as
 an archetype from its context menu. Proteus then writes the object (and its descendants)
@@ -111,9 +124,10 @@ Rules:
 
 * `classes` lists class tags from the most general to the most specific. **The last one is
   the main class**, which determines:
-  * the toolbar button: archetypes with the same main class are grouped in one button as
-    variants of the same class (e.g. `use-case` and `abstract-use-case`, both with main
-    class `use-case`); give the archetype its own main class to get its own button;
+  * the toolbar button (first-level archetypes) or the context menu entry (second-level
+    archetypes): archetypes with the same main class are grouped in one button or submenu
+    as variants of the same class (e.g. `use-case` and `abstract-use-case`, both with main
+    class `use-case`); give the archetype its own main class to get its own entry;
   * the icon (`icons/<main-class>.png`, step 4);
   * the class label in the toolbar and in the rendered document
     (`archetype.class.<main-class>`, step 5);
@@ -279,12 +293,16 @@ generic cell rule (`table.proteus_table > tbody > tr > td`) to override it.
 
 Proteus loads the profile at start-up, so restart it after changing the profile. Then:
 
-* The archetype appears in its tab, in the right position, with its icon and label, in
-  every language, and its button is enabled exactly when a valid parent is selected.
+* A first-level archetype appears in its tab, in the right position, with its icon and
+  label, in every language, and its button is enabled exactly when a valid parent is
+  selected. A second-level archetype appears, with its icon and label, in the context menu
+  of the objects that accept it, and nowhere else.
 * The edit form shows the properties in the expected tabs, with labels and tooltips.
 * The rendered document shows no `!key!` and no XSLT errors (logged as CRITICAL).
 
-The archetypes can also be checked from a script with the Proteus Python environment:
-`ArchetypeRepository.load_object_archetypes(<profile>/archetypes/<lang>)` returns the
-toolbar tabs and buttons, and `parent.accept_descendant(child)` tells whether an archetype
+The archetypes can also be checked from a script with the Proteus Python environment,
+pointing `Config().profile_settings` to the profile (`ProfileSettings.load(<profile>,
+<language>)`): `ArchetypeService().get_first_level_object_archetypes()` returns the
+toolbar tabs and buttons, `get_accepted_object_archetypes(<parent archetype>)` the context
+menu entries of a parent, and `parent.accept_descendant(child)` tells whether an archetype
 is accepted as a child of another.
