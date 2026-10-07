@@ -33,3 +33,6 @@ xslt.toc: "Table of contents"
 xslt.traceability_matrix_missing_class: "Cannot display traceability matrix. Make sure at least one class is selected for rows and columns."
 xslt.traceability_matrix_missing_item: "Cannot display traceability matrix. Make sure at least one object exists of the class selected in rows and columns."
 xslt.traceability_matrix: "Traceability matrix"
+
+# Language option of the babel LaTeX package (LaTeX template)
+xslt.latex_babel_language: "english"

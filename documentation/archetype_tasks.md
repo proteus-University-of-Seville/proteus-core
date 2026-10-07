@@ -258,6 +258,11 @@ Useful named templates of `core/`:
 Literal texts come from `proteus-utils:i18n('xslt.<name>')`; extra arguments of that
 function are `{0}` format arguments, not a fallback text.
 
+If the profile has a **LaTeX template** (e.g. `xslt/latex` in the basic profile, used to
+export to LaTeX and PDF), an archetype with a custom HTML module usually needs a LaTeX module
+too, included in `latex.xsl`; without one it is rendered as the generic property card. See
+**documentation/latex_export.md**.
+
 
 7. Choose a colour for the archetype
 ------------------------------------
@@ -274,7 +279,8 @@ property, so the stylesheet of a new archetype is one rule using its **main clas
 
 Put it in **&lt;template&gt;/resources/css/&lt;id_&gt;.css** and add an `@import` to
 **default.css**. Archetypes which do not declare an accent fall back to a neutral slate
-colour (`#475569`), so this step is optional.
+colour (`#475569`), so this step is optional. The LaTeX template, if any, takes the same
+colour from a `\ProteusSetAccent{<main-class>}{0E7490}` line in `resources/proteus.sty`.
 
 Each profile has its own palette. The basic profile uses `#0e7490` teal (organizations),
 `#6d28d9` violet (stakeholders), `#83900e` olive (meetings) and `#4f46e5` indigo

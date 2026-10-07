@@ -33,3 +33,6 @@ xslt.toc: "Índice"
 xslt.traceability_matrix_missing_class: "No se puede visualizar la matriz de trazabilidad. Compruebe que hay al menos una clase seleccionada para las filas y columnas de la matriz."
 xslt.traceability_matrix_missing_item: "No se puede visualizar la matriz de trazabilidad. Compruebe que existe al menos un objeto de las clases seleccionadas para las filas y columnas de la matriz."
 xslt.traceability_matrix: "Matriz de trazabilidad"
+
+# Opción de idioma del paquete babel de LaTeX (plantilla LaTeX)
+xslt.latex_babel_language: "spanish"

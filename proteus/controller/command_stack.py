@@ -883,10 +883,45 @@ class Controller:
     # ----------------------------------------------------------------------
     def get_available_xslt(self) -> List[str]:
         """
-        Get the available xslt templates in the xslt folder.
+        Get the available xslt templates in the xslt folder that can be
+        shown as views (HTML output). Templates with other output formats
+        (e.g. LaTeX) are only used by export strategies, see
+        get_templates_by_output_format().
         """
         templates: List[Template] = self._render_service.get_templates()
-        return [template.name for template in templates]
+        return [template.name for template in templates if template.is_view]
+
+    # ----------------------------------------------------------------------
+    # Method     : get_templates_by_output_format
+    # Description: Get the templates that generate the given output format.
+    # Date       : 07/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def get_templates_by_output_format(self, output_format: str) -> List[Template]:
+        """
+        Get the templates loaded from the xslt directory that generate the
+        given output format (e.g. 'latex').
+        """
+        templates: List[Template] = self._render_service.get_templates()
+        return [t for t in templates if t.output_format == output_format]
+
+    # ----------------------------------------------------------------------
+    # Method     : render_template
+    # Description: Render the project with the given template.
+    # Date       : 07/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def render_template(self, template_name: str) -> str:
+        """
+        Render the project XML with the given template and return the result
+        as a string, whatever its output format is (HTML, LaTeX...). Search
+        paths (assets:///, templates:///) are not replaced.
+        """
+        log.info(f"Rendering project with template '{template_name}'.")
+        xml: ET.Element = self._project_service.generate_project_xml()
+        return self._render_service.render(xml, template_name)
 
     # ----------------------------------------------------------------------
     # Method     : get_template_by_name

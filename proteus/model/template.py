@@ -46,6 +46,12 @@ XSLT_NAME_ATTRIBUTE      = "name"
 XSLT_LANGUAGE_ATTRIBUTE  = "language"
 XSLT_FILE_ATTRIBUTE      = "file"
 XSLT_DEFAULT_ATTRIBUTE   = "default"
+XSLT_OUTPUT_ATTRIBUTE    = "output"
+
+# Output formats. HTML templates are views shown in the application; any other
+# format (e.g. LaTeX) is only used by export strategies.
+TEMPLATE_OUTPUT_HTML: str  = "html"
+TEMPLATE_OUTPUT_LATEX: str = "latex"
 
 
 
@@ -64,6 +70,14 @@ class Template:
     default_entrypoint: Path = None
     entrypoints: Dict[str, Path] = None
     plugin_dependencies: List[str] = None
+    output_format: str = TEMPLATE_OUTPUT_HTML
+
+    @property
+    def is_view(self) -> bool:
+        """
+        True if the template generates HTML and can be shown as a view.
+        """
+        return self.output_format == TEMPLATE_OUTPUT_HTML
 
     # ----------------------------------------------------------------------
     # Method     : load
@@ -95,10 +109,16 @@ class Template:
             template_name is not None and template_name != ""
         ), f"Name attribute not found in template tag for template {template_file}"
 
+        # Get the output format (optional, HTML by default)
+        output_format: str = template_root.get(
+            XSLT_OUTPUT_ATTRIBUTE, TEMPLATE_OUTPUT_HTML
+        ).strip().lower()
+
         # Return the template object
         template = Template(
             name=template_name,
             path=template_path,
+            output_format=output_format,
         )
 
         template._load_entrypoints()

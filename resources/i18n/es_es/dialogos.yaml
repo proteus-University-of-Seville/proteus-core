@@ -162,6 +162,14 @@ export_dialog.export_html.error.not_directory: "La ruta seleccionada no es una c
 export_dialog.export_html.error.invalid_folder_name: "Nombre de carpeta no válido"
 export_dialog.export_html.error.folder_exists: "Ya existe una carpeta con ese nombre en el directorio seleccionado"
 
+# Export LaTeX (sources and PDF)
+export_dialog.export_strategy.latex: "LaTeX (con carpeta de recursos)"
+export_dialog.export_strategy.pdf_latex: "Archivo PDF (mediante LaTeX)"
+export_dialog.export_latex.template.label: "Plantilla LaTeX:"
+export_dialog.export_latex.error.no_template: "El perfil actual no tiene ninguna plantilla LaTeX"
+export_dialog.export_pdf_latex.engine.label: "Motor LaTeX:"
+export_dialog.export_pdf_latex.error.no_engine: "No se ha encontrado ningún motor LaTeX (xelatex, lualatex o pdflatex). Instale una distribución de LaTeX como MiKTeX o TeX Live y añádala al PATH."
+
 # ---------------------------------------------------------------------------
 # Information dialog
 # ---------------------------------------------------------------------------

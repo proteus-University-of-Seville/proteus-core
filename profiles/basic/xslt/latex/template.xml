@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- LaTeX template: it is not a view. It is used by the 'latex' and      -->
+<!-- 'pdf_latex' export strategies of the basic plugin (output="latex"). -->
+<!-- Like the default template, it is language-independent: localized    -->
+<!-- strings are retrieved with proteus-utils:i18n().                    -->
+<template name="latex" output="latex">
+    <entryPoints default="latex.xsl"/>
+    <dependencies>
+        <pluginDependency name="basic"/>
+    </dependencies>
+</template>

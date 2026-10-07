@@ -162,6 +162,14 @@ export_dialog.export_html.error.not_directory: "The path is not a directory"
 export_dialog.export_html.error.invalid_folder_name: "The folder name is invalid"
 export_dialog.export_html.error.folder_exists: "The folder already exists, select another name"
 
+# Export LaTeX (sources and PDF)
+export_dialog.export_strategy.latex: "LaTeX (with resources folder)"
+export_dialog.export_strategy.pdf_latex: "PDF file (through LaTeX)"
+export_dialog.export_latex.template.label: "LaTeX template:"
+export_dialog.export_latex.error.no_template: "The current profile has no LaTeX template"
+export_dialog.export_pdf_latex.engine.label: "LaTeX engine:"
+export_dialog.export_pdf_latex.error.no_engine: "No LaTeX engine (xelatex, lualatex or pdflatex) was found. Install a LaTeX distribution such as MiKTeX or TeX Live and add it to the PATH."
+
 # ---------------------------------------------------------------------------
 # Information dialog
 # ---------------------------------------------------------------------------
