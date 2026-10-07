@@ -195,7 +195,7 @@ same ids, classes and properties; only texts change.
   excludes a frequency of `0` via `excluded_properties`).
 - CSS: generic cell rules use `table.proteus_table > tbody > tr > td`; rules for a new
   row class need at least that specificity to win.
-- LaTeX template (`xslt/latex`, used by the LaTeX and PDF-through-LaTeX exports): an
+- LaTeX template (`xslt/latex`, used by the "LaTeX" and "PDF (from LaTeX)" exports): an
   archetype with a custom HTML module usually needs a LaTeX module too (included in
   `latex.xsl`) and its accent in `resources/proteus.sty` (`\ProteusSetAccent`). Escape all
   texts (`tex`/`label` named templates), never write raw `~ " < >`. Rules in

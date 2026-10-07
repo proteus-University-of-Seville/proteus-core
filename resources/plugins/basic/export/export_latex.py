@@ -14,17 +14,18 @@
 # --------------------------------------------------------------------------
 
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Set
 import logging
 import re
 import shutil
 import tempfile
+import urllib.request
 
 # --------------------------------------------------------------------------
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QProcess
+from PyQt6.QtCore import QObject, QProcess, QRunnable, QThreadPool, pyqtSignal
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget, QLabel, QComboBox
 
@@ -41,6 +42,7 @@ from proteus.controller.command_stack import Controller
 
 from basic.export.export_html import ExportHTML, remove_empty_directories
 from basic.export.export_pdf import ExportPDF
+from basic.proteus_xslt_latex import latex_url
 
 # logging configuration
 log = logging.getLogger(__name__)
@@ -64,6 +66,19 @@ UNSUPPORTED_IMAGE_SUFFIXES = {".gif", ".bmp", ".webp", ".svg", ".tif", ".tiff", 
 
 # Assets are referenced as {assets/<file name>} by LaTeX templates
 ASSET_REFERENCE_PATTERN = re.compile(r"\{" + ASSETS_REPOSITORY + r"/([^{}]+)\}")
+
+# Remote figures are written as \ProteusRemoteImage{<width>}{<URL>} by LaTeX
+# templates. They are downloaded to remote/ and replaced by \includegraphics.
+REMOTE_IMAGE_PATTERN = re.compile(r"\\ProteusRemoteImage\{([^{}]*)\}\{([^{}]*)\}")
+REMOTE_IMAGES_FOLDER: str = "remote"
+REMOTE_IMAGE_TIMEOUT: int = 15  # seconds
+
+# File signatures of the image formats graphicx can include as they are
+INCLUDABLE_IMAGE_SIGNATURES = {
+    b"\x89PNG": ".png",
+    b"\xff\xd8": ".jpg",
+    b"%PDF": ".pdf",
+}
 
 
 # --------------------------------------------------------------------------
@@ -114,16 +129,73 @@ def _copy_asset(asset: str, assets_folder: Path, destination: Path) -> str:
     return asset
 
 
-def write_latex_sources(controller: Controller, template: Template, folder: Path) -> Path:
+def _download_image(url: str, destination: Path, name: str) -> str | None:
     """
-    Renders the current document with the given LaTeX template and writes
-    the sources in the given folder:
-    - main.tex
+    Downloads a remote image to the destination folder and returns its
+    file name, or None if it could not be downloaded. PNG, JPEG and PDF
+    files are kept as they are; any other format Qt can read (GIF, WebP,
+    SVG...) is converted to PNG.
+    """
+    try:
+        request = urllib.request.Request(url, headers={"User-Agent": "PROTEUS"})
+        with urllib.request.urlopen(request, timeout=REMOTE_IMAGE_TIMEOUT) as response:
+            data: bytes = response.read()
+    except Exception as e:
+        log.warning(f"Remote figure '{url}' could not be downloaded: {e}")
+        return None
+
+    destination.mkdir(parents=True, exist_ok=True)
+
+    for signature, suffix in INCLUDABLE_IMAGE_SIGNATURES.items():
+        if data.startswith(signature):
+            (destination / f"{name}{suffix}").write_bytes(data)
+            return f"{name}{suffix}"
+
+    image = QImage.fromData(data)
+    if not image.isNull() and image.save((destination / f"{name}.png").as_posix(), "PNG"):
+        return f"{name}.png"
+
+    log.warning(f"Remote figure '{url}' is not an image format that can be included")
+    return None
+
+
+def _replace_remote_images(tex: str, folder: Path) -> str:
+    """
+    Downloads the remote figures of the LaTeX source to <folder>/remote and
+    replaces each \\ProteusRemoteImage{width}{URL} by \\includegraphics, or
+    by \\ProteusMissingImage{<link>} if the image could not be downloaded.
+    Each URL is downloaded once.
+    """
+    downloaded: Dict[str, str | None] = {}
+
+    def replace(match: re.Match) -> str:
+        width, url = match.group(1), match.group(2).strip()
+        if url not in downloaded:
+            downloaded[url] = _download_image(
+                url, folder / REMOTE_IMAGES_FOLDER, f"image-{len(downloaded) + 1}"
+            )
+        file_name = downloaded[url]
+        if file_name is None:
+            return r"\ProteusMissingImage{%s}" % latex_url(None, url)
+        return r"\includegraphics[width=%s\linewidth]{%s/%s}" % (
+            width, REMOTE_IMAGES_FOLDER, file_name
+        )
+
+    return REMOTE_IMAGE_PATTERN.sub(replace, tex)
+
+
+def prepare_latex_sources(controller: Controller, template: Template, folder: Path) -> str:
+    """
+    First step of writing the LaTeX sources, run in the application thread
+    because rendering uses the project and plugin components: renders the
+    current document with the given LaTeX template and copies to the given
+    folder:
     - the template files except XSL and XML files (e.g. resources/proteus.sty)
     - the profile icons (icons/<class>.png)
-    - the project assets referenced in main.tex (assets/...)
+    - the project assets referenced in the LaTeX source (assets/...)
 
-    :return: path to main.tex
+    :return: the LaTeX source, with remote figures still to be downloaded
+             (see finish_latex_sources)
     """
     tex: str = controller.render_template(template.name)
 
@@ -165,9 +237,91 @@ def write_latex_sources(controller: Controller, template: Template, folder: Path
         tex,
     )
 
+    return tex
+
+
+def finish_latex_sources(tex: str, folder: Path) -> Path:
+    """
+    Second step of writing the LaTeX sources, which may take a while and
+    can run in a worker thread (see LaTeXSourcesTask): downloads the remote
+    figures (remote/...) and writes main.tex.
+
+    :return: path to main.tex
+    """
+    tex = _replace_remote_images(tex, folder)
+
     main_file: Path = folder / LATEX_MAIN_FILE
     main_file.write_text(tex, encoding="utf-8")
     return main_file
+
+
+def write_latex_sources(controller: Controller, template: Template, folder: Path) -> Path:
+    """
+    Writes all the LaTeX sources in the given folder in the calling thread
+    (prepare_latex_sources and finish_latex_sources).
+
+    :return: path to main.tex
+    """
+    tex: str = prepare_latex_sources(controller, template, folder)
+    return finish_latex_sources(tex, folder)
+
+
+# --------------------------------------------------------------------------
+# Class: LaTeXSourcesTask
+# Description: Runs finish_latex_sources in a worker thread.
+# Date: 07/10/2026
+# Version: 0.1
+# Author: Amador Durán Toro
+# --------------------------------------------------------------------------
+class LaTeXSourcesSignals(QObject):
+    """
+    Signals of LaTeXSourcesTask (QRunnable is not a QObject).
+    - finished: path to main.tex and True, or an error message and False.
+    """
+
+    finished = pyqtSignal(str, bool)
+
+
+class LaTeXSourcesTask(QRunnable):
+    """
+    Downloads the remote figures and writes main.tex (finish_latex_sources)
+    in a thread of the global QThreadPool, so that the application does not
+    stop responding while images are downloaded.
+
+    Use start(): it keeps a reference to the running task until its finished
+    signal has been delivered in the application thread. Receivers connected
+    to the signal with a bound method of a QObject are disconnected
+    automatically if they are deleted before the task finishes (e.g. when
+    the export dialog is closed).
+    """
+
+    # Running tasks, so that they are not garbage collected
+    _running: Set["LaTeXSourcesTask"] = set()
+
+    def __init__(self, tex: str, folder: Path) -> None:
+        super().__init__()
+        self.setAutoDelete(False)
+        self._tex: str = tex
+        self._folder: Path = folder
+        self.signals = LaTeXSourcesSignals()
+
+    def start(self) -> None:
+        """
+        Starts the task. Must be called from the application thread.
+        """
+        LaTeXSourcesTask._running.add(self)
+        self.signals.finished.connect(
+            lambda *args: LaTeXSourcesTask._running.discard(self)
+        )
+        QThreadPool.globalInstance().start(self)
+
+    def run(self) -> None:
+        try:
+            main_file: Path = finish_latex_sources(self._tex, self._folder)
+            self.signals.finished.emit(main_file.as_posix(), True)
+        except Exception as e:
+            log.error(f"Error writing the LaTeX sources in '{self._folder}': {e}")
+            self.signals.finished.emit(str(e), False)
 
 
 def _template_selector(controller: Controller) -> QComboBox:
@@ -198,27 +352,45 @@ class ExportLaTeX(ExportHTML):
     def __init__(self, controller: Controller) -> None:
         super().__init__(controller)
         self._template_selector: QComboBox = None
+        self._export_folder: Path = None
+        self._task: LaTeXSourcesTask = None
 
     def export(self) -> None:
         """
-        Writes main.tex and its resources in the selected folder.
+        Writes main.tex and its resources in the selected folder. Remote
+        figures are downloaded in a worker thread; the export finishes in
+        _sources_written.
         """
-        export_folder: Path = Path(self._path_input.directory()) / self._folder_name_input.text()
+        self._export_folder = Path(self._path_input.directory()) / self._folder_name_input.text()
         template: Template = self._template_selector.currentData()
 
         try:
-            self.exportProgressSignal.emit(20)
-            export_folder.mkdir(parents=True)
-            write_latex_sources(self._controller, template, export_folder)
+            self.exportProgressSignal.emit(10)
+            self._export_folder.mkdir(parents=True)
+            tex: str = prepare_latex_sources(self._controller, template, self._export_folder)
         except Exception as e:
             log.error(f"Error exporting with LaTeX template '{template.name}': {e}")
-            if export_folder.exists():
-                shutil.rmtree(export_folder, ignore_errors=True)
-            self.exportFinishedSignal.emit(export_folder.as_posix(), False)
+            self._sources_written(str(e), False)
+            return
+
+        self.exportProgressSignal.emit(40)
+        self._task = LaTeXSourcesTask(tex, self._export_folder)
+        self._task.signals.finished.connect(self._sources_written)
+        self._task.start()
+
+    def _sources_written(self, result: str, success: bool) -> None:
+        """
+        Emits the finished signal. If the sources could not be written, the
+        export folder is removed.
+        """
+        if not success:
+            if self._export_folder.exists():
+                shutil.rmtree(self._export_folder, ignore_errors=True)
+            self.exportFinishedSignal.emit(self._export_folder.as_posix(), False)
             return
 
         self.exportProgressSignal.emit(100)
-        self.exportFinishedSignal.emit(export_folder.as_posix(), True)
+        self.exportFinishedSignal.emit(self._export_folder.as_posix(), True)
 
     def exportFormWidget(self) -> QWidget:
         """
@@ -266,21 +438,37 @@ class ExportPDFLaTeX(ExportPDF):
         self._template_selector: QComboBox = None
         self._engine_selector: QComboBox = None
         self._process: QProcess = None
+        self._task: LaTeXSourcesTask = None
         self._build_folder: Path = None
         self._pass: int = 0
 
     def export(self) -> None:
         """
-        Writes the LaTeX sources in a temporary folder and starts the first
-        compilation pass.
+        Writes the LaTeX sources in a temporary folder (remote figures are
+        downloaded in a worker thread) and then starts the first compilation
+        pass in _sources_written.
         """
         template: Template = self._template_selector.currentData()
         self._build_folder = Path(tempfile.mkdtemp(prefix="proteus-latex-"))
 
         try:
-            write_latex_sources(self._controller, template, self._build_folder)
+            self.exportProgressSignal.emit(5)
+            tex: str = prepare_latex_sources(self._controller, template, self._build_folder)
         except Exception as e:
             log.error(f"Error generating LaTeX with template '{template.name}': {e}")
+            self._finish(False)
+            return
+
+        self.exportProgressSignal.emit(10)
+        self._task = LaTeXSourcesTask(tex, self._build_folder)
+        self._task.signals.finished.connect(self._sources_written)
+        self._task.start()
+
+    def _sources_written(self, result: str, success: bool) -> None:
+        """
+        Starts the compilation once main.tex has been written.
+        """
+        if not success:
             self._finish(False)
             return
 

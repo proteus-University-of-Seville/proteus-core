@@ -34,5 +34,7 @@ xslt.traceability_matrix_missing_class: "No se puede visualizar la matriz de tra
 xslt.traceability_matrix_missing_item: "No se puede visualizar la matriz de trazabilidad. Compruebe que existe al menos un objeto de las clases seleccionadas para las filas y columnas de la matriz."
 xslt.traceability_matrix: "Matriz de trazabilidad"
 
-# Opción de idioma del paquete babel de LaTeX (plantilla LaTeX)
+# Plantilla LaTeX: opción de idioma del paquete babel y texto que se muestra
+# en lugar de una figura remota que no se ha podido descargar
 xslt.latex_babel_language: "spanish"
+xslt.remote_figure_not_available: "Figura remota no disponible"

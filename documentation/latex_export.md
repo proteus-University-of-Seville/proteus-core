@@ -1,5 +1,5 @@
-LaTeX and PDF (through LaTeX) export
-====================================
+LaTeX and PDF (from LaTeX) export
+=================================
 
 Besides the HTML views, a profile may include **LaTeX templates**: XSLT templates whose
 output is a LaTeX document instead of HTML. They are not views; they are used by two export
@@ -7,7 +7,7 @@ formats of the basic plugin:
 
 * **LaTeX (with resources folder)** (`latex`): writes `main.tex` and its resources in a new
   folder, ready to be edited or compiled by the user.
-* **PDF file (through LaTeX)** (`pdf_latex`): writes the same sources in a temporary folder,
+* **PDF (from LaTeX)** (`pdf_latex`): writes the same sources in a temporary folder,
   compiles them with a LaTeX engine installed in the system and saves the PDF.
 
 The basic profile ships one LaTeX template, `profiles/basic/xslt/latex`, the counterpart of
@@ -32,6 +32,27 @@ Requirements
   configured to *ask* before installing packages, its dialog appears during the export.
 * If the compilation fails, the LaTeX log is copied next to the selected PDF file
   (`<name>.log`).
+* Remote figures are downloaded during the export, so it needs network access to show them
+  (15 seconds of timeout per image).
+
+
+Document layout
+---------------
+
+* Class `article` with options `12pt,a4paper,twoside,titlepage`. With `twoside` the cover,
+  the table of contents and the body start on odd pages (`\cleardoublepage`), and
+  `\raggedbottom` avoids the stretched vertical space of `\flushbottom`.
+* Fonts: Latin Modern with every engine, and the sans serif family for the whole document
+  (`\familydefault` is `\sfdefault`); code uses the typewriter family.
+* Tables (property cards, Markdown tables and traceability matrices) are centred, 95% of the
+  text width (`\ProteusTableFraction` in `proteus.sty`), with rows separated by
+  `\arraystretch` 1.5. Columns of Markdown tables are left-aligned. The value column of
+  cards (`Q`) and the columns of Markdown tables (`Y`) start with `\@minipagetrue`, which
+  removes the space LaTeX adds above a list that starts a cell. That flag is global and
+  disables `\addvspace` (e.g. the space above section headings), so it is reset when the first
+  paragraph of the cell starts, as `minipage` does, and after each card and Markdown table.
+* Cards have `\medskipamount` above and below (`\LTpre`, `\LTpost`): 12pt between two cards,
+  while headings after a card keep their usual space.
 
 
 How it works
@@ -56,12 +77,56 @@ resources/proteus.sty        template files except *.xsl and *.xml
 resources/images/logo_us.png
 icons/<main-class>.png       profile icons
 assets/<file>                project assets referenced in main.tex
+remote/image-<n>.<ext>       remote figures, downloaded
 ```
 
 Assets are found by looking for `{assets/<file>}` in `main.tex`, so templates must always
 reference them that way. Formats that LaTeX cannot include (GIF, BMP, WebP, SVG, TIFF, ICO)
-are converted to PNG (`<file>.png`) and the reference is updated. Remote figures (`url`
-property) are shown as a link, not downloaded.
+are converted to PNG (`<file>.png`) and the reference is updated.
+
+Remote figures (`url` property) are written by the template as
+`\ProteusRemoteImage{<width>}{<URL>}`, with the URL unescaped. The export strategies
+download each URL once and replace the command by `\includegraphics` (PNG, JPEG and PDF are
+kept as they are, other formats Qt can read are converted to PNG), or by
+`\ProteusMissingImage{<link>}` if the image cannot be downloaded: a box with the text of the
+i18n key `xslt.remote_figure_not_available` and the URL.
+
+The sources are written in two steps. `prepare_latex_sources` renders the document and copies
+resources, icons and assets in the application thread, because rendering uses the project and
+plugin components. `finish_latex_sources` downloads the remote figures and writes `main.tex`;
+the export strategies run it in a `LaTeXSourcesTask` (a `QRunnable` of the global
+`QThreadPool`), so the application keeps responding during the downloads, and continue (or
+start the compilation) when its `finished` signal arrives. `write_latex_sources` runs both
+steps in the calling thread, for scripts.
+
+
+Bibliography and citations
+--------------------------
+
+Bibliography items are LaTeX bibliography entries, without BibTeX:
+
+* Each one is written as `\ProteusBibItem[<name>]{<id>} <authors>. <details>` (a `\bibitem`
+  with the item name as label, as in the HTML view). Consecutive items share one
+  `proteusbibliography` list, a `thebibliography` without its own heading (the items are
+  already in a section of the document) and with hanging labels as wide as needed. The list
+  stays where the items are in the document, in their order.
+* Citations are `\cite{<id>}`, printed as `[<name>]`:
+  * In Markdown texts: bibliography items are also glossary items, so the glossary
+    highlighter links their names; links to bibliography items of the rendered document are
+    converted to `\cite` (`markdown_to_latex` receives their ids, see the `bibliography_ids`
+    variable in `core/utilities.xsl`). Brackets written around the name
+    (`[Wiegers and Beatty 2013]`) are removed, since `\cite` adds them.
+  * In traces: a trace to a bibliography item of the document (e.g. *Dependencies*) is
+    `\cite{<id>}` (`trace_target` in `core/properties.xsl`).
+  * Bibliography items of other documents are not cited: links and traces to them are plain
+    text, like any other object of another document.
+* A bibliography item shown by a symbolic link opens and closes its own list (the `standalone`
+  parameter passed by `symbolic_link.xsl`), and `\ProteusBibItem` does not define the
+  citation again inside the link.
+* No extra tool or compilation pass is needed: the two passes resolve the citations.
+
+A `.bib` file processed by BibTeX or biber would need structured bibliography items (entry
+type, title, year, publisher...), which the basic profile does not have.
 
 
 Writing LaTeX templates and modules
@@ -92,7 +157,9 @@ module is mostly replacing HTML by LaTeX. Rules:
   pages and repeat their header row. Long tables cannot be nested in table cells or placed in
   boxes, so children are rendered below the card, indented (`adjustwidth`), and symbolic
   links are an indented block, not a box. `extra_rows_before` and `extra_rows` are LaTeX rows
-  (`label & value \\ \hline`).
+  (`label & value \\ \hline`). A long table steps the `table` counter: `\end{xltabular}` must
+  be followed by `\ProteusCardEnd`, which restores it, so that only real tables (e.g.
+  traceability matrices) are numbered.
 * **Accent colours**: `\ProteusSetAccent{<main-class>}{<HTML colour>}` in `proteus.sty`
   (the counterpart of `--accent` in the CSS files).
 * **Sections, figures and tables** are numbered by LaTeX; figures and matrices are not
@@ -114,4 +181,3 @@ Known limitations
 * Sections placed after an appendix are numbered with letters (appendices can only be placed
   directly in a document, at the end).
 * Raw HTML in Markdown is dropped (its text is kept).
-* Remote figures are not downloaded.

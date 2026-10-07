@@ -19,8 +19,11 @@
        document, as in the HTML view. LaTeX numbers them.
 
        NOTE #2
-       Remote figures (url property) cannot be included by LaTeX: the URL
-       is shown instead of the image.
+       Remote figures (url property) are written as
+       \ProteusRemoteImage{width}{URL}, with the URL unescaped. The export
+       strategies download the image and replace that command by
+       \includegraphics (or by \ProteusMissingImage if the download fails),
+       so it never reaches LaTeX.
   -->
   <!-- ================================================================ -->
 
@@ -45,8 +48,13 @@
         <xsl:text>}&#10;</xsl:text>
       </xsl:when>
       <xsl:when test="$figure_url">
-        <xsl:text>\fbox{</xsl:text>
-        <xsl:value-of select="proteus-utils:latex_url($figure_url)"/>
+        <!-- Replaced on export by the downloaded image (see proteus.sty) -->
+        <xsl:text>\ProteusRemoteImage{</xsl:text>
+        <xsl:call-template name="image_width">
+          <xsl:with-param name="width" select="properties/*[@name='width']"/>
+        </xsl:call-template>
+        <xsl:text>}{</xsl:text>
+        <xsl:value-of select="$figure_url"/>
         <xsl:text>}&#10;</xsl:text>
       </xsl:when>
       <xsl:otherwise>

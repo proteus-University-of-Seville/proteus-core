@@ -38,7 +38,11 @@
           <xsl:with-param name="key" select="'xslt.symlink_tooltip'"/>
         </xsl:call-template>
         <xsl:text>}&#10;</xsl:text>
-        <xsl:apply-templates select="$target_object" />
+        <!-- standalone: the target is rendered alone, out of its siblings -->
+        <!-- (used by bibliography items, ignored by other templates)     -->
+        <xsl:apply-templates select="$target_object">
+          <xsl:with-param name="standalone" select="true()"/>
+        </xsl:apply-templates>
         <xsl:text>\end{proteuslink}&#10;</xsl:text>
       </xsl:if>
     </xsl:for-each>

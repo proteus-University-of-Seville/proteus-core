@@ -61,7 +61,7 @@
     <xsl:value-of select="$class"/>
     <xsl:text>}</xsl:text>
     <xsl:call-template name="anchor"/>
-    <xsl:text>&#10;\begin{xltabular}{\linewidth}{|L|X|}&#10;\hline&#10;</xsl:text>
+    <xsl:text>&#10;\begin{xltabular}{\ProteusTableWidth}{|L|Q|}&#10;\hline&#10;</xsl:text>
 
     <!-- Header row: class icon and label, code, name and image -->
     <xsl:text>\ProteusHeaderRow{</xsl:text>
@@ -92,7 +92,7 @@
 
     <xsl:value-of select="$extra_rows"/>
 
-    <xsl:text>\end{xltabular}&#10;</xsl:text>
+    <xsl:text>\end{xltabular}\ProteusCardEnd&#10;</xsl:text>
 
     <!-- Render the children objects recursively, below the card -->
     <xsl:if test="$show_children">

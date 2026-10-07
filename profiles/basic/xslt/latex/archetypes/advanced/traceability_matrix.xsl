@@ -113,7 +113,7 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- Column specification: one centred column per column item -->
-        <xsl:text>\begin{adjustbox}{max width=\linewidth}\small&#10;\begin{tabular}{|l|</xsl:text>
+        <xsl:text>\begin{adjustbox}{max width=\ProteusTableWidth}\small&#10;\begin{tabular}{|l|</xsl:text>
         <xsl:for-each select="$col-items">c|</xsl:for-each>
         <xsl:text>}&#10;\hline&#10;\rowcolor{proteusaccent!12}</xsl:text>
 

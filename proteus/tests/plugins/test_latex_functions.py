@@ -11,6 +11,7 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import re
 import sys
 from pathlib import Path
 
@@ -100,7 +101,7 @@ def test_markdown_table():
     """
     result = markdown_to_latex_string("| A | B |\n|---|---|\n| 1% | 2 |", glossary_highlight=False)
 
-    assert result.startswith("\\begin{proteusmdtable}{XX}")
+    assert result.startswith("\\begin{proteusmdtable}{YY}")
     assert r"\textbf{A} & \textbf{B} \\ \hline" in result
     assert r"1\% & 2 \\ \hline" in result
 
@@ -114,6 +115,57 @@ def test_xslt_functions_accept_node_sets():
     assert latex_escape(None, [element]) == r"**50\%**"
     assert markdown_to_latex(None, [element], False) == r"\textbf{50\%}"
     assert latex_escape(None, "a_b") == r"a\_b"
+
+
+@pytest.fixture()
+def glossary_with_bibliography_item(monkeypatch):
+    """
+    Glossary with one bibliography item ('Wiegers and Beatty 2013', id
+    'bib1') and one glossary item ('loan', id 'loan1'), as the
+    GlossaryHandler component builds it in the application.
+    """
+    from basic.glossary_handler import GlossaryHandler
+
+    monkeypatch.setattr(GlossaryHandler, "object_ids_by_item",
+                        {"wiegers and beatty 2013": {"bib1"}, "loan": {"loan1"}})
+    monkeypatch.setattr(GlossaryHandler, "items_descriptions", {"bib1": "", "loan1": ""})
+    monkeypatch.setattr(GlossaryHandler, "pattern", re.compile(
+        r"\b(?<!-)(?:wiegers and beatty 2013|loan)(?!-)\b", re.IGNORECASE))
+
+
+@pytest.mark.parametrize(
+    "markdown, expected",
+    [
+        ("As in Wiegers and Beatty 2013.", r"As in \cite{bib1}."),
+        ("As in [Wiegers and Beatty 2013].", r"As in \cite{bib1}."),
+        ("A loan.", r"A \hyperref[loan1]{loan}."),
+        ("`Wiegers and Beatty 2013`", r"\texttt{Wiegers and Beatty 2013}"),
+    ],
+)
+def test_markdown_citations(glossary_with_bibliography_item, markdown, expected):
+    """
+    Glossary links to bibliography items of the document are citations;
+    brackets written around them are removed, since \\cite adds them.
+    Other glossary items are hyperlinks, and code is not highlighted.
+    """
+    assert markdown_to_latex_string(markdown, True, ["bib1"]) == expected
+
+
+def test_markdown_citations_other_documents(glossary_with_bibliography_item):
+    """
+    Bibliography items that are not in the rendered document (not in the
+    citation ids) are hyperlinks, not citations.
+    """
+    assert markdown_to_latex_string("[Wiegers and Beatty 2013]", True, []) == (
+        r"[\hyperref[bib1]{Wiegers and Beatty 2013}]"
+    )
+
+
+def test_xslt_markdown_citation_ids(glossary_with_bibliography_item):
+    """
+    The XSLT function receives the citation ids as a space-separated string.
+    """
+    assert markdown_to_latex(None, "Wiegers and Beatty 2013", True, " x bib1 ") == r"\cite{bib1}"
 
 
 def test_latex_url():

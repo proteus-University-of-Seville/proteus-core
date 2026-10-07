@@ -15,6 +15,8 @@
 
 import re
 import logging
+from contextvars import ContextVar
+from typing import FrozenSet, Iterable
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -79,6 +81,10 @@ INLINE_ELEMENTS = {
 # some languages and it breaks inside long tables.
 NBSP = r"\nobreakspace{}"
 
+# Ids whose internal links are citations, for the Markdown text being
+# converted (set by markdown_to_latex_string)
+_CITATION_IDS: ContextVar[FrozenSet[str]] = ContextVar("citation_ids", default=frozenset())
+
 
 # --------------------------------------------------------------------------
 # Helper functions
@@ -118,13 +124,18 @@ def escape_url(url: str) -> str:
 
 def _children_to_latex(element) -> str:
     """
-    Converts the text and children of an HTML element to LaTeX.
+    Converts the text and children of an HTML element to LaTeX. Brackets
+    written around a citation ("[Wiegers and Beatty 2013]") are removed,
+    since \\cite already adds them.
     """
     result = escape_latex(element.text) if element.text else ""
     for child in element:
-        result += _element_to_latex(child)
-        if child.tail:
-            result += escape_latex(child.tail)
+        child_latex: str = _element_to_latex(child)
+        tail: str = child.tail or ""
+        if child_latex.startswith("\\cite{") and result.endswith("[") and tail.startswith("]"):
+            result = result[:-1]
+            tail = tail[1:]
+        result += child_latex + escape_latex(tail)
     return result
 
 
@@ -151,7 +162,8 @@ def _table_to_latex(table) -> str:
 
     columns = max(len(row.findall("./th") + row.findall("./td")) for row in rows)
 
-    result = "\\begin{proteusmdtable}{%s}\n" % ("X" * columns)
+    # Y: left-aligned X column (see proteus.sty)
+    result = "\\begin{proteusmdtable}{%s}\n" % ("Y" * columns)
     for row in rows:
         cells = []
         for cell in row.findall("./th") + row.findall("./td"):
@@ -189,7 +201,10 @@ def _element_to_latex(element) -> str:
         href = element.get("href", "")
         text = _children_to_latex(element)
         if href.startswith("#"):
-            # Internal link, e.g. glossary items (object ids are labels)
+            # Internal link, e.g. glossary items (object ids are labels).
+            # Links to bibliography items of the document are citations.
+            if href[1:] in _CITATION_IDS.get():
+                return r"\cite{%s}" % href[1:]
             return r"\hyperref[%s]{%s}" % (href[1:], text)
         return r"\href{%s}{%s}" % (escape_url(href), text)
 
@@ -211,12 +226,16 @@ def _element_to_latex(element) -> str:
     return _children_to_latex(element)
 
 
-def markdown_to_latex_string(text: str, glossary_highlight: bool = True) -> str:
+def markdown_to_latex_string(
+    text: str, glossary_highlight: bool = True, citation_ids: Iterable[str] = ()
+) -> str:
     """
     Converts Markdown to LaTeX. Markdown is first converted to HTML with
     python-markdown (as generate_markdown does), glossary items are linked
     using the HTML glossary highlighter (so code blocks are skipped) and
-    the HTML tree is then converted to LaTeX.
+    the HTML tree is then converted to LaTeX. Internal links to the given
+    ids (bibliography items, which are also glossary items) are converted
+    to \\cite.
     """
     if not text.strip():
         return ""
@@ -228,8 +247,14 @@ def markdown_to_latex_string(text: str, glossary_highlight: bool = True) -> str:
 
     root = lxml.html.fragment_fromstring(html, create_parent="div")
 
+    token = _CITATION_IDS.set(frozenset(citation_ids))
+    try:
+        latex: str = _children_to_latex(root)
+    finally:
+        _CITATION_IDS.reset(token)
+
     # Newlines between HTML blocks are kept as text: one blank line is enough
-    return re.sub(r"\n{3,}", "\n\n", _children_to_latex(root)).strip()
+    return re.sub(r"\n{3,}", "\n\n", latex).strip()
 
 
 # --------------------------------------------------------------------------
@@ -244,14 +269,18 @@ def latex_escape(context, text) -> str:
     return escape_latex(_xslt_argument_to_text(text))
 
 
-def markdown_to_latex(context, text, glossary_highlight=True) -> str:
+def markdown_to_latex(context, text, glossary_highlight=True, citation_ids="") -> str:
     """
     XSLT function: converts the given Markdown text to LaTeX. Glossary items
     are linked to their definitions unless glossary_highlight is false.
+    Links to the objects whose ids are in citation_ids (space-separated,
+    the bibliography items of the document) are citations (\\cite).
     """
     try:
         return markdown_to_latex_string(
-            _xslt_argument_to_text(text), bool(glossary_highlight)
+            _xslt_argument_to_text(text),
+            bool(glossary_highlight),
+            _xslt_argument_to_text(citation_ids).split(),
         )
     except Exception as e:
         log.error(f"Error converting Markdown to LaTeX: {e}")

@@ -33,14 +33,38 @@
   </xsl:template>
 
   <!-- ============================================= -->
+  <!-- bibliography_ids variable                     -->
+  <!-- ============================================= -->
+
+  <!-- Space-separated ids of the bibliography items of the rendered -->
+  <!-- document: links to them are citations (\cite)                 -->
+  <xsl:variable name="bibliography_ids">
+    <xsl:for-each
+      select="//object[@id = proteus-utils:current_document()]//object[contains(concat(' ', normalize-space(@classes), ' '),' bibliography-item ')]"
+    >
+      <xsl:value-of select="@id"/>
+      <xsl:text> </xsl:text>
+    </xsl:for-each>
+  </xsl:variable>
+
+  <!-- True if $object is a bibliography item of the rendered document -->
+  <xsl:template name="is_citable">
+    <xsl:param name="object"/>
+    <xsl:if test="$object and contains(concat(' ', $bibliography_ids), concat(' ', $object/@id, ' '))">
+      <xsl:text>true</xsl:text>
+    </xsl:if>
+  </xsl:template>
+
+  <!-- ============================================= -->
   <!-- generate_markdown template                    -->
   <!-- ============================================= -->
 
-  <!-- Glossary items are linked to their definitions -->
+  <!-- Glossary items are linked to their definitions, and bibliography -->
+  <!-- items (which are also glossary items) are cited                  -->
   <xsl:template name="generate_markdown">
     <xsl:param name="content" select="string(.)"/>
     <xsl:param name="glossary-items-highlight" select="true()"/>
-    <xsl:value-of select="proteus-utils:markdown_to_latex(string($content), $glossary-items-highlight)"/>
+    <xsl:value-of select="proteus-utils:markdown_to_latex(string($content), $glossary-items-highlight, string($bibliography_ids))"/>
   </xsl:template>
 
   <!-- ============================================= -->

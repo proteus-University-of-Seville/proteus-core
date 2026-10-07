@@ -32,12 +32,40 @@
 
   <!-- Only targets in the rendered document have a label to -->
   <!-- link to; the others are shown as plain text.          -->
+  <!-- Bibliography items of the document are cited.         -->
   <xsl:template name="trace_target">
     <xsl:param name="target_object"/>
 
     <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
     <xsl:variable name="in_document"
       select="$target_object/ancestor::object[@classes=':Proteus-document']/@id = proteus-utils:current_document()"/>
+    <xsl:variable name="citable">
+      <xsl:call-template name="is_citable">
+        <xsl:with-param name="object" select="$target_object"/>
+      </xsl:call-template>
+    </xsl:variable>
+
+    <xsl:choose>
+      <xsl:when test="$citable = 'true'">
+        <xsl:text>\cite{</xsl:text>
+        <xsl:value-of select="$target_object/@id"/>
+        <xsl:text>}</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:call-template name="trace_target_link">
+          <xsl:with-param name="target_object" select="$target_object"/>
+          <xsl:with-param name="target_code" select="$target_code"/>
+          <xsl:with-param name="in_document" select="$in_document"/>
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!-- [code] name, linked if the target is in the rendered document -->
+  <xsl:template name="trace_target_link">
+    <xsl:param name="target_object"/>
+    <xsl:param name="target_code"/>
+    <xsl:param name="in_document"/>
 
     <xsl:if test="$in_document">
       <xsl:text>\hyperref[</xsl:text>

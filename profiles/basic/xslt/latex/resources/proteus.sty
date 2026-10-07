@@ -12,7 +12,9 @@
 \ProvidesPackage{resources/proteus}[2026/10/07 PROTEUS LaTeX template style]
 
 % --------------------------------------------------------------------------
-% Engine-dependent fonts
+% Fonts: Latin Modern (the default font of fontspec with xelatex and
+% lualatex, lmodern with pdflatex). The whole document uses the sans serif
+% family (\sffamily); typewriter is used for code.
 % --------------------------------------------------------------------------
 \RequirePackage{iftex}
 \ifPDFTeX
@@ -21,6 +23,7 @@
 \else
   \RequirePackage{fontspec}
 \fi
+\renewcommand{\familydefault}{\sfdefault}
 
 % --------------------------------------------------------------------------
 % Packages
@@ -48,6 +51,9 @@
 \definecolor{proteuslink}{HTML}{1D4ED8}
 \hypersetup{colorlinks, linkcolor=proteuslink, urlcolor=proteuslink, citecolor=proteuslink}
 
+% twoside implies \flushbottom, which stretches the vertical space of pages
+% that end before a card or a figure that does not fit
+\raggedbottom
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.5em}
 \setcounter{secnumdepth}{4}
@@ -81,15 +87,41 @@
 \ProteusSetAccent{traceability-matrix}{4F46E5}
 
 % --------------------------------------------------------------------------
-% Object cards (generate_table): an xltabular with a label column (L) and
-% a value column (X). The header row is repeated on every page.
+% Tables (cards, Markdown tables, traceability matrices): rows separated
+% by \arraystretch, \ProteusTableFraction of the text width, centred.
 % --------------------------------------------------------------------------
-% Cards start at the current left margin (children cards are indented)
-\AddToHook{env/xltabular/begin}{\setlength{\LTleft}{\@totalleftmargin}\setlength{\LTright}{0pt}}
-% longtable steps the table counter: cards must not number tables
-\AddToHook{env/xltabular/end}{\addtocounter{table}{-1}}
+\renewcommand{\arraystretch}{1.5}
+\newcommand{\ProteusTableFraction}{0.95}
+\newcommand{\ProteusTableWidth}{\ProteusTableFraction\linewidth}
+
+% --------------------------------------------------------------------------
+% Object cards (generate_table): an xltabular of width \ProteusTableWidth
+% with a label column (L) and a value column (X). The header row is
+% repeated on every page.
+% --------------------------------------------------------------------------
+% Space above and below each card (12pt between two cards; headings keep
+% their own space above, since \addvspace takes the larger one)
+\setlength{\LTpre}{\medskipamount}
+\setlength{\LTpost}{\medskipamount}
+% Cards are centred in the current text width (children cards are indented)
+\AddToHook{env/xltabular/begin}{%
+  \setlength{\LTleft}{\dimexpr\@totalleftmargin+(\linewidth-\ProteusTableWidth)/2\relax}%
+  \setlength{\LTright}{0pt plus 1fill}}
+% longtable steps the table counter: cards must not number tables, so the
+% counter is saved at the beginning of each card and restored by
+% \ProteusCardEnd, written by the template after \end{xltabular} (the
+% end/after hooks of xltabular are not run, since it collects its body)
+\AddToHook{env/xltabular/begin}{\xdef\proteus@tablecounter{\the\c@table}}
+\newcommand{\ProteusCardEnd}{\setcounter{table}{\proteus@tablecounter}\global\@minipagefalse}
 \arrayrulecolor{proteusline}
-\newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode\small\bfseries\color{proteusink!75}}p{0.24\linewidth}}
+\newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode\small\bfseries\color{proteusink!75}}p{0.23\linewidth}}
+% Value column. \@minipagetrue (as at the beginning of a minipage) removes
+% the space LaTeX adds above a list that starts a cell. The flag is global
+% and suppresses \addvspace (e.g. the space above section headings), so,
+% as minipage does, it is reset when the first paragraph of the cell
+% starts, and also after each card (\ProteusCardEnd), for empty cells
+\newcommand{\proteus@cellstart}{\@minipagetrue\everypar{\global\@minipagefalse\everypar{}}}
+\newcolumntype{Q}{>{\proteus@cellstart}X}
 
 % Icons are copied from the profile to icons/<main class>.png
 \newcommand{\ProteusIcon}[1]{\IfFileExists{icons/#1.png}{\raisebox{-0.2em}{\includegraphics[height=1.1em]{icons/#1.png}}\,}{}}
@@ -101,6 +133,16 @@
   \textcolor{proteusaccent!82!black}{\bfseries\if\relax\detokenize{#3}\relax\else[#3]\nobreakspace\fi #4}\\ \hline}
 
 \newcommand{\ProteusObjectImage}[1]{\hfill\raisebox{-0.5\height}{\includegraphics[height=3em]{#1}}}
+
+% --------------------------------------------------------------------------
+% Remote figures. The template writes \ProteusRemoteImage{<width>}{<URL>};
+% the export strategies download the image and replace it by
+% \includegraphics, or by \ProteusMissingImage{<link>} if the download
+% failed. \ProteusMissingImageText is set by the template (i18n).
+% --------------------------------------------------------------------------
+\newcommand{\ProteusMissingImageText}{Remote figure not available}
+\newcommand{\ProteusMissingImage}[1]{%
+  \fbox{\parbox{0.8\linewidth}{\centering\ProteusTBD{\ProteusMissingImageText}\\ \small #1}}}
 \newcommand{\ProteusChildren}[1]{\par\vspace{-0.6em}{\small\bfseries\color{proteusaccent!82!black}#1}\par\vspace{-0.4em}}
 \newcommand{\ProteusTBD}[1]{\textcolor{red!70!black}{\textit{#1}}}
 
@@ -108,7 +150,34 @@
 % Markdown (see proteus_xslt_latex.py in the basic plugin)
 % --------------------------------------------------------------------------
 \newenvironment{proteuscode}{\par\small\ttfamily\raggedright\setlength{\parskip}{0pt}}{\par}
-\newenvironment{proteusmdtable}[1]{\par\noindent\tabularx{\linewidth}{|#1|}\hline}{\endtabularx\par}
+% Markdown tables: Y columns are left-aligned X columns (narrow justified
+% columns hyphenate badly), without space above a list that starts a cell
+\newcolumntype{Y}{>{\raggedright\arraybackslash\proteus@cellstart}X}
+\newenvironment{proteusmdtable}[1]
+  {\par\addvspace{\medskipamount}\centering\tabularx{\ProteusTableWidth}{|#1|}\hline}
+  {\endtabularx\par\global\@minipagefalse\addvspace{\medskipamount}}
+
+% --------------------------------------------------------------------------
+% Bibliography (bibliography items). Like thebibliography but without its
+% own heading, since bibliography items are placed in a section of the
+% document, and with hanging labels as wide as needed ([<item name>]).
+% \ProteusBibItem[<label>]{<id>} is \bibitem, which defines the citation
+% \cite{<id>}; inside symbolic links it only shows the label, so that the
+% citation is not defined twice.
+% --------------------------------------------------------------------------
+\newenvironment{proteusbibliography}
+  {\list{}{%
+     \setlength{\leftmargin}{1.5em}%
+     \setlength{\labelwidth}{0pt}%
+     \setlength{\labelsep}{0.5em}%
+     \setlength{\itemindent}{-\leftmargin}%
+     \setlength{\itemsep}{0.4em}%
+     \setlength{\parsep}{0pt}%
+     \renewcommand{\makelabel}[1]{\hspace{\labelsep}\normalfont\bfseries ##1}}%
+   \sloppy\clubpenalty4000\widowpenalty4000}
+  {\endlist}
+\newcommand{\ProteusBibItem}[2][]{%
+  \ifproteus@inlink\item[\@biblabel{#1}]\else\bibitem[#1]{#2}\fi}
 
 % --------------------------------------------------------------------------
 % Comments
