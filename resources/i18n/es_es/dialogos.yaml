@@ -146,7 +146,7 @@ export_dialog.finished.dialog.error.title: "Error al exportar"
 export_dialog.finished.dialog.error.text: "No se pudo exportar la vista actual. Para más información, consulte el archivo de registro de la aplicación"
 
 # Export PDF
-export_dialog.export_strategy.pdf: "Archivo PDF"
+export_dialog.export_strategy.pdf: "PDF (a partir de HTML)"
 export_dialog.export_pdf.filename.label: "Introduzca un nombre de archivo:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'El nombre del archivo no puede contener los siguientes caracteres: / \ : * ? " < > |'
 export_dialog.export_pdf.filename.error.empty: "El nombre del archivo no puede estar vacío"
@@ -161,6 +161,13 @@ export_dialog.export_html.error.not_found: "La ruta seleccionada no existe"
 export_dialog.export_html.error.not_directory: "La ruta seleccionada no es una carpeta"
 export_dialog.export_html.error.invalid_folder_name: "Nombre de carpeta no válido"
 export_dialog.export_html.error.folder_exists: "Ya existe una carpeta con ese nombre en el directorio seleccionado"
+
+# Export LaTeX (sources and PDF)
+export_dialog.export_strategy.latex: "LaTeX (con carpeta de recursos)"
+export_dialog.export_strategy.pdf_latex: "PDF (a partir de LaTeX)"
+export_dialog.export_latex.template.label: "Plantilla LaTeX:"
+export_dialog.export_pdf_latex.engine.label: "Motor LaTeX:"
+export_dialog.export_pdf_latex.error.no_engine: "No se ha encontrado ningún motor LaTeX (xelatex, lualatex o pdflatex). Instale una distribución de LaTeX como MiKTeX o TeX Live y añádala al PATH."
 
 # ---------------------------------------------------------------------------
 # Information dialog

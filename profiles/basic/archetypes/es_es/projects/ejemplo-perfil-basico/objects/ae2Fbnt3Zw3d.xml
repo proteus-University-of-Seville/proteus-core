@@ -9,7 +9,7 @@
     <fileProperty name="file" category="detail" tooltip="file-info"><![CDATA[]]></fileProperty>
     <urlProperty name="url" category="detail"><![CDATA[https://www.us.es/sites/default/files/2019-05/marca-US-principal.jpg]]></urlProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">25</integerProperty>
-    <markdownProperty name="description" category="detail"><![CDATA[Figura 2. Marca oficial de la Universidad de Sevilla, cargada desde el sitio web de la universidad. La interfaz web de BiblioUS debe mostrarla en su cabecera y, al referenciarla de forma remota, recoge automáticamente cualquier cambio en la identidad corporativa.]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Marca oficial de la Universidad de Sevilla, cargada desde el sitio web de la universidad. La interfaz web de BiblioUS debe mostrarla en su cabecera y, al referenciarla de forma remota, recoge automáticamente cualquier cambio en la identidad corporativa.]]></markdownProperty>
     <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>

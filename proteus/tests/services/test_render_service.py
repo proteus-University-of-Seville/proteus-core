@@ -26,6 +26,7 @@ import lxml.etree as ET
 from proteus.application.configuration.config import Config
 from proteus.application.resources.plugins import Plugins
 from proteus.services.render_service import RenderService
+from proteus.model.template import TEMPLATE_OUTPUT_LATEX
 from proteus.tests import PROTEUS_SAMPLE_PROJECTS_PATH, PROTEUS_SAMPLE_DATA_PATH
 
 # --------------------------------------------------------------------------
@@ -33,6 +34,7 @@ from proteus.tests import PROTEUS_SAMPLE_PROJECTS_PATH, PROTEUS_SAMPLE_DATA_PATH
 # --------------------------------------------------------------------------
 
 DEFAULT_TEMPLATE = "default"
+LATEX_SAMPLE_TEMPLATE = "latex_sample"
 
 
 @pytest.fixture()
@@ -179,6 +181,28 @@ def test_render_error(mocker, render_service: RenderService, example_xml: ET.Ele
         f"\nRender result: {html_string}"
         f"\nExpected result: {error_string}"
     )
+
+@pytest.mark.order(4)
+def test_render_text_output(render_service: RenderService, example_xml: ET.Element):
+    """
+    Test that templates with <xsl:output method="text"> (e.g. LaTeX) are
+    serialized as text, not as HTML, and that they are not listed as views.
+    """
+    # Act -----------------------------
+    latex_string: str = render_service.render(example_xml, LATEX_SAMPLE_TEMPLATE)
+    templates = {t.name: t for t in render_service.get_templates()}
+
+    # Assert --------------------------
+    expected = "\\section{Print project}\nPrice: \\textbf{50\\%} \\& more"
+    assert latex_string == expected, (
+        f"Render result: {latex_string!r}\nExpected result: {expected!r}"
+    )
+
+    assert (
+        templates[LATEX_SAMPLE_TEMPLATE].output_format == TEMPLATE_OUTPUT_LATEX
+    ), "Output format must be read from template.xml"
+    assert not templates[LATEX_SAMPLE_TEMPLATE].is_view, "LaTeX templates are not views"
+    assert templates[DEFAULT_TEMPLATE].is_view, "HTML templates are views"
 
 
 # --------------------------------------------------------------------------

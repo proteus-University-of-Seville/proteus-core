@@ -9,3 +9,5 @@
 
 xslt_templates.default: "Vista básica de PROTEUS"
 xslt_templates.description.default: "Plantilla básica de PROTEUS."
+xslt_templates.latex: "Documento LaTeX"
+xslt_templates.description.latex: "Plantilla LaTeX usada por los formatos de exportación LaTeX y PDF (a partir de LaTeX)."

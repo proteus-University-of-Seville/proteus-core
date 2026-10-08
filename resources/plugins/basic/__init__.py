@@ -22,6 +22,8 @@ from basic.document_interactions import DocumentInteractions
 from basic.impact_analyzer import ImpactAnalyzer
 from basic.export.export_html import ExportHTML
 from basic.export.export_pdf import ExportPDF
+from basic.export.export_latex import ExportLaTeX, ExportPDFLaTeX
+from basic.proteus_xslt_latex import latex_escape, markdown_to_latex, latex_url
 from basic.glossary_handler import GlossaryHandler
 from basic.traceability_matrix_helper import TraceabilityMatrixHelper
 
@@ -41,9 +43,16 @@ def register(register_xslt_function, register_qwebchannel_class, register_proteu
 
     register_qwebchannel_class("proteusBasics", ProteusBasicMethods)
 
-    # Export strategies
-    register_export_strategy("pdf", ExportPDF)
+    # Export strategies (the export dialog lists them in this order)
     register_export_strategy("html", ExportHTML)
+    register_export_strategy("pdf", ExportPDF)
+    register_export_strategy("latex", ExportLaTeX)
+    register_export_strategy("pdf_latex", ExportPDFLaTeX)
+
+    # XSLT functions for LaTeX templates
+    register_xslt_function("latex_escape", latex_escape)
+    register_xslt_function("markdown_to_latex", markdown_to_latex)
+    register_xslt_function("latex_url", latex_url)
 
     # Glossary
     register_xslt_function("glossary_highlight", GlossaryHandler.highlight_glossary_items)

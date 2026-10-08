@@ -146,7 +146,7 @@ export_dialog.finished.dialog.error.title: "Error exporting"
 export_dialog.finished.dialog.error.text: "Current view could not be exported. For more information, check the log file."
 
 # Export PDF
-export_dialog.export_strategy.pdf: "PDF file"
+export_dialog.export_strategy.pdf: "PDF (from HTML)"
 export_dialog.export_pdf.filename.label: "Enter file name and path:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'The file name cannot contain the following characters: / \ : * ? \" < > |'
 export_dialog.export_pdf.filename.error.empty: "The file name cannot be empty"
@@ -161,6 +161,13 @@ export_dialog.export_html.error.not_found: "The directory does not exist"
 export_dialog.export_html.error.not_directory: "The path is not a directory"
 export_dialog.export_html.error.invalid_folder_name: "The folder name is invalid"
 export_dialog.export_html.error.folder_exists: "The folder already exists, select another name"
+
+# Export LaTeX (sources and PDF)
+export_dialog.export_strategy.latex: "LaTeX (with resources folder)"
+export_dialog.export_strategy.pdf_latex: "PDF (from LaTeX)"
+export_dialog.export_latex.template.label: "LaTeX template:"
+export_dialog.export_pdf_latex.engine.label: "LaTeX engine:"
+export_dialog.export_pdf_latex.error.no_engine: "No LaTeX engine (xelatex, lualatex or pdflatex) was found. Install a LaTeX distribution such as MiKTeX or TeX Live and add it to the PATH."
 
 # ---------------------------------------------------------------------------
 # Information dialog
