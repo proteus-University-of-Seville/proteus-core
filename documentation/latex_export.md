@@ -10,6 +10,14 @@ formats of the basic plugin:
 * **PDF (from LaTeX)** (`pdf_latex`): writes the same sources in a temporary folder,
   compiles them with a LaTeX engine installed in the system and saves the PDF.
 
+Default names are built from the acronym of the current document, or its name if it has
+none (`document_file_name` in `basic/export/file_names.py`), so that every format can be
+exported to the same folder without collisions:
+
+* HTML and LaTeX folders: `<acronym>-exported-html`, `<acronym>-exported-latex`.
+* PDF files: `<acronym>_html.pdf` (PDF from HTML), `<acronym>_latex.pdf` (PDF from LaTeX),
+  see `FILE_NAME_SUFFIX` of each strategy.
+
 The basic profile ships one LaTeX template, `profiles/basic/xslt/latex`, the counterpart of
 the `default` view. It renders the current document like the HTML view (cover, table of
 contents, sections, paragraphs, comments, glossary and bibliography items, figures, symbolic
@@ -20,11 +28,23 @@ translated with the same i18n files.
 Requirements
 ------------
 
+* Both formats are only listed in the export dialog if the current profile has a LaTeX
+  template (`ExportStrategy.is_available`). A profile created from basic does not have one
+  unless it copies `xslt/latex` (madeja has its own, see below).
 * PDF export needs `xelatex`, `lualatex` or `pdflatex` in the `PATH` (MiKTeX or TeX Live).
-  The export form lists the engines found; if there is none, the format shows an error and
-  cannot be used. LaTeX export does not need any engine.
+  The export form lists the engines found in that order, `xelatex` by default; if there is
+  none, the format shows an error and cannot be used. xelatex and lualatex support any
+  Unicode character (a character the font does not have is left out, with a `Missing
+  character` warning in the log), while pdflatex fails with characters it does not know
+  (e.g. arrows or emojis in the texts of the project); xelatex is faster than lualatex.
+  LaTeX export does not need any engine.
 * `latexmk` is not used: MiKTeX on Windows does not ship the Perl interpreter it needs. The
-  engine is run twice, enough for the table of contents and cross-references.
+  export does what it would do: the engine is run until the auxiliary files (`main.aux`,
+  `main.toc`, `main.out`) do not change in a pass and the log does not ask for another one
+  (`Rerun to get...`, `Label(s) may have changed`), at least twice and at most four times
+  (`LATEX_MIN_PASSES`, `LATEX_MAX_PASSES`). Usually two passes are enough; a third one is
+  needed when the second changes page numbers (e.g. a table of contents longer than one
+  page with `twoside`).
 * The generated document needs these packages: babel, fontspec (xelatex/lualatex) or
   fontenc+lmodern (pdflatex), geometry, xcolor, graphicx, array, xltabular, changepage,
   amssymb, ulem, float, adjustbox, tcolorbox, enumitem, caption, hyperref. MiKTeX installs
@@ -46,11 +66,13 @@ Document layout
   (`\familydefault` is `\sfdefault`); code uses the typewriter family.
 * Tables (property cards, Markdown tables and traceability matrices) are centred, 95% of the
   text width (`\ProteusTableFraction` in `proteus.sty`), with rows separated by
-  `\arraystretch` 1.5. Columns of Markdown tables are left-aligned. The value column of
-  cards (`Q`) and the columns of Markdown tables (`Y`) start with `\@minipagetrue`, which
-  removes the space LaTeX adds above a list that starts a cell. That flag is global and
-  disables `\addvspace` (e.g. the space above section headings), so it is reset when the first
-  paragraph of the cell starts, as `minipage` does, and after each card and Markdown table.
+  `\arraystretch` 1.5. Columns of Markdown tables are left-aligned. The content of the value
+  column of cards (`Q`) and of the columns of Markdown tables (`Y`) is set in a top-aligned
+  `minipage` (`\proteus@cellbegin`, `\proteus@cellend`): cells of X columns start in
+  horizontal mode, so a list at the beginning of a cell would end that empty paragraph and
+  leave an empty line above it. The minipage starts lists without space above and removes the
+  space after a final list; the cell ends with the depth of the row strut
+  (`\proteus@finalstrut`) and paragraphs inside cells keep the `\parskip` of the document.
 * Cards have `\medskipamount` above and below (`\LTpre`, `\LTpost`): 12pt between two cards,
   while headings after a card keep their usual space.
 
@@ -98,6 +120,18 @@ the export strategies run it in a `LaTeXSourcesTask` (a `QRunnable` of the globa
 `QThreadPool`), so the application keeps responding during the downloads, and continue (or
 start the compilation) when its `finished` signal arrives. `write_latex_sources` runs both
 steps in the calling thread, for scripts.
+
+Closing the export dialog while an export is running cancels it (`ExportDialog.done` calls
+`ExportStrategy.cancel`, which does nothing by default). Both LaTeX strategies stop what is
+running and remove their partial output without emitting `exportFinishedSignal`:
+
+* While the sources are being written, `LaTeXSourcesTask.cancel` makes the task stop before
+  the next download and remove the folder itself. If the task had already finished, it
+  returns `False` and the strategy removes the folder.
+* While compiling, the engine process (a child of the strategy) is killed and the temporary
+  folder is removed once it has exited.
+
+The export format cannot be changed while an export is running.
 
 
 Bibliography and citations
@@ -171,7 +205,25 @@ module is mostly replacing HTML by LaTeX. Rules:
 
 Profiles are copies, not extensions: a profile created from basic (e.g. madeja) gets the
 LaTeX template only if it copies `xslt/latex`, and every archetype with a custom HTML module
-needs a LaTeX module too; archetypes without one use the generic property card.
+needs a LaTeX module too; archetypes without one use the generic property card. Changes to
+the core of the template (`core/*.xsl`, `proteus.sty`) must be made in every copy.
+
+The madeja profile (`C:\proteus-profiles\madeja`, its own repository) has a copy of the basic
+template plus:
+
+* the accent colours of its archetypes in `proteus.sty`, taken from its CSS files;
+* `unitProperty` in `core/properties.xsl` (`<value> <unit>`), as in its HTML template;
+* `archetypes/requirements/information_requirement.xsl`: specific data as a list in a row
+  after the description;
+* `archetypes/requirements/use_case.xsl`: the evolved use case. The HTML card has a third
+  column for step numbers and a label spanning the rows of a sequence (`rowspan`); here every
+  step, branch step, exception action and ending is a row of the card, so that long
+  sequences break across pages. The label is written in the first row only, the rows of a
+  sequence are separated by `\cline{2-2}`, and the value cell shows the number and the action
+  with `\ProteusStepHeader`, `\ProteusStep` and `\ProteusSubStep` (madeja's `proteus.sty`).
+
+Anchors (`\ProteusAnchor`, i.e. `\phantomsection`) at the beginning of a minipage or of a list
+item must come after `\leavevmode`: in vertical mode they add an empty first line.
 
 
 Known limitations

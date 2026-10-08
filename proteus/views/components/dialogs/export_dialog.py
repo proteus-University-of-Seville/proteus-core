@@ -69,6 +69,9 @@ class ExportDialog(ProteusDialog):
         # Export strategy
         self._export_strategy: ExportStrategy = None
 
+        # True from the export button click until the export finishes
+        self._exporting: bool = False
+
         # Widgets
         self.progress_bar: QProgressBar = None
         self.export_format_selector: QComboBox = None
@@ -114,6 +117,9 @@ class ExportDialog(ProteusDialog):
 
         self.export_format_selector = QComboBox()
         for export_strategy_name, export_strategy_class in export_strategies.items():
+            # e.g. LaTeX formats when the profile has no LaTeX template
+            if not export_strategy_class.is_available(self._controller):
+                continue
             self.export_format_selector.addItem(
                 _(f"export_dialog.export_strategy.{export_strategy_name}"),
                 export_strategy_class,
@@ -212,8 +218,11 @@ class ExportDialog(ProteusDialog):
         method and disable the button box to avoid multiple exports.
         """
         self.progress_bar.show()
-        self._export_strategy.export()
+        self._exporting = True
+        # The strategy cannot be replaced while it is exporting
+        self.export_format_selector.setEnabled(False)
         self.accept_button.setEnabled(False)
+        self._export_strategy.export()
 
     # ----------------------------------------------------------------------
     # Method     : print_pdf_finished_dialog
@@ -229,6 +238,8 @@ class ExportDialog(ProteusDialog):
         :param filePath: The path to the exported file.
         :param success: True if the export was successful, False otherwise.
         """
+        self._exporting = False
+
         if success:
             MessageBox.information(
                 _("export_dialog.finished.dialog.title"),
@@ -243,6 +254,26 @@ class ExportDialog(ProteusDialog):
             )
 
             self.close()
+
+    # ----------------------------------------------------------------------
+    # Method     : done
+    # Description: Cancel a running export when the dialog is closed.
+    # Date       : 08/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def done(self, result: int) -> None:
+        """
+        Every way of closing the dialog ends here: the cancel button and the
+        window close button (through closeEvent and reject) and the Escape
+        key (reject). If an export is running, it is cancelled, so that no
+        process or temporary file is left behind.
+        """
+        if self._exporting and self._export_strategy is not None:
+            self._exporting = False
+            self._export_strategy.cancel()
+
+        super().done(result)
 
     # ----------------------------------------------------------------------
     # Method     : _progress_changed

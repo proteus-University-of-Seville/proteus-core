@@ -51,8 +51,10 @@ the `proteus-project-format` skill.
     archetypes/<category>/<archetype>.xsl
     resources/css/            default.css @imports one CSS per archetype
     resources/images, javascript
-  xslt/latex/                 basic only: LaTeX template (template.xml output="latex"), not a
-                              view; same structure, latex.xsl entry, resources/proteus.sty
+  xslt/latex/                 basic and madeja: LaTeX template (template.xml output="latex"),
+                              not a view; same structure, latex.xsl entry,
+                              resources/proteus.sty. Without it the LaTeX export formats
+                              are not offered
   plugins/                    optional (plugins_directory in profile.ini)
 ```
 
@@ -198,7 +200,9 @@ same ids, classes and properties; only texts change.
 - LaTeX template (`xslt/latex`, used by the "LaTeX" and "PDF (from LaTeX)" exports): an
   archetype with a custom HTML module usually needs a LaTeX module too (included in
   `latex.xsl`) and its accent in `resources/proteus.sty` (`\ProteusSetAccent`). Escape all
-  texts (`tex`/`label` named templates), never write raw `~ " < >`. Rules in
+  texts (`tex`/`label` named templates), never write raw `~ " < >`. Write `\leavevmode`
+  before an anchor that starts a minipage or a list item. Changes to the template core
+  (`core/*.xsl`, `proteus.sty`) must be copied to every profile that has it. Rules in
   `documentation/latex_export.md`.
 
 ## Verify

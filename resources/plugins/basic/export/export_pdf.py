@@ -41,6 +41,8 @@ from proteus.application.state.manager import StateManager
 from proteus.controller.command_stack import Controller
 from proteus.application.export_strategy import ExportStrategy
 
+from basic.export.file_names import document_file_name
+
 
 # --------------------------------------------------------------------------
 # Constants
@@ -62,6 +64,10 @@ class ExportPDF(ExportStrategy):
     It exports the current view to PDF format. It uses PyQt6
     QWebEnginePage.printToPdf() method to perform the export.
     """
+
+    # Suffix of the default file name (<document acronym>_html.pdf), so that
+    # it does not collide with PDF files exported in other ways
+    FILE_NAME_SUFFIX: str = "html"
 
     # ----------------------------------------------------------------------
     # Method     : __init__
@@ -222,13 +228,15 @@ class ExportPDF(ExportStrategy):
         Opens a file dialog to select the file path/name.
 
         The file dialog is configured to select only pdf files and
-        the default file name is the current view name. If the user
-        selects a file name without extension, the extension is added
+        the default file name is the acronym (or name) of the current
+        document followed by FILE_NAME_SUFFIX (e.g. SRS_html.pdf). If the
+        user selects a file name without extension, the extension is added
         automatically.
         """
         # Build default file name
-        current_view = StateManager().get_current_view()
-        default_file_name: str = f"{current_view}.{FILE_EXTENSION_PDF}"
+        default_file_name: str = (
+            f"{document_file_name(self._controller)}_{self.FILE_NAME_SUFFIX}.{FILE_EXTENSION_PDF}"
+        )
 
         # Open the file dialog and set the default file name
         file_dialog: QFileDialog = QFileDialog()

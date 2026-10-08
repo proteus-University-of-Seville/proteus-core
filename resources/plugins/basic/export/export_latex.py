@@ -14,11 +14,13 @@
 # --------------------------------------------------------------------------
 
 from pathlib import Path
-from typing import Dict, List, Set
+from typing import Callable, Dict, List, Set
+import hashlib
 import logging
 import re
 import shutil
 import tempfile
+import threading
 import urllib.request
 
 # --------------------------------------------------------------------------
@@ -42,6 +44,7 @@ from proteus.controller.command_stack import Controller
 
 from basic.export.export_html import ExportHTML, remove_empty_directories
 from basic.export.export_pdf import ExportPDF
+from basic.export.file_names import document_file_name
 from basic.proteus_xslt_latex import latex_url
 
 # logging configuration
@@ -54,12 +57,26 @@ log = logging.getLogger(__name__)
 LATEX_MAIN_FILE: str = "main.tex"
 LATEX_ICONS_FOLDER: str = "icons"
 
-# Supported engines in order of preference. latexmk is not used because
-# MiKTeX on Windows does not ship the Perl interpreter it needs.
+# Supported engines in order of preference (the first one found is the
+# default in the export form): xelatex and lualatex support any Unicode
+# character, pdflatex fails with characters it does not know (e.g. arrows
+# or emojis), and xelatex is faster than lualatex. latexmk is not used
+# because MiKTeX on Windows does not ship the Perl interpreter it needs.
 LATEX_ENGINES: List[str] = ["xelatex", "lualatex", "pdflatex"]
 
-# Two passes are enough for the table of contents and cross-references
-LATEX_PASSES: int = 2
+# The engine is run until the auxiliary files do not change (the table of
+# contents, cross-references and citations are stable), at least twice and
+# at most LATEX_MAX_PASSES times, in case they never stabilize
+LATEX_MIN_PASSES: int = 2
+LATEX_MAX_PASSES: int = 4
+
+# Auxiliary files written by each pass and read by the next one
+LATEX_AUXILIARY_SUFFIXES: List[str] = [".aux", ".toc", ".out"]
+
+# Warnings of LaTeX and its packages asking for another pass
+LATEX_RERUN_PATTERN = re.compile(
+    r"Rerun to get|Label\(s\) may have changed|Rerun LaTeX|[Pp]lease rerun"
+)
 
 # Image formats graphicx cannot include: converted to PNG on export
 UNSUPPORTED_IMAGE_SUFFIXES = {".gif", ".bmp", ".webp", ".svg", ".tif", ".tiff", ".ico"}
@@ -103,6 +120,43 @@ def find_latex_engines() -> Dict[str, str]:
         if executable:
             engines[engine] = executable
     return engines
+
+
+class LaTeXExportCancelled(Exception):
+    """
+    Raised while the LaTeX sources are being written if the export is
+    cancelled.
+    """
+
+
+def latex_auxiliary_digest(folder: Path) -> str:
+    """
+    Digest of the auxiliary files of main.tex (aux, toc, out) in the given
+    folder. If it does not change in a pass, another one is not needed.
+    """
+    digest = hashlib.sha256()
+    for suffix in LATEX_AUXILIARY_SUFFIXES:
+        auxiliary_file: Path = (folder / LATEX_MAIN_FILE).with_suffix(suffix)
+        digest.update(suffix.encode())
+        if auxiliary_file.is_file():
+            digest.update(auxiliary_file.read_bytes())
+    return digest.hexdigest()
+
+
+def latex_rerun_needed(
+    passes: int, previous_digest: str, digest: str, log_text: str
+) -> bool:
+    """
+    True if the engine has to be run again after the given number of
+    passes: always before LATEX_MIN_PASSES, never after LATEX_MAX_PASSES,
+    and otherwise if the auxiliary files changed in the last pass or the
+    log asks for another pass.
+    """
+    if passes < LATEX_MIN_PASSES:
+        return True
+    if passes >= LATEX_MAX_PASSES:
+        return False
+    return digest != previous_digest or LATEX_RERUN_PATTERN.search(log_text) is not None
 
 
 def _copy_asset(asset: str, assets_folder: Path, destination: Path) -> str:
@@ -159,18 +213,28 @@ def _download_image(url: str, destination: Path, name: str) -> str | None:
     return None
 
 
-def _replace_remote_images(tex: str, folder: Path) -> str:
+def _not_cancelled() -> bool:
+    return False
+
+
+def _replace_remote_images(
+    tex: str, folder: Path, cancelled: Callable[[], bool] = _not_cancelled
+) -> str:
     """
     Downloads the remote figures of the LaTeX source to <folder>/remote and
     replaces each \\ProteusRemoteImage{width}{URL} by \\includegraphics, or
     by \\ProteusMissingImage{<link>} if the image could not be downloaded.
     Each URL is downloaded once.
+
+    :raises LaTeXExportCancelled: if cancelled() is true before a download
     """
     downloaded: Dict[str, str | None] = {}
 
     def replace(match: re.Match) -> str:
         width, url = match.group(1), match.group(2).strip()
         if url not in downloaded:
+            if cancelled():
+                raise LaTeXExportCancelled()
             downloaded[url] = _download_image(
                 url, folder / REMOTE_IMAGES_FOLDER, f"image-{len(downloaded) + 1}"
             )
@@ -240,15 +304,18 @@ def prepare_latex_sources(controller: Controller, template: Template, folder: Pa
     return tex
 
 
-def finish_latex_sources(tex: str, folder: Path) -> Path:
+def finish_latex_sources(
+    tex: str, folder: Path, cancelled: Callable[[], bool] = _not_cancelled
+) -> Path:
     """
     Second step of writing the LaTeX sources, which may take a while and
     can run in a worker thread (see LaTeXSourcesTask): downloads the remote
     figures (remote/...) and writes main.tex.
 
     :return: path to main.tex
+    :raises LaTeXExportCancelled: if cancelled() is true before a download
     """
-    tex = _replace_remote_images(tex, folder)
+    tex = _replace_remote_images(tex, folder, cancelled)
 
     main_file: Path = folder / LATEX_MAIN_FILE
     main_file.write_text(tex, encoding="utf-8")
@@ -293,6 +360,9 @@ class LaTeXSourcesTask(QRunnable):
     to the signal with a bound method of a QObject are disconnected
     automatically if they are deleted before the task finishes (e.g. when
     the export dialog is closed).
+
+    The task can be cancelled with cancel(): it stops before the next
+    download, removes the folder and does not emit its finished signal.
     """
 
     # Running tasks, so that they are not garbage collected
@@ -305,6 +375,31 @@ class LaTeXSourcesTask(QRunnable):
         self._folder: Path = folder
         self.signals = LaTeXSourcesSignals()
 
+        # Shared with the worker thread, protected by _lock
+        self._lock = threading.Lock()
+        self._cancelled: bool = False
+        self._done: bool = False
+
+    def cancel(self) -> bool:
+        """
+        Cancels the task. Must be called from the application thread.
+
+        :return: True if the task was still running: it removes the folder
+                 itself and its finished signal is not emitted. False if it
+                 had already finished: the caller must remove the folder,
+                 since the finished signal may still be waiting to be
+                 delivered to a receiver that is being deleted.
+        """
+        with self._lock:
+            if self._done:
+                return False
+            self._cancelled = True
+            return True
+
+    def _is_cancelled(self) -> bool:
+        with self._lock:
+            return self._cancelled
+
     def start(self) -> None:
         """
         Starts the task. Must be called from the application thread.
@@ -316,12 +411,37 @@ class LaTeXSourcesTask(QRunnable):
         QThreadPool.globalInstance().start(self)
 
     def run(self) -> None:
+        result, success = "", False
         try:
-            main_file: Path = finish_latex_sources(self._tex, self._folder)
-            self.signals.finished.emit(main_file.as_posix(), True)
+            main_file: Path = finish_latex_sources(self._tex, self._folder, self._is_cancelled)
+            result, success = main_file.as_posix(), True
+        except LaTeXExportCancelled:
+            pass
         except Exception as e:
             log.error(f"Error writing the LaTeX sources in '{self._folder}': {e}")
-            self.signals.finished.emit(str(e), False)
+            result = str(e)
+
+        with self._lock:
+            self._done = True
+            cancelled: bool = self._cancelled
+
+        if cancelled:
+            log.info(f"LaTeX export cancelled, '{self._folder}' removed")
+            shutil.rmtree(self._folder, ignore_errors=True)
+            LaTeXSourcesTask._running.discard(self)
+            return
+
+        self.signals.finished.emit(result, success)
+
+
+def _cancel_sources_task(task: LaTeXSourcesTask, folder: Path) -> None:
+    """
+    Cancels the task that writes the LaTeX sources in the given folder. If
+    it had already finished (or not started), the folder is removed here.
+    """
+    if task is None or not task.cancel():
+        if folder is not None:
+            shutil.rmtree(folder, ignore_errors=True)
 
 
 def _template_selector(controller: Controller) -> QComboBox:
@@ -354,6 +474,7 @@ class ExportLaTeX(ExportHTML):
         self._template_selector: QComboBox = None
         self._export_folder: Path = None
         self._task: LaTeXSourcesTask = None
+        self._cancelled: bool = False
 
     def export(self) -> None:
         """
@@ -361,6 +482,7 @@ class ExportLaTeX(ExportHTML):
         figures are downloaded in a worker thread; the export finishes in
         _sources_written.
         """
+        self._cancelled = False
         self._export_folder = Path(self._path_input.directory()) / self._folder_name_input.text()
         template: Template = self._template_selector.currentData()
 
@@ -383,6 +505,9 @@ class ExportLaTeX(ExportHTML):
         Emits the finished signal. If the sources could not be written, the
         export folder is removed.
         """
+        if self._cancelled:
+            return
+
         if not success:
             if self._export_folder.exists():
                 shutil.rmtree(self._export_folder, ignore_errors=True)
@@ -392,13 +517,22 @@ class ExportLaTeX(ExportHTML):
         self.exportProgressSignal.emit(100)
         self.exportFinishedSignal.emit(self._export_folder.as_posix(), True)
 
+    def cancel(self) -> None:
+        """
+        Cancels the export: remote figures are no longer downloaded and the
+        export folder is removed. The finished signal is not emitted.
+        """
+        self._cancelled = True
+        _cancel_sources_task(self._task, self._export_folder)
+        log.info(f"LaTeX export to '{self._export_folder}' cancelled")
+
     def exportFormWidget(self) -> QWidget:
         """
         HTML export form plus a LaTeX template selector.
         """
         widget: QWidget = super().exportFormWidget()
         self._folder_name_input.setText(
-            f"{StateManager().get_current_view()}-exported-latex"
+            f"{document_file_name(self._controller)}-exported-latex"
         )
 
         self._template_selector = _template_selector(self._controller)
@@ -408,13 +542,12 @@ class ExportLaTeX(ExportHTML):
 
         return widget
 
-    def _validate_directory(self) -> None:
-        super()._validate_directory()
-
-        if self._template_selector is not None and self._template_selector.count() == 0:
-            self._error_label.setText(_("export_dialog.export_latex.error.no_template"))
-            self._error_label.setHidden(False)
-            self.readyToExportSignal.emit(False)
+    @classmethod
+    def is_available(cls, controller: Controller) -> bool:
+        """
+        Only available if the profile has a LaTeX template.
+        """
+        return len(get_latex_templates(controller)) > 0
 
 
 # --------------------------------------------------------------------------
@@ -429,9 +562,13 @@ class ExportPDFLaTeX(ExportPDF):
     Exports the current document to PDF through LaTeX: the sources are
     written in a temporary folder and compiled with a LaTeX engine found in
     the PATH (xelatex, lualatex or pdflatex). The engine runs in a QProcess
-    so that the application is not blocked. If the compilation fails, the
-    LaTeX log is copied next to the selected PDF file.
+    so that the application is not blocked, until the auxiliary files are
+    stable (see latex_rerun_needed). If the compilation fails, the LaTeX
+    log is copied next to the selected PDF file.
     """
+
+    # Default file name: <document acronym>_latex.pdf
+    FILE_NAME_SUFFIX: str = "latex"
 
     def __init__(self, controller: Controller) -> None:
         super().__init__(controller)
@@ -441,6 +578,8 @@ class ExportPDFLaTeX(ExportPDF):
         self._task: LaTeXSourcesTask = None
         self._build_folder: Path = None
         self._pass: int = 0
+        self._digest: str = ""
+        self._cancelled: bool = False
 
     def export(self) -> None:
         """
@@ -448,6 +587,7 @@ class ExportPDFLaTeX(ExportPDF):
         downloaded in a worker thread) and then starts the first compilation
         pass in _sources_written.
         """
+        self._cancelled = False
         template: Template = self._template_selector.currentData()
         self._build_folder = Path(tempfile.mkdtemp(prefix="proteus-latex-"))
 
@@ -468,12 +608,16 @@ class ExportPDFLaTeX(ExportPDF):
         """
         Starts the compilation once main.tex has been written.
         """
+        if self._cancelled:
+            return
+
         if not success:
             self._finish(False)
             return
 
         self.exportProgressSignal.emit(20)
         self._pass = 0
+        self._digest = latex_auxiliary_digest(self._build_folder)
         self._run_engine()
 
     def _run_engine(self) -> None:
@@ -483,7 +627,9 @@ class ExportPDFLaTeX(ExportPDF):
         self._pass += 1
         engine: str = self._engine_selector.currentData()
 
-        self._process = QProcess()
+        # Child of the strategy, so that it is not left running if the
+        # strategy is deleted
+        self._process = QProcess(self)
         self._process.setWorkingDirectory(self._build_folder.as_posix())
         self._process.finished.connect(self._engine_finished)
         self._process.errorOccurred.connect(self._engine_error)
@@ -494,22 +640,59 @@ class ExportPDFLaTeX(ExportPDF):
     def _engine_error(self, error: QProcess.ProcessError) -> None:
         # Only errors that prevent the process from running are handled
         # here; a failed compilation is detected in _engine_finished.
+        if self._cancelled:
+            return
         if error == QProcess.ProcessError.FailedToStart:
             log.error(f"LaTeX engine '{self._engine_selector.currentData()}' failed to start")
             self._finish(False)
 
     def _engine_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> None:
+        if self._cancelled:
+            return
+
         if exit_code != 0 or exit_status != QProcess.ExitStatus.NormalExit:
             log.error(f"LaTeX compilation failed (pass {self._pass}, exit code {exit_code})")
             self._finish(False)
             return
 
-        self.exportProgressSignal.emit(20 + 70 * self._pass // LATEX_PASSES)
+        # Usually LATEX_MIN_PASSES are run: the progress bar is computed for
+        # them and stays at 90% during any extra pass
+        self.exportProgressSignal.emit(min(90, 20 + 70 * self._pass // LATEX_MIN_PASSES))
 
-        if self._pass < LATEX_PASSES:
+        previous_digest: str = self._digest
+        self._digest = latex_auxiliary_digest(self._build_folder)
+        log_file: Path = self._build_folder / "main.log"
+        log_text: str = (
+            log_file.read_text(encoding="utf-8", errors="replace") if log_file.exists() else ""
+        )
+
+        if latex_rerun_needed(self._pass, previous_digest, self._digest, log_text):
             self._run_engine()
-        else:
-            self._finish(True)
+            return
+
+        if self._pass >= LATEX_MAX_PASSES and self._digest != previous_digest:
+            log.warning(
+                f"LaTeX auxiliary files still changing after {self._pass} passes; "
+                "cross-references may be wrong"
+            )
+        log.info(f"LaTeX compilation finished after {self._pass} passes")
+        self._finish(True)
+
+    def cancel(self) -> None:
+        """
+        Cancels the export: the LaTeX engine is stopped (or the remote
+        figures are no longer downloaded) and the temporary folder is
+        removed. The finished signal is not emitted.
+        """
+        self._cancelled = True
+
+        if self._process is not None and self._process.state() != QProcess.ProcessState.NotRunning:
+            self._process.kill()
+            # The folder cannot be removed on Windows while the engine is running
+            self._process.waitForFinished(5000)
+
+        _cancel_sources_task(self._task, self._build_folder)
+        log.info("PDF export from LaTeX cancelled")
 
     def _finish(self, success: bool) -> None:
         """
@@ -517,6 +700,9 @@ class ExportPDFLaTeX(ExportPDF):
         the selected file, removes the temporary folder and emits the
         finished signal.
         """
+        if self._cancelled:
+            return
+
         file_path: Path = Path(self._input.text())
 
         try:
@@ -555,21 +741,27 @@ class ExportPDFLaTeX(ExportPDF):
         layout.insertWidget(2, QLabel(_("export_dialog.export_pdf_latex.engine.label")))
         layout.insertWidget(3, self._engine_selector)
 
-        # Show missing prerequisites from the beginning
-        error: str = self._missing_prerequisite()
+        # Show the missing engine from the beginning
+        error: str = self._missing_engine()
         if error:
             self._error_label.setText(error)
             self._error_label.setHidden(False)
 
         return widget
 
-    def _missing_prerequisite(self) -> str:
+    @classmethod
+    def is_available(cls, controller: Controller) -> bool:
         """
-        Error message if there is no LaTeX template or no LaTeX engine,
-        empty string otherwise.
+        Only available if the profile has a LaTeX template. A missing LaTeX
+        engine is shown as an error in the form instead, so that the user
+        knows that it can be installed.
         """
-        if self._template_selector is not None and self._template_selector.count() == 0:
-            return _("export_dialog.export_latex.error.no_template")
+        return len(get_latex_templates(controller)) > 0
+
+    def _missing_engine(self) -> str:
+        """
+        Error message if there is no LaTeX engine, empty string otherwise.
+        """
         if self._engine_selector is not None and self._engine_selector.count() == 0:
             return _("export_dialog.export_pdf_latex.error.no_engine")
         return ""
@@ -577,7 +769,7 @@ class ExportPDFLaTeX(ExportPDF):
     def _validate_file_path(self) -> None:
         super()._validate_file_path()
 
-        error: str = self._missing_prerequisite()
+        error: str = self._missing_engine()
         if error:
             self._error_label.setText(error)
             self._error_label.setHidden(False)

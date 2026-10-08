@@ -40,6 +40,8 @@ from proteus.application.export_strategy import ExportStrategy
 from proteus.views.forms.directory_edit import DirectoryEdit
 from proteus.views.forms import validators
 
+from basic.export.file_names import document_file_name
+
 # Module configuration
 log = logging.getLogger(__name__) # Logger
 
@@ -225,7 +227,8 @@ class ExportHTML(ExportStrategy):
         the export directory and a line edit to set the folder name. It also
         has an error label to show the error messages for both inputs.
 
-        The default folder name is <current_view>-exported-html.
+        The default folder name is <document acronym>-exported-html (the
+        document name if it has no acronym).
         """
 
         self._export_widget = QWidget()
@@ -237,7 +240,7 @@ class ExportHTML(ExportStrategy):
 
         # Set default folder name
         self._folder_name_input.setText(
-            f"{StateManager().get_current_view()}-exported-html"
+            f"{document_file_name(self._controller)}-exported-html"
         )
 
         # Information labels

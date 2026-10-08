@@ -71,6 +71,29 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
         """
         pass
 
+    @classmethod
+    def is_available(cls, controller: Controller) -> bool:
+        """
+        Whether the strategy can be used with the current profile and
+        project. The export dialog only lists available strategies.
+
+        Strategies that depend on something the profile may not provide
+        (e.g. a template with a given output format) should override it.
+        By default it returns True.
+        """
+        return True
+
+    def cancel(self) -> None:
+        """
+        Cancel a running export (e.g. the export dialog is closed before it
+        finishes). exportFinishedSignal must not be emitted afterwards.
+
+        Strategies whose export runs in the background (processes, worker
+        threads) should override it to stop them and remove any partial
+        output. By default it does nothing.
+        """
+        pass
+
     @abstractmethod
     def exportFormWidget(self) -> QWidget:
         """

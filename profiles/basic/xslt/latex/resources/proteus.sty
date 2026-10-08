@@ -56,6 +56,9 @@
 \raggedbottom
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.5em}
+% Paragraph spacing inside table cells, which reset \parskip to 0pt
+\newlength{\proteus@parskip}
+\setlength{\proteus@parskip}{\parskip}
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{3}
 \setlist{nosep, leftmargin=1.5em}
@@ -112,16 +115,22 @@
 % \ProteusCardEnd, written by the template after \end{xltabular} (the
 % end/after hooks of xltabular are not run, since it collects its body)
 \AddToHook{env/xltabular/begin}{\xdef\proteus@tablecounter{\the\c@table}}
-\newcommand{\ProteusCardEnd}{\setcounter{table}{\proteus@tablecounter}\global\@minipagefalse}
+\newcommand{\ProteusCardEnd}{\setcounter{table}{\proteus@tablecounter}}
 \arrayrulecolor{proteusline}
 \newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode\small\bfseries\color{proteusink!75}}p{0.23\linewidth}}
-% Value column. \@minipagetrue (as at the beginning of a minipage) removes
-% the space LaTeX adds above a list that starts a cell. The flag is global
-% and suppresses \addvspace (e.g. the space above section headings), so,
-% as minipage does, it is reset when the first paragraph of the cell
-% starts, and also after each card (\ProteusCardEnd), for empty cells
-\newcommand{\proteus@cellstart}{\@minipagetrue\everypar{\global\@minipagefalse\everypar{}}}
-\newcolumntype{Q}{>{\proteus@cellstart}X}
+% Value column. Cells of X columns start in horizontal mode, so a list at
+% the beginning of a cell would end that empty paragraph and leave an
+% empty line above it. The content is set in a top-aligned minipage, which
+% starts lists without space above and removes the space after a final
+% list; \proteus@cellend adds the depth of the row strut instead, which
+% the minipage would lose. \arraybackslash after \begin{minipage} keeps
+% \\ as the end of the row.
+\newcommand{\proteus@cellbegin}{%
+  \begin{minipage}[t]{\linewidth}\setlength{\parskip}{\proteus@parskip}\arraybackslash}
+\newcommand{\proteus@finalstrut}{%
+  \ifhmode\@finalstrut\@arstrutbox\else\par\kern\dp\@arstrutbox\fi}
+\newcommand{\proteus@cellend}{\proteus@finalstrut\end{minipage}}
+\newcolumntype{Q}{>{\proteus@cellbegin}X<{\proteus@cellend}}
 
 % Icons are copied from the profile to icons/<main class>.png
 \newcommand{\ProteusIcon}[1]{\IfFileExists{icons/#1.png}{\raisebox{-0.2em}{\includegraphics[height=1.1em]{icons/#1.png}}\,}{}}
@@ -151,11 +160,11 @@
 % --------------------------------------------------------------------------
 \newenvironment{proteuscode}{\par\small\ttfamily\raggedright\setlength{\parskip}{0pt}}{\par}
 % Markdown tables: Y columns are left-aligned X columns (narrow justified
-% columns hyphenate badly), without space above a list that starts a cell
-\newcolumntype{Y}{>{\raggedright\arraybackslash\proteus@cellstart}X}
+% columns hyphenate badly), set in a minipage like the value column of cards
+\newcolumntype{Y}{>{\proteus@cellbegin\raggedright\arraybackslash}X<{\proteus@cellend}}
 \newenvironment{proteusmdtable}[1]
   {\par\addvspace{\medskipamount}\centering\tabularx{\ProteusTableWidth}{|#1|}\hline}
-  {\endtabularx\par\global\@minipagefalse\addvspace{\medskipamount}}
+  {\endtabularx\par\addvspace{\medskipamount}}
 
 % --------------------------------------------------------------------------
 % Bibliography (bibliography items). Like thebibliography but without its

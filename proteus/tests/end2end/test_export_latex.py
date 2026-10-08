@@ -12,22 +12,28 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import importlib
 from pathlib import Path
+from types import SimpleNamespace
 
 # --------------------------------------------------------------------------
 # Third party imports
 # --------------------------------------------------------------------------
 
 import pytest
+from PyQt6.QtCore import QProcess
+from PyQt6.QtWidgets import QFileDialog
 from pytestqt.qtbot import QtBot
 
 # --------------------------------------------------------------------------
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.model import PROTEUS_ACRONYM, PROTEUS_NAME
 from proteus.application.resources.plugins import Plugins
 from proteus.application.state.manager import StateManager
 from proteus.views.components.main_window import MainWindow
+from proteus.views.components.dialogs.export_dialog import ExportDialog
 from proteus.tests.end2end.fixtures import app, load_project
 
 # --------------------------------------------------------------------------
@@ -139,3 +145,190 @@ def test_export_pdf_latex(app, qtbot: QtBot, tmp_path: Path):
     assert success, f"PDF export failed, see {pdf_file.with_suffix('.log')}"
     assert Path(path) == pdf_file
     assert pdf_file.read_bytes().startswith(b"%PDF")
+    # At least two passes; more only while the auxiliary files change
+    assert 2 <= strategy._pass <= 4
+    assert not strategy._build_folder.exists(), "The temporary folder must be removed"
+
+
+def test_export_pdf_latex_cancel(app, qtbot: QtBot, tmp_path: Path):
+    """
+    Cancelling the 'pdf_latex' export while the engine is running stops it,
+    removes the temporary folder and does not emit the finished signal.
+    Skipped if there is no LaTeX engine.
+    """
+    # Arrange ----------------------------------------------------------
+    strategy = create_strategy(app, "pdf_latex")
+    if strategy._engine_selector.count() == 0:
+        pytest.skip("No LaTeX engine installed")
+
+    pdf_file = tmp_path / "document.pdf"
+    strategy._input.setText(pdf_file.as_posix())
+
+    strategy.export()
+    qtbot.waitUntil(
+        lambda: strategy._process is not None
+        and strategy._process.state() == QProcess.ProcessState.Running,
+        timeout=30_000,
+    )
+    process = strategy._process
+
+    # Act --------------------------------------------------------------
+    with qtbot.assertNotEmitted(strategy.exportFinishedSignal, wait=500):
+        strategy.cancel()
+
+    # Assert -----------------------------------------------------------
+    assert process.state() == QProcess.ProcessState.NotRunning
+    assert not strategy._build_folder.exists(), "The temporary folder must be removed"
+    assert not pdf_file.exists()
+    assert not pdf_file.with_suffix(".log").exists()
+
+
+def test_export_latex_cancel(app, qtbot: QtBot, tmp_path: Path):
+    """
+    Cancelling the 'latex' export removes the export folder and does not
+    emit the finished signal, even if the sources were already written.
+    """
+    # Arrange ----------------------------------------------------------
+    strategy = create_strategy(app, "latex")
+    strategy._path_input.setDirectory(tmp_path.as_posix())
+    strategy._folder_name_input.setText("exported-latex")
+    folder = tmp_path / "exported-latex"
+
+    strategy.export()
+
+    # Act --------------------------------------------------------------
+    with qtbot.assertNotEmitted(strategy.exportFinishedSignal, wait=500):
+        strategy.cancel()
+
+    # Assert -----------------------------------------------------------
+    qtbot.waitUntil(lambda: not folder.exists(), timeout=10_000)
+
+
+@pytest.mark.parametrize(
+    "strategy_name, expected_file_name",
+    [("pdf", "DOC1_html.pdf"), ("pdf_latex", "DOC1_latex.pdf")],
+)
+def test_export_pdf_default_file_name(app, monkeypatch, strategy_name, expected_file_name):
+    """
+    The file dialog of both PDF exports proposes the acronym of the current
+    document followed by the export method, so that they do not collide.
+    """
+    # Arrange ----------------------------------------------------------
+    strategy = create_strategy(app, strategy_name)
+    selected = []
+    monkeypatch.setattr(QFileDialog, "selectFile", lambda dialog, name: selected.append(name))
+    monkeypatch.setattr(QFileDialog, "exec", lambda dialog: QFileDialog.DialogCode.Rejected)
+
+    # Act --------------------------------------------------------------
+    strategy._select_file_path()
+
+    # Assert -----------------------------------------------------------
+    assert selected == [expected_file_name]
+
+
+@pytest.mark.parametrize(
+    "strategy_name, expected_folder_name",
+    [("html", "DOC1-exported-html"), ("latex", "DOC1-exported-latex")],
+)
+def test_export_default_folder_name(app, strategy_name, expected_folder_name):
+    """
+    The HTML and LaTeX exports propose a folder named after the acronym of
+    the current document.
+    """
+    strategy = create_strategy(app, strategy_name)
+
+    assert strategy._folder_name_input.text() == expected_folder_name
+
+
+@pytest.mark.parametrize(
+    "acronym, name, view, expected",
+    [
+        ("DOC1", "Document 1", "default", "DOC1"),
+        ("  ", "Document 1", "default", "Document 1"),
+        (None, "Requirements: v1/2?", "default", "Requirements_ v1_2_"),
+        (None, None, "default", "default"),
+        (None, None, None, "document"),
+    ],
+)
+def test_document_file_name(app, monkeypatch, acronym, name, view, expected):
+    """
+    The base name of exported files is the document acronym, or its name,
+    or the current view; characters not valid in file names are replaced.
+    """
+    # Arrange ----------------------------------------------------------
+    create_strategy(app, "pdf")
+    file_names = importlib.import_module("basic.export.file_names")
+    document = app._controller.get_element(TEST_DOCUMENT_ID)
+    values = {PROTEUS_ACRONYM: acronym, PROTEUS_NAME: name}
+
+    def get_property(property_name):
+        value = values.get(property_name)
+        return None if value is None else SimpleNamespace(value=value)
+
+    monkeypatch.setattr(document, "get_property", get_property)
+    monkeypatch.setattr(StateManager, "get_current_view", lambda self: view)
+
+    # Act / Assert -----------------------------------------------------
+    assert file_names.document_file_name(app._controller) == expected
+
+
+@pytest.mark.parametrize("has_latex_template", [True, False])
+def test_export_dialog_lists_latex_formats_only_with_latex_template(
+    app, monkeypatch, has_latex_template
+):
+    """
+    LaTeX formats are only offered if the profile has a LaTeX template
+    (e.g. profiles created from basic may not have one). The other formats
+    are always offered.
+    """
+    # Arrange ----------------------------------------------------------
+    load_project(main_window=app, project_name=TEST_PROJECT_NAME)
+    StateManager().set_current_document(TEST_DOCUMENT_ID)
+    controller = app._controller
+    if not has_latex_template:
+        monkeypatch.setattr(controller, "get_templates_by_output_format", lambda output_format: [])
+
+    strategies = Plugins().get_export_strategies()
+
+    # Act --------------------------------------------------------------
+    dialog = ExportDialog(controller=controller)
+    listed = [
+        dialog.export_format_selector.itemData(i)
+        for i in range(dialog.export_format_selector.count())
+    ]
+    dialog.deleteLater()
+
+    # Assert -----------------------------------------------------------
+    assert strategies["latex"].is_available(controller) == has_latex_template
+    assert strategies["pdf_latex"].is_available(controller) == has_latex_template
+    expected = ["html", "pdf"] + (["latex", "pdf_latex"] if has_latex_template else [])
+    assert listed == [strategies[name] for name in expected]
+
+
+def test_export_dialog_cancels_running_export(app):
+    """
+    Closing the export dialog while an export is running cancels it; once
+    the export has finished, closing the dialog does not cancel anything.
+    """
+    # Arrange ----------------------------------------------------------
+    load_project(main_window=app, project_name=TEST_PROJECT_NAME)
+    StateManager().set_current_document(TEST_DOCUMENT_ID)
+    dialog = ExportDialog(controller=app._controller)
+
+    cancelled = []
+    dialog._export_strategy.cancel = lambda: cancelled.append(True)
+    dialog._export_strategy.export = lambda: None
+
+    # Act --------------------------------------------------------------
+    dialog.export_button_clicked()
+    exporting_selector_enabled = dialog.export_format_selector.isEnabled()
+    dialog.reject()
+
+    # Assert -----------------------------------------------------------
+    assert not exporting_selector_enabled, "The format cannot change while exporting"
+    assert cancelled == [True]
+
+    # A second close does not cancel again
+    dialog.reject()
+    assert cancelled == [True]
+    dialog.deleteLater()
