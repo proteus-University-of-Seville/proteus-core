@@ -158,3 +158,5 @@ spellchecker/
 
 # Local helper scripts (asset generators, one-off tooling)
 scripts/
+/.vscode
+/.gitattributes
