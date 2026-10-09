@@ -11,6 +11,7 @@
 # --------------------------------------------------------------------------
 
 from typing import Dict
+import json
 import logging
 
 # --------------------------------------------------------------------------
@@ -21,7 +22,7 @@ from PyQt6.QtCore import Qt, QByteArray, QUrl, QSize
 from PyQt6.QtGui import QDesktopServices
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebChannel import QWebChannel
-from PyQt6.QtWebEngineCore import QWebEnginePage
+from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineScript
 from PyQt6.QtWidgets import (
     QWidget,
     QHBoxLayout,
@@ -36,6 +37,7 @@ from PyQt6.QtWidgets import (
 # --------------------------------------------------------------------------
 
 from proteus.model import ProteusID
+from proteus.model.abstract_object import ProteusState
 from proteus.application.metrics import Metrics
 from proteus.application.resources.translator import translate as _
 from proteus.application.configuration.config import Config
@@ -60,6 +62,36 @@ from proteus.views.components.dialogs.export_dialog import ExportDialog
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
+
+# Script injected when a document starts loading to scroll to an object. It hides
+# the page until the element with the object id is parsed, scrolls to it and
+# shows the page. If the element is never found, the page is shown when loaded.
+SCROLL_ON_LOAD_SCRIPT_NAME: str = "proteus-scroll-on-load"
+SCROLL_ON_LOAD_SCRIPT: str = """
+(function () {
+  var id = __ID__, done = false, hidden = false;
+  function reveal() {
+    if (done) return;
+    done = true;
+    observer.disconnect();
+    if (document.documentElement) document.documentElement.style.visibility = '';
+  }
+  var observer = new MutationObserver(function () {
+    if (done) return;
+    if (!hidden && document.documentElement) {
+      hidden = true;
+      document.documentElement.style.visibility = 'hidden';
+    }
+    var element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'instant' });
+      reveal();
+    }
+  });
+  observer.observe(document, { childList: true, subtree: true });
+  window.addEventListener('load', reveal);
+})();
+"""
 
 
 # --------------------------------------------------------------------------
@@ -275,7 +307,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         ViewsContainer component subscribes to the following events:
             - ADD OBJECT -> update_view
             - MODIFY OBJECT -> update_view
-            - DELETE OBJECT -> update_view
+            - DELETE OBJECT -> update_view_on_delete_object
             - CURRENT DOCUMENT CHANGED -> update_view
             - SORT CHILDREN -> update_view
             - CHANGE OBJECT POSITION -> update_view
@@ -286,7 +318,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         """
         AddObjectEvent().connect(self.update_view_on_add_object)
         ModifyObjectEvent().connect(self.update_view)
-        DeleteObjectEvent().connect(self.update_view)
+        DeleteObjectEvent().connect(self.update_view_on_delete_object)
         CurrentDocumentChangedEvent().connect(self.update_view)
         SortChildrenEvent().connect(self.update_view)
         ChangeObjectPositionEvent().connect(self.update_view)
@@ -338,12 +370,49 @@ class ViewsContainer(QTabWidget, ProteusComponent):
             )
 
             url: QUrl = QUrl.fromLocalFile(html_path)
+
+            # Scroll to the object while the page is being built, so there is
+            # no flash of the top of the document
+            target: ProteusID | None = (
+                object_to_scroll or self._state_manager.get_current_object()
+            )
+            self._set_scroll_on_load_script(browser, target)
+
             log.debug(f"Loading HTML file: {url.toString()}")
             browser.page().load(url)
 
             # NOTE: When using onLoadFinished signal make sure to disconnect
             # the sender using self.sender().disconnect() to avoid multiple
             # calls when page is reloaded.
+
+    def _set_scroll_on_load_script(
+        self, browser: QWebEngineView, target: ProteusID | None
+    ) -> None:
+        """
+        Install in the browser a script that scrolls to the given object as soon
+        as its element is parsed, while the page is loading, instead of after
+        the whole page is loaded. Meanwhile the page is hidden, otherwise the
+        top of the document would be shown until the element is parsed.
+
+        Any script previously installed by this method is removed. If there is
+        no target, no script is installed.
+
+        :param browser: Browser that is going to load the page.
+        :param target: Id of the object to scroll to, or None.
+        """
+        scripts = browser.page().scripts()
+        for old_script in scripts.find(SCROLL_ON_LOAD_SCRIPT_NAME):
+            scripts.remove(old_script)
+
+        if target is None:
+            return
+
+        script = QWebEngineScript()
+        script.setName(SCROLL_ON_LOAD_SCRIPT_NAME)
+        script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+        script.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
+        script.setSourceCode(SCROLL_ON_LOAD_SCRIPT.replace("__ID__", json.dumps(str(target))))
+        scripts.insert(script)
 
     def load_finished(self, sender: QWebEngineView.loadFinished, object_to_scroll: ProteusID):  # type: ignore
         # Disconnect the signal to avoid multiple calls when page is reloaded
@@ -352,18 +421,17 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         current_selected_object: ProteusID = self._state_manager.get_current_object()
         current_view: str = self._state_manager.get_current_view()
 
-        # If an object is given to scroll, scroll to it
-        if object_to_scroll is not None:
-            script_template: str = "onTreeObjectSelected('{}');"
-            browser: QWebEngineView = self.tabs[current_view]
-            browser.page().runJavaScript(script_template.format(object_to_scroll))
-        # If not, scroll to the current selected object
-        elif current_selected_object is not None:
-            script_template: str = "onTreeObjectSelected('{}');"
-            browser: QWebEngineView = self.tabs[current_view]
-            browser.page().runJavaScript(
-                script_template.format(current_selected_object)
-            )
+        # Scroll to the given object or, if not, to the current selected one.
+        # NOTE: The page has already scrolled to it while loading (see
+        #       _set_scroll_on_load_script), this only corrects the position
+        #       if the layout changed afterwards and makes sure the page is
+        #       visible. It is not smooth to avoid moving the view twice.
+        target: ProteusID | None = object_to_scroll or current_selected_object
+        browser: QWebEngineView = self.tabs[current_view]
+        script: str = "document.documentElement.style.visibility = '';"
+        if target is not None:
+            script += f"document.getElementById({json.dumps(str(target))})?.scrollIntoView({{ behavior: 'instant' }});"
+        browser.page().runJavaScript(script)
 
         Metrics.html_load_time_end()
 
@@ -391,6 +459,56 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         """
         if update_view is True:
             self.display_view(object_id)
+
+    # ----------------------------------------------------------------------
+    # Method     : update_view_on_delete_object
+    # Description: Update the view when an object is deleted, scrolling to
+    #              a neighbour of the deleted object.
+    # Date       : 09/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def update_view_on_delete_object(
+        self, object_id: ProteusID, update_view: bool
+    ) -> None:
+        """
+        Update the view when an object is deleted. After reloading, the view
+        scrolls to the previous sibling of the deleted object or, if there is
+        none, to the next sibling or, if there is none, to its parent.
+        Otherwise the view would scroll to the top of the document.
+
+        Triggered by: DeleteObjectEvent
+
+        :param object_id: Id of the deleted object.
+        :param update_view: Flag to update the view.
+        """
+        if update_view is not True:
+            return
+
+        object_to_scroll: ProteusID | None = None
+        try:
+            deleted_object = self._controller.get_element(object_id)
+            parent = deleted_object.parent
+
+            # The deleted object is already DEAD, so it is skipped as the rest
+            # of the dead siblings
+            siblings = [
+                sibling
+                for sibling in parent.children
+                if sibling.id == object_id or sibling.state != ProteusState.DEAD
+            ]
+            index = next(i for i, s in enumerate(siblings) if s.id == object_id)
+
+            if index > 0:
+                object_to_scroll = siblings[index - 1].id
+            elif index + 1 < len(siblings):
+                object_to_scroll = siblings[index + 1].id
+            else:
+                object_to_scroll = parent.id
+        except Exception as error:
+            log.warning(f"Cannot get the object to scroll to after deleting: {error}")
+
+        self.display_view(object_to_scroll)
 
     # ----------------------------------------------------------------------
     # Method     : update_view
