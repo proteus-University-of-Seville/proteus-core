@@ -618,10 +618,15 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         if navigate is False:
             return
 
-        # NOTE: This javascript function must be implemented in the xslt
-        #       template. If not implemented, a js error will be shown in
-        #       the python console.
-        script_template: str = "onTreeObjectSelected('{}');"
+        # NOTE: This javascript function should be implemented in the xslt
+        #       template. It is checked before calling it, so there is no js
+        #       error if the template does not implement it or if the page
+        #       is still loading, when the object is scrolled into view by
+        #       the scripts used while the page is loaded (see display_view).
+        script_template: str = (
+            "if (typeof onTreeObjectSelected === 'function') "
+            "{{ onTreeObjectSelected('{}'); }}"
+        )
 
         # Get current view
         current_view: str = self._state_manager.get_current_view()
