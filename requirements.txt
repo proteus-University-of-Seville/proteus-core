@@ -181,7 +181,7 @@ pygments==2.21.0
 pyinstaller==6.20.0
 pyinstaller-hooks-contrib==2026.7
     # via pyinstaller
-pyjwt==2.14.0
+pyjwt==2.15.1
     # via mcp
 pyperclip==1.11.0
     # via fastmcp-slim
