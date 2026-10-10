@@ -21,7 +21,7 @@ if (Get-Command py -ErrorAction SilentlyContinue) {
 if (-not $python_executable) {
     foreach ($cand in 'python','python3') {
         if (-not (Get-Command $cand -ErrorAction SilentlyContinue)) { continue }
-        $mm = & $cand -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>$null
+        $mm = & $cand -c 'import sys; print(*sys.version_info[:2], sep=chr(46))' 2>$null
         if ($LASTEXITCODE -eq 0 -and $mm -in '3.11','3.12','3.13','3.14') {
             $python_executable = $cand
             break
@@ -79,30 +79,49 @@ if (Test-Path $venv_dir) {
 Write-Output "PROTEUS: Activating the virtual environment..."
 & "$venv_dir\Scripts\Activate.ps1"
 
-Write-Output "PROTEUS: Checking the Python version in the virtual environment..."
+Write-Output "PROTEUS: Checking the virtual environment..."
 
-# Get the Python version from the script environment
-$script_python_version = (& $python_executable @python_args --version) -split ' ' | Select-Object -Index 1
-
-# Get the Python version from the virtual environment
+# An existing virtual environment is used as it is, whichever Python it was
+# created with (e.g. a Python managed by uv), so the interpreter selected above
+# is only used to create it when it does not exist. Here we just check that the
+# environment was activated and that its Python version is supported.
+$venv_prefix = (& python -c 'import sys; print(sys.prefix)' 2>$null)
 $venv_python_version = (& python --version) -split ' ' | Select-Object -Index 1
+$venv_python_mm = (& python -c 'import sys; print(*sys.version_info[:2], sep=chr(46))' 2>$null)
 
 Write-Output "PROTEUS: Virtual environment Python version: $venv_python_version"
 
-# Check if the versions are different
-if ($script_python_version -ne $venv_python_version) {
-    Write-Output "PROTEUS: Looks like the Python version in the virtual environment is different from the one chosen by the script."
+# Check that the python being used belongs to the virtual environment
+if ($venv_prefix -ne (Resolve-Path $venv_dir).Path) {
     Write-Output "PROTEUS: Virtual environment was not activated successfully."
-    Write-Output "PROTEUS: Script Python version: $script_python_version"
-    Write-Output "PROTEUS: Virtual environment Python version: $venv_python_version"
     Write-Output "PROTEUS: You can try running the app manually by activating the virtual environment and running 'python -m proteus'."
     Pause
     exit 1
 }
 
-# Install the required packages
+# Check that the Python version of the virtual environment is supported
+if ($venv_python_mm -notin '3.11','3.12','3.13','3.14') {
+    Write-Output "PROTEUS: The Python version of the virtual environment ($venv_python_version) is not supported (3.11-3.14)."
+    Write-Output "PROTEUS: Delete the '.venv' directory and run this script again to create it again."
+    Pause
+    exit 1
+}
+
+# Install the required packages. A virtual environment not created with 'venv'
+# (e.g. created with uv) might not have pip, in that case try with uv.
 Write-Output "PROTEUS: Installing the required packages..."
-& pip install -r "$script_dir\requirements.txt"
+& python -m pip --version *> $null
+if ($LASTEXITCODE -eq 0) {
+    & python -m pip install -r "$script_dir\requirements.txt"
+} elseif (Get-Command uv -ErrorAction SilentlyContinue) {
+    Write-Output "PROTEUS: pip is not available in the virtual environment, using uv."
+    & uv pip install --python "$venv_dir\Scripts\python.exe" -r "$script_dir\requirements.txt"
+} else {
+    Write-Output "PROTEUS: pip is not available in the virtual environment and uv was not found."
+    Write-Output "PROTEUS: Install the required packages manually and run this script again."
+    Pause
+    exit 1
+}
 
 # Check for errors while installing the required packages
 if ($LASTEXITCODE -ne 0) {
