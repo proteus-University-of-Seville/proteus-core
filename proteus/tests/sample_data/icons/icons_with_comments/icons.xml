@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<icons>
+    <!-- Comments are valid children of the XML tree and must be ignored -->
+    <type name="app" default="dummy.jpg">
+        <!-- A comment inside a type -->
+    </type>
+    <!-- <type name="main_menu"/> -->
+</icons>

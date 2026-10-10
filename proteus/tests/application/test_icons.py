@@ -111,6 +111,22 @@ def test_icons_load_icons_empty(icons_object: Icons):
     ), "Icons types were found in the 'icons.xml' file"
 
 
+def test_icons_load_ignores_xml_comments(icons_object: Icons, caplog):
+    """
+    Test that XML comments in icons.xml (at the root or inside a type) are
+    ignored: the file is loaded and no error is logged.
+    """
+
+    with caplog.at_level("ERROR"):
+        success: bool = icons_object.load_icons(
+            PROTEUS_SAMPLE_ICONS_PATH / "icons_with_comments"
+        )
+
+    assert success, "Icons were not loaded from an icons.xml file with comments"
+    assert list(icons_object._icons_paths) == ["app"]
+    assert not caplog.records, f"Unexpected errors logged: {caplog.messages}"
+
+
 @pytest.mark.parametrize("sample_dir", ["icons_missing_xml_file", "nonexistingdir"])
 def test_icons_load_fail(icons_object: Icons, sample_dir: str):
     """
