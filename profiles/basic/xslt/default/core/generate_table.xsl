@@ -68,11 +68,17 @@
       select="properties/fileProperty[@name='logo' or @name='photo'][normalize-space() != '']"
     />
 
-    <!-- The corner image is not shown again as a property row -->
+    <!-- The corner image is not shown again as a property row. The       -->
+    <!-- 'width' property is not shown either when the object has a file  -->
+    <!-- property: it only sets the image size (see the fileProperty      -->
+    <!-- template in properties.xsl), it is not content of the object.    -->
     <xsl:variable name="all_excluded_properties">
       <xsl:value-of select="$excluded_properties"/>
       <xsl:if test="$image">
         <xsl:value-of select="concat($image[1]/@name, ',')"/>
+      </xsl:if>
+      <xsl:if test="properties/fileProperty">
+        <xsl:text>width,</xsl:text>
       </xsl:if>
     </xsl:variable>
 
