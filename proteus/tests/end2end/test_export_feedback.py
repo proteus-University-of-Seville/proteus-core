@@ -177,3 +177,30 @@ def test_pdf_from_latex_progress_follows_the_pages(app, qtbot, tmp_path, monkeyp
     assert determinate == sorted(determinate)
     assert any(55 < p < 90 for p in determinate), determinate
     assert determinate[-1] == 100
+
+
+def test_export_starts_after_the_dialog_is_painted(app, qtbot):
+    """
+    The export strategy is called once the event loop has run (so the dialog,
+    which grows to show the progress bar, is painted before an export that
+    does all its work at once), not from the click itself; and it is not
+    called if the dialog is closed in between.
+    """
+    dialog = create_dialog(app, "html")
+    calls = []
+    dialog._export_strategy.export = lambda: calls.append(True)
+    dialog._export_strategy.cancel = lambda: None
+
+    dialog.export_button_clicked()
+    called_by_the_click = bool(calls)
+    qtbot.waitUntil(lambda: bool(calls), timeout=2000)
+
+    # Closed before the event loop runs: nothing is exported
+    calls.clear()
+    dialog.export_button_clicked()
+    dialog.reject()
+    qtbot.wait(100)
+
+    assert not called_by_the_click
+    assert calls == []
+    dialog.deleteLater()

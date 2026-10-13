@@ -253,8 +253,10 @@ class ExportDialog(ProteusDialog):
     # ----------------------------------------------------------------------
     def export_button_clicked(self) -> None:
         """
-        Handle the export button click. Call the export strategy export
-        method and disable the button box to avoid multiple exports.
+        Handle the export button click. Disable the button box to avoid
+        multiple exports and show the progress bar, and call the export
+        strategy export method once the dialog has been laid out and painted
+        again (see _start_export).
         """
         self._clear_log()
         self.progress_bar.setRange(0, 100)
@@ -265,7 +267,28 @@ class ExportDialog(ProteusDialog):
         # The strategy cannot be replaced while it is exporting
         self.export_format_selector.setEnabled(False)
         self.accept_button.setEnabled(False)
-        self._export_strategy.export()
+
+        # The dialog grows when the progress bar is shown. If the strategy
+        # worked right now, without returning to the event loop (e.g. the
+        # export to HTML does all its work in the application thread), the
+        # dialog would not be laid out and painted until it finishes, and the
+        # new area would be shown black meanwhile.
+        QTimer.singleShot(0, self._start_export)
+
+    # ----------------------------------------------------------------------
+    # Method     : _start_export
+    # Description: Call the export strategy export method.
+    # Date       : 14/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _start_export(self) -> None:
+        """
+        Call the export strategy export method, unless the dialog was closed
+        (and the export cancelled) since the export button was clicked.
+        """
+        if self._exporting and self._export_strategy is not None:
+            self._export_strategy.export()
 
     # ----------------------------------------------------------------------
     # Method     : print_pdf_finished_dialog
