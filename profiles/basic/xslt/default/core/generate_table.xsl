@@ -61,6 +61,14 @@
     <xsl:param name="extra_rows"/>
     <xsl:param name="show_children" select="true()"/>
 
+    <!-- Children are shown in a row at the end of the table, as nested    -->
+    <!-- object cards (children_style 'cards') or as a compact list with   -->
+    <!-- the code (if any), the name and the description of each child,    -->
+    <!-- nested if the children have children ('list'). children_label_key -->
+    <!-- is the i18n key of the label of the row.                          -->
+    <xsl:param name="children_style" select="'cards'"/>
+    <xsl:param name="children_label_key" select="'xslt.children'"/>
+
     <!-- Image shown in the upper right corner of the object, if any.     -->
     <!-- Organizations use 'logo' and stakeholders use 'photo'. An        -->
     <!-- archetype may pass a different property in this parameter.       -->
@@ -148,6 +156,8 @@
           <xsl:call-template name="renderChildren">
             <xsl:with-param name="children" select="children/*" />
             <xsl:with-param name="span" select="$span" />
+            <xsl:with-param name="style" select="$children_style" />
+            <xsl:with-param name="label_key" select="$children_label_key" />
           </xsl:call-template>
         </xsl:if>
       </table>
@@ -167,19 +177,75 @@
   <xsl:template name="renderChildren">
     <xsl:param name="children" />
     <xsl:param name="span" select="1"/>
+    <xsl:param name="style" select="'cards'"/>
+    <xsl:param name="label_key" select="'xslt.children'"/>
 
     <xsl:if test="$children">
       <tr class="children_row">
         <th>
-          <xsl:value-of select="proteus-utils:i18n('xslt.children')"/>
+          <xsl:value-of select="proteus-utils:i18n($label_key)"/>
         </th>
         <td colspan="{$span}" class="children_column">
-          <xsl:for-each select="$children">
-            <xsl:call-template name="generate_table"/>
-          </xsl:for-each>
+          <xsl:choose>
+            <xsl:when test="$style = 'list'">
+              <xsl:call-template name="renderChildrenList">
+                <xsl:with-param name="children" select="$children"/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:for-each select="$children">
+                <xsl:call-template name="generate_table"/>
+              </xsl:for-each>
+            </xsl:otherwise>
+          </xsl:choose>
         </td>
       </tr>
     </xsl:if>
+  </xsl:template>
+
+  <!-- ============================================= -->
+  <!-- renderChildrenList template                   -->
+  <!-- ============================================= -->
+
+  <!-- Compact list of objects: "[code] name: description" per item, with -->
+  <!-- the code only if the object has one and the description only if it -->
+  <!-- is not empty. The children of the objects are shown in nested       -->
+  <!-- lists. The id and data-proteus-id of each item allow selecting     -->
+  <!-- the object from the tree and opening its properties on double click -->
+
+  <xsl:template name="renderChildrenList">
+    <xsl:param name="children" />
+
+    <ul class="children_list">
+      <xsl:for-each select="$children">
+        <xsl:variable name="code" select="properties/*[@name=':Proteus-code']"/>
+        <xsl:variable name="description" select="properties/*[@name='description']"/>
+        <li id="{@id}" data-proteus-id="{@id}">
+          <xsl:if test="$code">
+            <span class="child_code">
+              <xsl:text>[</xsl:text>
+              <xsl:value-of select="$code"/>
+              <xsl:text>]</xsl:text>
+            </span>
+            <xsl:text> </xsl:text>
+          </xsl:if>
+          <strong class="child_name">
+            <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
+          </strong>
+          <xsl:if test="normalize-space($description) != ''">
+            <xsl:text>: </xsl:text>
+            <xsl:call-template name="generate_markdown">
+              <xsl:with-param name="content" select="$description"/>
+            </xsl:call-template>
+          </xsl:if>
+          <xsl:if test="children/*">
+            <xsl:call-template name="renderChildrenList">
+              <xsl:with-param name="children" select="children/*"/>
+            </xsl:call-template>
+          </xsl:if>
+        </li>
+      </xsl:for-each>
+    </ul>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -44,6 +44,14 @@
     <xsl:param name="extra_rows_before"/>
     <xsl:param name="extra_rows"/>
     <xsl:param name="show_children" select="true()"/>
+
+    <!-- Children are shown in a row at the end of the table, as nested    -->
+    <!-- object cards (children_style 'cards') or as a compact list with   -->
+    <!-- the code (if any), the name and the description of each child,    -->
+    <!-- nested if the children have children ('list'). children_label_key -->
+    <!-- is the i18n key of the label of the row.                          -->
+    <xsl:param name="children_style" select="'cards'"/>
+    <xsl:param name="children_label_key" select="'xslt.children'"/>
     <xsl:param name="image"
       select="properties/fileProperty[@name='logo' or @name='photo'][normalize-space() != '']"
     />
@@ -102,10 +110,21 @@
 
     <xsl:value-of select="$extra_rows"/>
 
+    <!-- Children as a compact list, in a row at the end of the table -->
+    <xsl:if test="$show_children and $children_style = 'list' and children/object">
+      <xsl:call-template name="label"><xsl:with-param name="key" select="$children_label_key"/></xsl:call-template>
+      <xsl:text> &amp; </xsl:text>
+      <xsl:call-template name="renderChildrenItems">
+        <xsl:with-param name="children" select="children/object"/>
+      </xsl:call-template>
+      <xsl:text> \\ \hline&#10;</xsl:text>
+    </xsl:if>
+
     <xsl:text>\end{xltabular}\ProteusCardEnd&#10;</xsl:text>
 
-    <!-- Render the children objects recursively, below the card -->
-    <xsl:if test="$show_children">
+    <!-- Render the children objects recursively, below the card, unless -->
+    <!-- they are shown as a list inside it                               -->
+    <xsl:if test="$show_children and $children_style != 'list'">
       <xsl:call-template name="renderChildren">
         <xsl:with-param name="children" select="children/object" />
       </xsl:call-template>
@@ -128,6 +147,52 @@
       </xsl:for-each>
       <xsl:text>\end{adjustwidth}&#10;</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <!-- ============================================= -->
+  <!-- renderChildrenItems template                  -->
+  <!-- ============================================= -->
+
+  <!-- Compact list of objects: "[code] name: description" per item, with -->
+  <!-- the code only if the object has one and the description only if it -->
+  <!-- is not empty. The children of the objects are shown in nested       -->
+  <!-- lists.                                                              -->
+
+  <xsl:template name="renderChildrenItems">
+    <xsl:param name="children" />
+
+    <xsl:text>\begin{itemize}&#10;</xsl:text>
+    <xsl:for-each select="$children">
+      <xsl:variable name="code" select="properties/*[@name=':Proteus-code']"/>
+      <xsl:variable name="description" select="properties/*[@name='description']"/>
+      <!-- The paragraph must start before the anchor (\phantomsection), -->
+      <!-- or it adds an empty line above the item                       -->
+      <xsl:text>\item\leavevmode</xsl:text>
+      <xsl:call-template name="anchor"/>
+      <xsl:if test="$code">
+        <xsl:text>\textcolor{proteusaccent}{\texttt{[</xsl:text>
+        <xsl:call-template name="tex"><xsl:with-param name="text" select="$code"/></xsl:call-template>
+        <xsl:text>]}} </xsl:text>
+      </xsl:if>
+      <xsl:text>\textbf{</xsl:text>
+      <xsl:call-template name="tex">
+        <xsl:with-param name="text" select="properties/*[@name=':Proteus-name']"/>
+      </xsl:call-template>
+      <xsl:text>}</xsl:text>
+      <xsl:if test="normalize-space($description) != ''">
+        <xsl:text>: </xsl:text>
+        <xsl:call-template name="generate_markdown">
+          <xsl:with-param name="content" select="$description"/>
+        </xsl:call-template>
+      </xsl:if>
+      <xsl:text>&#10;</xsl:text>
+      <xsl:if test="children/object">
+        <xsl:call-template name="renderChildrenItems">
+          <xsl:with-param name="children" select="children/object"/>
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:for-each>
+    <xsl:text>\end{itemize}&#10;</xsl:text>
   </xsl:template>
 
 </xsl:stylesheet>

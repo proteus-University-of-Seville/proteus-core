@@ -23,7 +23,7 @@
 # Literal texts used by the templates (key: xslt.<name>)
 # -----------------------------------------------------------------------
 
-xslt.children: "Hijos"
+xslt.children: "Contiene"
 xslt.empty_paragraph: "Párrafo vacío"
 xslt.figure: "Figura"
 xslt.project: "Proyecto"
