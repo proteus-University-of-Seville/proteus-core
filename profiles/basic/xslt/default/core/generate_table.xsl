@@ -61,13 +61,16 @@
     <xsl:param name="extra_rows"/>
     <xsl:param name="show_children" select="true()"/>
 
-    <!-- Children are shown in a row at the end of the table, as nested    -->
-    <!-- object cards (children_style 'cards') or as a compact list with   -->
-    <!-- the code (if any), the name and the description of each child,    -->
-    <!-- nested if the children have children ('list'). children_label_key -->
-    <!-- is the i18n key of the label of the row.                          -->
+    <!-- Children are shown in a row, as nested object cards              -->
+    <!-- (children_style 'cards') or as a compact list with the code (if   -->
+    <!-- any), the name and the description of each child, nested if the   -->
+    <!-- children have children ('list'). children_label_key is the i18n   -->
+    <!-- key of the label of the row. The row is at the end of the table   -->
+    <!-- (children_position 'end') or, in a list, right after the          -->
+    <!-- description row, if there is one ('after_description').           -->
     <xsl:param name="children_style" select="'cards'"/>
     <xsl:param name="children_label_key" select="'xslt.children'"/>
+    <xsl:param name="children_position" select="'end'"/>
 
     <!-- Image shown in the upper right corner of the object, if any.     -->
     <!-- Organizations use 'logo' and stakeholders use 'photo'. An        -->
@@ -93,6 +96,16 @@
         <xsl:text>width,</xsl:text>
       </xsl:if>
     </xsl:variable>
+
+    <!-- True if the list of children is shown right after the description -->
+    <xsl:variable name="children_after_description" select="
+      $show_children
+      and $children_style = 'list'
+      and $children_position = 'after_description'
+      and boolean(children/*)
+      and boolean(properties/*[@name='description'])
+      and not(contains($all_excluded_properties, ',description,'))
+    "/>
 
     <!-- All objects are displayed inside a div with their IDs -->
     <div id="{@id}" data-proteus-id="{@id}" class="{$class}">
@@ -147,12 +160,22 @@
             <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
             <xsl:with-param name="span" select="$span"/>
           </xsl:call-template>
+
+          <!-- Children right after the description -->
+          <xsl:if test="$children_after_description and @name='description'">
+            <xsl:call-template name="renderChildren">
+              <xsl:with-param name="children" select="../../children/*" />
+              <xsl:with-param name="span" select="$span" />
+              <xsl:with-param name="style" select="$children_style" />
+              <xsl:with-param name="label_key" select="$children_label_key" />
+            </xsl:call-template>
+          </xsl:if>
         </xsl:for-each>
 
         <xsl:copy-of select="$extra_rows"/>
 
         <!-- Render the children objects recursively -->
-        <xsl:if test="$show_children">
+        <xsl:if test="$show_children and not($children_after_description)">
           <xsl:call-template name="renderChildren">
             <xsl:with-param name="children" select="children/*" />
             <xsl:with-param name="span" select="$span" />

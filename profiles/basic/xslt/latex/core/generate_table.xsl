@@ -45,13 +45,16 @@
     <xsl:param name="extra_rows"/>
     <xsl:param name="show_children" select="true()"/>
 
-    <!-- Children are shown in a row at the end of the table, as nested    -->
-    <!-- object cards (children_style 'cards') or as a compact list with   -->
-    <!-- the code (if any), the name and the description of each child,    -->
-    <!-- nested if the children have children ('list'). children_label_key -->
-    <!-- is the i18n key of the label of the row.                          -->
+    <!-- Children are shown in a row, as nested object cards              -->
+    <!-- (children_style 'cards') or as a compact list with the code (if   -->
+    <!-- any), the name and the description of each child, nested if the   -->
+    <!-- children have children ('list'). children_label_key is the i18n   -->
+    <!-- key of the label of the row. The row is at the end of the table   -->
+    <!-- (children_position 'end') or, in a list, right after the          -->
+    <!-- description row, if there is one ('after_description').           -->
     <xsl:param name="children_style" select="'cards'"/>
     <xsl:param name="children_label_key" select="'xslt.children'"/>
+    <xsl:param name="children_position" select="'end'"/>
     <xsl:param name="image"
       select="properties/fileProperty[@name='logo' or @name='photo'][normalize-space() != '']"
     />
@@ -73,6 +76,16 @@
         <xsl:text>width,</xsl:text>
       </xsl:if>
     </xsl:variable>
+
+    <!-- True if the list of children is shown right after the description -->
+    <xsl:variable name="children_after_description" select="
+      $show_children
+      and $children_style = 'list'
+      and $children_position = 'after_description'
+      and boolean(children/object)
+      and boolean(properties/*[@name='description'])
+      and not(contains($all_excluded_properties, ',description,'))
+    "/>
 
     <!-- Accent colour of the archetype (see proteus.sty) and anchor -->
     <xsl:text>&#10;\ProteusUseAccent{</xsl:text>
@@ -106,18 +119,24 @@
       <xsl:call-template name="generate_property_row">
         <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
       </xsl:call-template>
+
+      <!-- Children right after the description -->
+      <xsl:if test="$children_after_description and @name='description'">
+        <xsl:call-template name="renderChildrenListRow">
+          <xsl:with-param name="children" select="../../children/object"/>
+          <xsl:with-param name="label_key" select="$children_label_key"/>
+        </xsl:call-template>
+      </xsl:if>
     </xsl:for-each>
 
     <xsl:value-of select="$extra_rows"/>
 
     <!-- Children as a compact list, in a row at the end of the table -->
-    <xsl:if test="$show_children and $children_style = 'list' and children/object">
-      <xsl:call-template name="label"><xsl:with-param name="key" select="$children_label_key"/></xsl:call-template>
-      <xsl:text> &amp; </xsl:text>
-      <xsl:call-template name="renderChildrenItems">
+    <xsl:if test="$show_children and $children_style = 'list' and children/object and not($children_after_description)">
+      <xsl:call-template name="renderChildrenListRow">
         <xsl:with-param name="children" select="children/object"/>
+        <xsl:with-param name="label_key" select="$children_label_key"/>
       </xsl:call-template>
-      <xsl:text> \\ \hline&#10;</xsl:text>
     </xsl:if>
 
     <xsl:text>\end{xltabular}\ProteusCardEnd&#10;</xsl:text>
@@ -147,6 +166,24 @@
       </xsl:for-each>
       <xsl:text>\end{adjustwidth}&#10;</xsl:text>
     </xsl:if>
+  </xsl:template>
+
+  <!-- ============================================= -->
+  <!-- renderChildrenListRow template                -->
+  <!-- ============================================= -->
+
+  <!-- Row of the table with the label and the list of children -->
+
+  <xsl:template name="renderChildrenListRow">
+    <xsl:param name="children" />
+    <xsl:param name="label_key" select="'xslt.children'"/>
+
+    <xsl:call-template name="label"><xsl:with-param name="key" select="$label_key"/></xsl:call-template>
+    <xsl:text> &amp; </xsl:text>
+    <xsl:call-template name="renderChildrenItems">
+      <xsl:with-param name="children" select="$children"/>
+    </xsl:call-template>
+    <xsl:text> \\ \hline&#10;</xsl:text>
   </xsl:template>
 
   <!-- ============================================= -->
