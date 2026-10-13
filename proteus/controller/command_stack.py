@@ -27,7 +27,7 @@ import lxml.etree as ET
 
 from proteus import PROTEUS_TEMP_DIR
 from proteus.model import ProteusID, ProteusClassTag, ASSETS_REPOSITORY
-from proteus.application import ASSETS_DUMMY_SEARCH_PATH, TEMPLATE_DUMMY_SEARCH_PATH
+from proteus.application import TEMPLATE_DUMMY_SEARCH_PATH, replace_assets_urls
 from proteus.application.metrics import Metrics
 from proteus.controller.commands.update_properties import UpdatePropertiesCommand
 from proteus.controller.commands.clone_archetype_object import (
@@ -860,9 +860,7 @@ class Controller:
         ).as_posix()
         xslt_dir = Config().profile_settings.xslt_directory.as_posix()
 
-        html_string = html_string.replace(
-            f"{ASSETS_DUMMY_SEARCH_PATH}:///", f"file:///{assets_dir}/"
-        )
+        html_string = replace_assets_urls(html_string, f"file:///{assets_dir}/")
         html_string = html_string.replace(
             f"{TEMPLATE_DUMMY_SEARCH_PATH}:///", f"file:///{xslt_dir}/"
         )
