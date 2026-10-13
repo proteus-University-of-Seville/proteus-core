@@ -30,6 +30,7 @@ PLUGIN_DIR = Path("resources/plugins").resolve()
 if str(PLUGIN_DIR) not in sys.path:
     sys.path.insert(0, str(PLUGIN_DIR))
 
+from basic.export.export_latex import ASSET_REFERENCE_PATTERN  # noqa: E402
 from basic.proteus_xslt_latex import (  # noqa: E402
     escape_latex,
     markdown_to_latex_string,
@@ -176,3 +177,42 @@ def test_latex_url():
         latex_url(None, " https://a.org/a_b#c ")
         == r"\href{https://a.org/a_b\#c}{\texttt{https://a.org/a\_b\#c}}"
     )
+
+
+def test_markdown_image_from_assets():
+    """
+    An image of the project assets is included from assets/, centered if it
+    is alone in its paragraph, and the export strategies find it to copy it.
+    """
+    result = markdown_to_latex_string("![Report](assets:///report%20one.png)", glossary_highlight=False)
+
+    assert result == "\\begin{center}\n\\adjustbox{max width=\\linewidth}{\\includegraphics{assets/report one.png}}\n\\end{center}"
+    assert ASSET_REFERENCE_PATTERN.findall(result) == ["report one.png"]
+
+
+def test_markdown_image_inside_text():
+    """
+    An image inside a paragraph with text is not centered.
+    """
+    result = markdown_to_latex_string("See ![icon](assets:///icon.png) here", glossary_highlight=False)
+
+    assert result == "See \\adjustbox{max width=\\linewidth}{\\includegraphics{assets/icon.png}} here"
+
+
+def test_markdown_remote_image():
+    """
+    Remote images are written to be downloaded by the export strategies.
+    """
+    result = markdown_to_latex_string("![x](https://example.com/a/x.png)", glossary_highlight=False)
+
+    assert "\\ProteusRemoteImage{1}{https://example.com/a/x.png}" in result
+
+
+@pytest.mark.parametrize("source", ["file:///C:/x.png", "x.png", "assets:///", "assets:///a{b}.png"])
+def test_markdown_image_that_cannot_be_included(source):
+    """
+    Images that cannot be included are left out, without breaking the text.
+    """
+    result = markdown_to_latex_string(f"Before ![x]({source}) after", glossary_highlight=False)
+
+    assert result == "Before  after"

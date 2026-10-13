@@ -199,6 +199,11 @@ module is mostly replacing HTML by LaTeX. Rules:
   are linked with the HTML glossary highlighter, and the HTML is converted to LaTeX (emphasis,
   code, lists, links, tables as `proteusmdtable`, code blocks as `proteuscode`, quotes,
   rules). Code blocks are not verbatim, so they also work inside table cells.
+  Images of the Markdown text (`![text](assets:///<file>)`) are written as
+  `\adjustbox{max width=\linewidth}{\includegraphics{assets/<file>}}` (centred if they are
+  alone in their paragraph, scaled down if they are wider than the cell, never enlarged), so
+  they are copied as any asset. `http(s)` images are written as `\ProteusRemoteImage{1}{URL}`
+  and downloaded. Images with any other source are left out (a warning is logged).
 * **Labels and links** use the object ids: `\ProteusAnchor{id}` (named template `anchor`) for
   objects and `\ProteusLabel{id}` after `\section`, `\caption`...; links are
   `\hyperref[id]{text}`. Both commands do nothing inside symbolic links, which render the

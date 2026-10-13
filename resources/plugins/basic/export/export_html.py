@@ -32,7 +32,7 @@ from PyQt6.QtWidgets import (
 # --------------------------------------------------------------------------
 
 from proteus.model import ASSETS_REPOSITORY
-from proteus.application import ASSETS_DUMMY_SEARCH_PATH, TEMPLATE_DUMMY_SEARCH_PATH
+from proteus.application import TEMPLATE_DUMMY_SEARCH_PATH, replace_assets_urls
 from proteus.application.state.manager import StateManager
 from proteus.application.resources.translator import translate as _
 from proteus.controller.command_stack import Controller
@@ -184,7 +184,7 @@ class ExportHTML(ExportStrategy):
             # ------------------------------------------------------------------
             # Replace all the 'assets:///' dummy URLs from 'src' attributes with
             # the string './assets/'
-            html = html.replace(f"{ASSETS_DUMMY_SEARCH_PATH}:///", "./assets/")
+            html = replace_assets_urls(html, "./assets/")
 
             self.exportProgressSignal.emit(75)
 
