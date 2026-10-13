@@ -171,7 +171,7 @@ export_dialog.export_pdf.filename.error.folder_not_found: "Selected path does no
 export_dialog.export_strategy.html: "HTML (with resources folder)"
 export_dialog.export_html.filepath.label: "Select destination directory:"
 export_dialog.export_html.folder_name.label: "Enter folder name:"
-export_dialog.export_html.error.empty: "The directory name cannot be empty"
+export_dialog.export_html.error.empty: "Select a destination directory"
 export_dialog.export_html.error.not_found: "The directory does not exist"
 export_dialog.export_html.error.not_directory: "The path is not a directory"
 export_dialog.export_html.error.invalid_folder_name: "The folder name is invalid"

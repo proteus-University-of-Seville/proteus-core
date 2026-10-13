@@ -171,7 +171,7 @@ export_dialog.export_pdf.filename.error.folder_not_found: "La ruta seleccionada 
 export_dialog.export_strategy.html: "HTML (con carpeta de recursos)"
 export_dialog.export_html.filename.label: "Seleccione una carpeta de destino:"
 export_dialog.export_html.folder_name.label: "Introduzca un nombre de carpeta:"
-export_dialog.export_html.error.empty: "El nombre de la carpeta no puede estar vacío"
+export_dialog.export_html.error.empty: "Seleccione una carpeta de destino"
 export_dialog.export_html.error.not_found: "La ruta seleccionada no existe"
 export_dialog.export_html.error.not_directory: "La ruta seleccionada no es una carpeta"
 export_dialog.export_html.error.invalid_folder_name: "Nombre de carpeta no válido"
