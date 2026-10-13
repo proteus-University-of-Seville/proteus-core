@@ -286,6 +286,11 @@ class RenderService:
                 error_element = ET.SubElement(result_tree, "error")
                 error_element.text = error.message
 
+        # Templates with <xsl:output method="text"> (e.g. LaTeX) produce no
+        # root element: serialize them as the stylesheet says
+        if isinstance(result_tree, ET._XSLTResultTree) and result_tree.getroot() is None:
+            return str(result_tree)
+
         html_string = ET.tostring(
             result_tree, encoding="unicode", pretty_print=True, method="html"
         )

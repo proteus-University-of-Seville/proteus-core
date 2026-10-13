@@ -19,23 +19,30 @@
   <!-- traceProperty                                 -->
   <!-- ============================================= -->
 
+  <!-- Link to the target of a trace: "[code] name", the code only if it has one -->
+  <xsl:template name="trace_target_link">
+    <xsl:param name="target_object"/>
+
+    <xsl:variable name="target_id" select="$target_object/@id" />
+    <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
+
+    <a href="#{$target_id}" onclick="selectAndNavigate(`{$target_id}`, event)">
+      <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]<xsl:text>&#160;</xsl:text></xsl:if>
+      <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
+    </a>
+  </xsl:template>
+
   <!-- List mode -->
   <xsl:template match="traceProperty">
     <ul class="traces">
       <xsl:for-each select="trace">
-        <xsl:variable name="target_id" select="@target" />
-        <xsl:variable name="target_object" select="//object[@id=$target_id]" />
-        <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
-        <xsl:variable name="target_name">
-          <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]</xsl:if>
-          <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
-        </xsl:variable>
+        <xsl:variable name="target_object" select="//object[@id=current()/@target]" />
 
         <xsl:if test="$target_object">
           <li>
-            <a href="#{$target_id}" onclick="selectAndNavigate(`{$target_id}`, event)">
-              <xsl:value-of select="$target_name"/>
-            </a>
+            <xsl:call-template name="trace_target_link">
+              <xsl:with-param name="target_object" select="$target_object"/>
+            </xsl:call-template>
           </li>
         </xsl:if>
       </xsl:for-each>
@@ -45,19 +52,13 @@
   <!-- Paragraph mode -->
   <xsl:template match="traceProperty" mode="paragraph">
     <xsl:for-each select="trace">
-      <xsl:variable name="target_id" select="@target" />
-      <xsl:variable name="target_object" select="//object[@id=$target_id]" />
-      <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
-      <xsl:variable name="target_name">
-        <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/></xsl:if>
-        <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
-      </xsl:variable>
+      <xsl:variable name="target_object" select="//object[@id=current()/@target]" />
 
       <xsl:if test="$target_object">
         <p>
-          <a href="#{$target_id}" onclick="selectAndNavigate(`{$target_id}`, event)">
-            <xsl:value-of select="$target_name"/>
-          </a>
+          <xsl:call-template name="trace_target_link">
+            <xsl:with-param name="target_object" select="$target_object"/>
+          </xsl:call-template>
         </p>
       </xsl:if>
     </xsl:for-each>

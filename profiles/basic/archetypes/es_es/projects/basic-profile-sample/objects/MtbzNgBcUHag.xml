@@ -9,7 +9,7 @@
     <fileProperty name="file" category="detail" tooltip="file-info"><![CDATA[us-logo.jpg]]></fileProperty>
     <urlProperty name="url" category="detail"><![CDATA[]]></urlProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">30</integerProperty>
-    <markdownProperty name="description" category="detail"><![CDATA[Figura 1. Logotipo de la Universidad de Sevilla, cliente del proyecto BiblioUS. Se guarda en los recursos del proyecto para que la portada se muestre sin conexión.]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Logotipo de la Universidad de Sevilla, cliente del proyecto BiblioUS. Se guarda en los recursos del proyecto para que la portada se muestre sin conexión.]]></markdownProperty>
     <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>

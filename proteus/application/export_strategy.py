@@ -46,7 +46,13 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
     - readyToExportSignal: emitted when the export dialog is ready to
     to perform the export.
     - exportProgressSignal: emitted to update the progress of the export
-    process (progress bar in the export dialog 0-100).
+    process (progress bar in the export dialog 0-100). PROGRESS_BUSY is
+    emitted when the progress cannot be known: the progress bar shows that
+    the export is working, without a percentage.
+    - exportLogSignal: emitted with a piece of text that the strategy wants
+    to show to the user while it is exporting (e.g. the output of a compiler),
+    in a text panel of the export dialog. It is optional: the panel is only
+    shown if the strategy emits it.
 
     Export strategies use Controller to access the backend information
     directly and perform the necessary operations to export the current
@@ -56,11 +62,30 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
     exportFinishedSignal = pyqtSignal(str, bool)
     readyToExportSignal = pyqtSignal(bool)
     exportProgressSignal = pyqtSignal(int)
+    exportLogSignal = pyqtSignal(str)
+
+    # Value of exportProgressSignal for a step of unknown length
+    PROGRESS_BUSY: int = -1
 
     def __init__(self, controller: Controller) -> None:
         super().__init__()
 
         self._controller = controller
+
+    def report(self, message: str = "", progress: int = None) -> None:
+        """
+        Tells the user what the export is doing: the message is added to the
+        text panel of the export dialog (it is shown the first time) and the
+        progress bar is updated.
+
+        :param message: Text to add to the panel, as a line (it may be empty).
+        :param progress: Value of the progress bar (0-100), PROGRESS_BUSY if
+                         it is not known, or None to leave it as it is.
+        """
+        if message:
+            self.exportLogSignal.emit(message if message.endswith("\n") else message + "\n")
+        if progress is not None:
+            self.exportProgressSignal.emit(progress)
 
     @abstractmethod
     def export(self) -> None:
@@ -68,6 +93,29 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
         Export the current view.
 
         Must be implemented by the concrete export strategy.
+        """
+        pass
+
+    @classmethod
+    def is_available(cls, controller: Controller) -> bool:
+        """
+        Whether the strategy can be used with the current profile and
+        project. The export dialog only lists available strategies.
+
+        Strategies that depend on something the profile may not provide
+        (e.g. a template with a given output format) should override it.
+        By default it returns True.
+        """
+        return True
+
+    def cancel(self) -> None:
+        """
+        Cancel a running export (e.g. the export dialog is closed before it
+        finishes). exportFinishedSignal must not be emitted afterwards.
+
+        Strategies whose export runs in the background (processes, worker
+        threads) should override it to stop them and remove any partial
+        output. By default it does nothing.
         """
         pass
 

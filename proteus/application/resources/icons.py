@@ -143,7 +143,8 @@ class Icons(metaclass=SingletonMeta):
         resources_icons_root: ET._Element = resources_icons_tree.getroot()
 
         # Iterate over icons tag children (type tag) to create each type dictionary
-        for type_tag in resources_icons_root.iterchildren():
+        # NOTE: '*' selects only elements, XML comments are also children in lxml
+        for type_tag in resources_icons_root.iterchildren("*"):
             # Get name attribute to check if it is a valid icon type
             type_name: str = type_tag.attrib.get("name", None)
 
@@ -165,7 +166,7 @@ class Icons(metaclass=SingletonMeta):
                 )
 
             # Iterate over icons tag children icon
-            for icon in type_tag.iterchildren():
+            for icon in type_tag.iterchildren("*"):
                 # Get key and file attributes for the icon tag
                 key = icon.attrib.get("key", None)
                 file = icon.attrib.get("file", None)

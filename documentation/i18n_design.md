@@ -35,7 +35,34 @@ It calls `proteus.application.resources.translator.translate()`, which looks
 the key up in the translations of the current application language, loaded from
 the application `resources/i18n/<lang>/` and the profile `<profile>/i18n/<lang>/`
 directories. Optional arguments are formatted into the translation
-(`{0}` placeholders), as in the rest of the application.
+(`{0}` placeholders, with Python's `str.format()`), as in the rest of the
+application.
+
+**The extra arguments of `i18n()` are format arguments, not a fallback text**:
+`proteus-utils:i18n('archetype.enum_units.day', 'day')` does not return `day` when
+the key is missing (it returns `!archetype.enum_units.day!`). When arguments are
+passed, literal braces in the translation must be doubled (`{{`, `}}`).
+
+How translations are loaded and looked up (`Translator` in
+`proteus/application/resources/translator.py`):
+
+* The language directory is chosen with the `languages.xml` file of each i18n
+  directory. If the current language is not listed, the `default` language of
+  that file is used.
+* The application translations are loaded first and the profile translations
+  afterwards, into the same dictionary: **a profile key overrides an application
+  key with the same name** (e.g. `archetype.class.:proteus-document`), whether on
+  purpose or by accident.
+* Inside a language directory, every `*.yaml` file and then every `*.yml` file is
+  loaded, **including those in subdirectories**, in file system order; each file
+  overrides the keys already loaded. If a file cannot be loaded (e.g. an empty
+  YAML file, which is not a dictionary), an error is logged and the remaining
+  files of the directory are not loaded.
+* Lookups convert the key to lowercase and replace spaces with underscores.
+* By default the translation of `\n` is replaced with a space: only the toolbar
+  buttons keep line breaks. A class label such as `"Use\ncase"` is shown in two
+  lines in the toolbar and as `Use case` everywhere else, including the rendered
+  documents.
 
 Fixed keys are written literally:
 
@@ -63,21 +90,32 @@ it flags a profile i18n gap instead of masking it with a raw value.
 ```
 
 Note that keys are case-insensitive: `Translator.text()` lowercases them, so
-`:Proteus-date` and `:proteus-date` are the same key. Keys in the YAML files
-must therefore be written in lowercase.
+`:Proteus-date` and `:proteus-date` are the same key. Keys are **not** lowercased
+when the YAML files are loaded, so keys in the YAML files must be written in
+lowercase (and with `_` instead of spaces), otherwise they are never found.
 
 Key conventions
 ---------------
 
-| Key | Content | Shared with the GUI |
+| Key | Content | Used by |
 | --- | --- | --- |
-| `archetype.class.<class>` | class label of an object | yes |
-| `archetype.prop_name.<property>` | label of a property | yes |
-| `archetype.enum_choices.<choice>` | label of an enumeration choice | yes |
-| `xslt.trace_type.<trace type>` | label of a trace type | no |
-| `xslt.<name>` | literal text used by a template | no |
+| `archetype.class.<class>` | class label of an object | GUI and templates |
+| `archetype.prop_name.<property>` | label of a property | GUI and templates |
+| `archetype.enum_choices.<choice>` | label of an enumeration choice | GUI and templates |
+| `archetype.enum_units.<unit>` | label of a unit of a `unitProperty` | GUI and templates |
+| `archetype.enum_choices.tooltip.<property>.<choice>` | tooltip of a choice (`valueTooltips="true"`) | GUI |
+| `archetype.tooltip.<tooltip>` | tooltip of a property (its `tooltip` attribute) | GUI |
+| `archetype.prop_category.<category>` | tab of the edit form | GUI |
+| `archetype.category.<category>` | tab of the toolbar (archetype category folder) | GUI |
+| `xslt_templates.<template>` | name of a template (view) | GUI |
+| `xslt_templates.description.<template>` | description of a template (view) | GUI |
+| `xslt.trace_type.<trace type>` | label of a trace type | templates |
+| `xslt.<name>` | literal text used by a template | templates |
 
 Punctuation (`:`, brackets, etc.) belongs to the template, not to the label.
+The application itself defines some keys in `resources/i18n/<lang>/` that profiles
+normally reuse, such as `archetype.class.:proteus-document` or
+`archetype.prop_name.:proteus-name`.
 
 Where the strings live
 ----------------------
@@ -87,29 +125,42 @@ Where the strings live
   |
   +-- i18n
         |
-        +-- languages.xml
+        +-- languages.xml                   language keys, directories and default
         |
         +-- <lang>                          (e.g. es_es, en_us)
               |
-              +-- basic_archetypes.yaml     archetype classes, properties, enums
+              +-- <archetype labels>.yaml   archetype classes, properties, enums...
               +-- xslt_labels.yaml          labels used only by the templates
-              +-- xslt_pending_labels.yaml  labels of archetypes not migrated yet
+              +-- xslt_templates.yaml       names and descriptions of the templates
               +-- <new archetype>.yaml      <-- just add a file here
 ```
 
+File names are not significant: every YAML file of the language directory is
+loaded. Current profiles use these names:
+
+| File | basic | madeja |
+| --- | --- | --- |
+| archetype labels | `basic_archetypes.yaml` | `archetypes.yaml` |
+| template labels | `xslt_labels.yaml` | `xslt_labels.yaml` |
+| labels of archetypes not migrated yet | — | `xslt_pending_labels.yaml` |
+| template names | `xslt_templates.yaml` | `xslt_templates.yaml` (`xslt_plantillas.yaml` in `es_es`) |
+
 All YAML files in the language directory are merged into a single dictionary,
 so **a key must be defined in one file only**: repeated keys silently override
-each other in file system order.
+each other in file system order. Inside a single file, YAML also keeps the last
+of two repeated keys without any warning.
 
 Adding a new archetype
 ----------------------
 
-1. Write the archetype XSLT module and include it in `default.xsl` (the only
-   file of the template that has to be modified, and only if the archetype is
-   not rendered by the generic `any_archetype.xsl` template).
-2. Create `<profile>/i18n/<lang>/<archetype>.yaml` for every language with the
-   labels of the new class, its properties, its enumeration choices and any
-   literal text used by its template.
+1. Write the archetype XSLT module and include it in `default.xsl`, only if the
+   archetype is not rendered by the generic `any_archetype.xsl` template. If the
+   archetype has its own stylesheet, `default.css` must import it as well.
+2. Add the labels of the new classes, properties, enumeration choices, units,
+   tooltips and any literal text used by its template, for every language: in
+   the existing YAML files or in a new `<profile>/i18n/<lang>/<archetype>.yaml`.
+
+See `archetype_tasks.md` for the complete list of steps to add an archetype.
 
 Previous design (removed)
 -------------------------

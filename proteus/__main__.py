@@ -25,10 +25,14 @@ def print_banner() -> None:
     console = Console()
     content = (
         f"[bold cyan]Proteus Application[/bold cyan] [dim]{PROTEUS_VERSION} ({PROTEUS_VERSION_YEAR})[/dim]\n\n"
-        f"University of Seville (Andalucía, Spain)\n"
+        f"University of Seville (Andalucía, Spain, EU)\n"
         f"[dim]Distributed under the BSD 3-Clause License[/dim]\n\n"
-        f"[bold]Developers:[/bold] José María Delgado Sánchez & other students\n"
-        f"[bold]Supervisor:[/bold] Prof. Amador Durán Toro"
+        f"[bold]Developers:[/bold]\n"
+        f"\tJosé María Delgado Sánchez\n"
+        f"\tAmador Durán Toro\n"
+        f"\tClaude Code\n"
+        f"[bold]Product owner:[/bold]\n"
+        f"\tAmador Durán Toro (amador@us.es)"
     )
     console.print(
         Panel(
