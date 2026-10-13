@@ -52,8 +52,12 @@
     <!-- 'width' property is not shown either when the object has a file  -->
     <!-- property: it only sets the image size (see the fileProperty      -->
     <!-- template in properties.xsl), it is not content of the object.    -->
+    <!-- 'dependencies' is never shown, whatever the excluded properties  -->
+    <!-- an archetype passes: the traceability matrix is the way of       -->
+    <!-- showing them in a document.                                      -->
     <xsl:variable name="all_excluded_properties">
       <xsl:value-of select="$excluded_properties"/>
+      <xsl:text>dependencies,</xsl:text>
       <xsl:if test="$image">
         <xsl:value-of select="concat($image[1]/@name, ',')"/>
       </xsl:if>
