@@ -204,3 +204,47 @@ def test_export_starts_after_the_dialog_is_painted(app, qtbot):
     assert not called_by_the_click
     assert calls == []
     dialog.deleteLater()
+
+
+def test_export_starts_after_the_pending_events_are_processed(app, monkeypatch):
+    """
+    The pending events of the dialog (layout and painting of the area that
+    appears with the progress bar) are processed before the strategy starts
+    working, which in the export to HTML does not return to the event loop.
+    """
+    from proteus.views.components.dialogs import export_dialog
+
+    order = []
+
+    class FakeApplication:
+        @staticmethod
+        def processEvents(flags=None):
+            order.append("events")
+
+    monkeypatch.setattr(export_dialog, "QApplication", FakeApplication)
+    dialog = create_dialog(app, "html")
+    dialog._export_strategy.export = lambda: order.append("export")
+
+    dialog.export_button_clicked()
+    dialog._start_export()
+
+    assert order == ["events", "export"]
+    dialog._exporting = False
+    dialog.deleteLater()
+
+
+@pytest.mark.parametrize("strategy_name", ["html", "latex", "pdf", "pdf_latex"])
+def test_export_forms_show_no_error_when_they_are_created(app, strategy_name):
+    """
+    No format shows an error before the user does anything (the LaTeX form
+    changed the default folder name after connecting the validation, which
+    showed one).
+    """
+    dialog = create_dialog(app, strategy_name)
+    strategy = dialog._export_strategy
+
+    assert strategy._error_label.isHidden()
+    if strategy_name in ("html", "latex"):
+        suffix = "exported-html" if strategy_name == "html" else "exported-latex"
+        assert strategy._folder_name_input.text().endswith("-" + suffix)
+    dialog.deleteLater()

@@ -17,9 +17,10 @@ from typing import Callable
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize, QTimer
+from PyQt6.QtCore import QEventLoop, QSize, QTimer
 from PyQt6.QtGui import QFontDatabase
 from PyQt6.QtWidgets import (
+    QApplication,
     QWidget,
     QVBoxLayout,
     QLabel,
@@ -256,7 +257,7 @@ class ExportDialog(ProteusDialog):
         Handle the export button click. Disable the button box to avoid
         multiple exports and show the progress bar, and call the export
         strategy export method once the dialog has been laid out and painted
-        again (see _start_export).
+        again.
         """
         self._clear_log()
         self.progress_bar.setRange(0, 100)
@@ -268,11 +269,15 @@ class ExportDialog(ProteusDialog):
         self.export_format_selector.setEnabled(False)
         self.accept_button.setEnabled(False)
 
-        # The dialog grows when the progress bar is shown. If the strategy
-        # worked right now, without returning to the event loop (e.g. the
-        # export to HTML does all its work in the application thread), the
-        # dialog would not be laid out and painted until it finishes, and the
-        # new area would be shown black meanwhile.
+        # The dialog grows when the progress bar and the elapsed time are
+        # shown. Its layout and its painting are pending events, which are
+        # processed (but not the user input) before the strategy starts to
+        # work: an export that does all its work at once (e.g. the export to
+        # HTML) does not return to the event loop until it finishes, and the
+        # new area would be shown black meanwhile. Returning to the event
+        # loop is not enough, since the timer fires before the window is
+        # painted.
+        QApplication.processEvents(QEventLoop.ProcessEventsFlag.ExcludeUserInputEvents)
         QTimer.singleShot(0, self._start_export)
 
     # ----------------------------------------------------------------------

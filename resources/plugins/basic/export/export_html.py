@@ -66,6 +66,12 @@ class ExportHTML(ExportStrategy):
     It export the current view HTML to a folder with all its local resources.
     """
 
+    # Suffix of the default folder name: <document acronym>-exported-html. It
+    # must be known when the form is created, since changing the folder name
+    # afterwards validates the form and shows an error before the user does
+    # anything.
+    FOLDER_NAME_SUFFIX: str = "exported-html"
+
     # ----------------------------------------------------------------------
     # Method     : __init__
     # Description: Object initialization.
@@ -227,7 +233,7 @@ class ExportHTML(ExportStrategy):
         the export directory and a line edit to set the folder name. It also
         has an error label to show the error messages for both inputs.
 
-        The default folder name is <document acronym>-exported-html (the
+        The default folder name is <document acronym>-<FOLDER_NAME_SUFFIX> (the
         document name if it has no acronym).
         """
 
@@ -240,7 +246,7 @@ class ExportHTML(ExportStrategy):
 
         # Set default folder name
         self._folder_name_input.setText(
-            f"{document_file_name(self._controller)}-exported-html"
+            f"{document_file_name(self._controller)}-{self.FOLDER_NAME_SUFFIX}"
         )
 
         # Information labels

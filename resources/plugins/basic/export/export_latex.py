@@ -46,7 +46,6 @@ from proteus.controller.command_stack import Controller
 
 from basic.export.export_html import ExportHTML, remove_empty_directories
 from basic.export.export_pdf import ExportPDF
-from basic.export.file_names import document_file_name
 from basic.proteus_xslt_latex import latex_url
 
 # logging configuration
@@ -527,6 +526,9 @@ class ExportLaTeX(ExportHTML):
     selector.
     """
 
+    # Default folder name: <document acronym>-exported-latex
+    FOLDER_NAME_SUFFIX: str = "exported-latex"
+
     def __init__(self, controller: Controller) -> None:
         super().__init__(controller)
         self._template_selector: QComboBox = None
@@ -589,9 +591,6 @@ class ExportLaTeX(ExportHTML):
         HTML export form plus a LaTeX template selector.
         """
         widget: QWidget = super().exportFormWidget()
-        self._folder_name_input.setText(
-            f"{document_file_name(self._controller)}-exported-latex"
-        )
 
         self._template_selector = _template_selector(self._controller)
         layout = widget.layout()
