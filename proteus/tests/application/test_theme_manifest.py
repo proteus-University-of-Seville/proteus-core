@@ -242,6 +242,29 @@ def test_build_palette_resolves_tokens_and_literals(manifest_dir: Path):
     assert palette.color(QPalette.ColorRole.Highlight).name() == "#0080ff"
 
 
+def test_partial_palette_uses_explicit_baseline_without_mutating_it(manifest_dir, qapp):
+    from PyQt6.QtGui import QColor
+
+    manifest = ThemeManifest.load(_write_manifest(
+        manifest_dir, '{"palette": {"highlight": "#0080ff"}}'
+    ))
+    previous = qapp.palette()
+    baseline = QPalette(previous)
+    baseline.setColor(QPalette.ColorRole.Window, QColor("#112233"))
+    original_baseline = QPalette(baseline)
+    contaminated = QPalette(previous)
+    contaminated.setColor(QPalette.ColorRole.Window, QColor("#abcdef"))
+    try:
+        qapp.setPalette(contaminated)
+        palette = manifest.build_palette(baseline)
+        assert palette.color(QPalette.ColorRole.Window).name() == "#112233"
+        assert palette.color(QPalette.ColorRole.Highlight).name() == "#0080ff"
+        assert baseline == original_baseline
+        assert qapp.palette() == contaminated
+    finally:
+        qapp.setPalette(previous)
+
+
 def test_build_palette_skips_invalid_entries(manifest_dir: Path):
     """
     Unknown roles, undefined token references and invalid colors are

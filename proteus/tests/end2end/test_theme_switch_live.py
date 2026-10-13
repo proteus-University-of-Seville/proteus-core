@@ -21,7 +21,8 @@ from unittest.mock import patch
 
 import pytest
 from PyQt6.QtCore import QDir
-from PyQt6.QtWidgets import QApplication
+from PyQt6.QtGui import QGuiApplication, QIcon
+from PyQt6.QtWidgets import QApplication, QTreeWidget
 
 # --------------------------------------------------------------------------
 # Project specific imports
@@ -79,6 +80,8 @@ def theme_state(qapp: QApplication) -> Generator[None, None, None]:
     """
     previous_stylesheet = qapp.styleSheet()
     previous_search_paths = QDir.searchPaths(THEME_SEARCH_PATH)
+    previous_palette = qapp.palette()
+    previous_scheme = QGuiApplication.styleHints().colorScheme()
 
     themes = Themes()
     if not themes.available_themes:
@@ -89,6 +92,9 @@ def theme_state(qapp: QApplication) -> Generator[None, None, None]:
 
     # Flush deferred dialog deletions before a global stylesheet repolish.
     qapp.processEvents()
+    qapp.setStyleSheet("")
+    QGuiApplication.styleHints().setColorScheme(previous_scheme)
+    qapp.setPalette(previous_palette)
     qapp.setStyleSheet(previous_stylesheet)
     QDir.setSearchPaths(THEME_SEARCH_PATH, previous_search_paths)
     for singleton in (Themes, ThemeService):
@@ -202,6 +208,54 @@ def test_theme_can_switch_back_and_forth_in_one_session(
     save_theme("dark")
     assert Themes().current_theme.key == "dark"
     assert DARK_WINDOW_COLOR in QApplication.instance().styleSheet()
+
+
+@pytest.mark.parametrize("source,destination", [
+    ("gruvbox-light", "dark"), ("win98", "light"),
+])
+def test_settings_hot_switch_restores_disabled_icons_and_tree(
+    app, app_settings, theme_state, mocker, source, destination
+):
+    """Real ribbon icons and document frames match a clean destination baseline."""
+    import hashlib
+
+    mocker.patch.object(MessageBox, "warning")
+    assert ThemeService().apply_theme(destination)
+    load_project(main_window=app)
+    qapp = QApplication.instance()
+    buttons = [app.main_menu.paste_button, app.main_menu.undo_button, app.main_menu.redo_button]
+    trees = app.project_container.findChildren(QTreeWidget)
+    assert trees
+    assert all(not button.isEnabled() for button in buttons)
+
+    def image_hash(image):
+        bits = image.constBits()
+        bits.setsize(image.sizeInBytes())
+        return hashlib.sha256(bytes(bits)).hexdigest()
+
+    def state():
+        qapp.processEvents()
+        return (
+            qapp.palette(),
+            [image_hash(button.grab().toImage()) for button in buttons],
+            [image_hash(button.icon().pixmap(32, 32, QIcon.Mode.Disabled).toImage())
+             for button in buttons],
+            [image_hash(tree.grab().toImage()) for tree in trees],
+        )
+
+    baseline = state()
+    # Align saved settings with the clean baseline before going through Settings.
+    Config().app_settings = Config().app_settings_copy.clone(theme=destination)
+
+    for _ in range(3):
+        for key in (source, destination):
+            dialog = get_dialog(app.main_menu.settings_button.click)
+            index = dialog.theme_combo.findData(key)
+            assert index >= 0
+            dialog.theme_combo.setCurrentIndex(index)
+            dialog.accept_button.click()
+            assert Themes().current_theme.key == key
+        assert state() == baseline
 
 
 def test_restart_warning_not_repeated_on_unchanged_save(

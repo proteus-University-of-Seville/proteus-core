@@ -21,6 +21,7 @@ from pathlib import Path
 
 import pytest
 from PyQt6.QtCore import QDir
+from PyQt6.QtGui import QGuiApplication, QPalette, QIcon
 from PyQt6.QtWidgets import QApplication
 
 # --------------------------------------------------------------------------
@@ -58,11 +59,16 @@ def theme_service(qapp: QApplication) -> Generator[ThemeService, None, None]:
 
     previous_stylesheet = qapp.styleSheet()
     previous_search_paths = QDir.searchPaths(THEME_SEARCH_PATH)
+    previous_palette = qapp.palette()
+    previous_scheme = QGuiApplication.styleHints().colorScheme()
 
     Themes().load_themes(REAL_THEMES_DIRECTORY)
 
     yield ThemeService()
 
+    qapp.setStyleSheet("")
+    QGuiApplication.styleHints().setColorScheme(previous_scheme)
+    qapp.setPalette(previous_palette)
     qapp.setStyleSheet(previous_stylesheet)
     QDir.setSearchPaths(THEME_SEARCH_PATH, previous_search_paths)
     for singleton in (Themes, Icons, ThemeService):
@@ -310,3 +316,78 @@ def test_metric_token_drives_widget_geometry(qapp: QApplication, tmp_path: Path)
     finally:
         for singleton in (Themes, Icons, ThemeService):
             singleton._instances.pop(singleton, None)
+
+
+@pytest.mark.parametrize("source,destination", [
+    ("gruvbox-light", "dark"), ("win98", "light"),
+    ("win98", "gruvbox-light"), ("gruvbox-light", "win98"),
+])
+def test_hot_switch_restores_palette_and_rendering(
+    theme_service: ThemeService, qapp: QApplication, source: str, destination: str
+):
+    """Palette roles, native frames and generated disabled icons are history-independent."""
+    from PyQt6.QtWidgets import QWidget, QVBoxLayout, QToolButton, QFrame, QTreeWidget
+
+    panel = QWidget()
+    layout = QVBoxLayout(panel)
+    button = QToolButton()
+    button.setEnabled(False)
+    frame = QFrame()
+    frame.setFrameShape(QFrame.Shape.StyledPanel)
+    frame.setFrameShadow(QFrame.Shadow.Sunken)
+    frame.setMinimumSize(180, 50)
+    tree = QTreeWidget()
+    for widget in (button, frame, tree):
+        layout.addWidget(widget)
+    panel.resize(250, 250)
+
+    def image_bytes(image):
+        bits = image.constBits()
+        bits.setsize(image.sizeInBytes())
+        return bytes(bits)
+
+    def state():
+        button.setIcon(Icons().icon(ProteusIconType.MainMenu, "undo"))
+        panel.ensurePolished()
+        qapp.processEvents()
+        return (
+            qapp.palette(),
+            image_bytes(panel.grab().toImage()),
+            image_bytes(button.icon().pixmap(32, 32, QIcon.Mode.Disabled).toImage()),
+        )
+
+    try:
+        assert theme_service.apply_theme(destination)
+        baseline = state()
+        for _ in range(3):
+            assert theme_service.apply_theme(source)
+            assert theme_service.apply_theme(destination)
+            assert state() == baseline
+    finally:
+        panel.deleteLater()
+
+
+def test_palette_is_restored_after_stylesheet_failure(theme_service, qapp, mocker):
+    assert theme_service.apply_theme("gruvbox-light")
+    previous_palette = qapp.palette()
+    previous_stylesheet = qapp.styleSheet()
+    previous_scheme = QGuiApplication.styleHints().colorScheme()
+    previous_icons = dict(Icons()._icons_paths)
+    previous_paths = QDir.searchPaths(THEME_SEARCH_PATH)
+    original_set_stylesheet = qapp.setStyleSheet
+    notify = mocker.patch.object(ThemeChangedEvent(), "notify")
+
+    def fail_new_stylesheet(stylesheet):
+        if stylesheet and Themes().current_theme.key == "dark":
+            raise RuntimeError("stylesheet failed after palette application")
+        original_set_stylesheet(stylesheet)
+
+    mocker.patch.object(qapp, "setStyleSheet", side_effect=fail_new_stylesheet)
+    assert not theme_service.apply_theme("dark")
+    assert Themes().current_theme.key == "gruvbox-light"
+    assert qapp.palette() == previous_palette
+    assert qapp.styleSheet() == previous_stylesheet
+    assert QGuiApplication.styleHints().colorScheme() == previous_scheme
+    assert Icons()._icons_paths == previous_icons
+    assert QDir.searchPaths(THEME_SEARCH_PATH) == previous_paths
+    notify.assert_not_called()

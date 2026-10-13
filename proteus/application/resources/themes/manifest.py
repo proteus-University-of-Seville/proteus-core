@@ -333,18 +333,20 @@ class ThemeManifest:
         """Return the theme metrics merged over DEFAULT_METRICS."""
         return {**DEFAULT_METRICS, **self.metrics}
 
-    def build_palette(self) -> "QPalette | None":
+    def build_palette(self, baseline: "QPalette | None" = None) -> "QPalette | None":
         """
         Build a QPalette from the manifest "palette" section. Values may be
         literal CSS colors or references to color tokens ("@token").
 
         Returns None when the theme defines no explicit palette mapping.
+        When supplied, baseline is copied so omitted roles cannot inherit
+        another theme's application palette. The caller's palette is unchanged.
         """
         if not self.palette:
             return None
 
         color_tokens: Dict[str, str] = {**DEFAULT_COLORS, **self.colors}
-        palette = QPalette()
+        palette = QPalette(baseline) if baseline is not None else QPalette()
 
         for role_key, raw_value in self.palette.items():
             role = PALETTE_ROLES.get(role_key)

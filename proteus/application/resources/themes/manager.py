@@ -395,16 +395,17 @@ class Themes(metaclass=SingletonMeta):
             log.warning(f"Metric '{name}' value '{value}' is not numeric.")
             return fallback
 
-    def build_palette(self) -> "QPalette | None":
+    def build_palette(self, baseline: "QPalette | None" = None) -> "QPalette | None":
         """
         Build a QPalette from the current theme's manifest "palette" section.
         Returns None when no explicit palette is defined. The Qt color scheme
         can still affect the platform palette independently of this section.
+        An explicit baseline prevents omitted roles inheriting previous themes.
         """
         if self._current_theme is None:
             log.error("build_palette() called but no theme is selected.")
             return None
-        return self._current_theme.manifest.build_palette()
+        return self._current_theme.manifest.build_palette(baseline)
 
     def icons_directory(self) -> Path:
         """

@@ -17,7 +17,7 @@ import logging
 # --------------------------------------------------------------------------
 
 from PyQt6.QtCore import Qt, QDir
-from PyQt6.QtGui import QGuiApplication
+from PyQt6.QtGui import QGuiApplication, QPalette
 from PyQt6.QtWidgets import QApplication
 
 # --------------------------------------------------------------------------
@@ -48,11 +48,17 @@ class ThemeService(metaclass=SingletonMeta):
            fresh icons.
         2. "theme:" Qt search path registration (active theme first,
            baseline as fallback) for url(theme:...) QSS references.
-        3. Request the Qt color scheme and apply explicit palette roles when
-           the theme defines them.
+        3. Request the Qt color scheme and restore the unthemed palette,
+           with the active theme's explicit palette overrides.
         4. Application stylesheet (rendered from the theme template).
         5. ThemeChangedEvent notification.
     """
+
+    def __init__(self) -> None:
+        # Capture lazily, once a QApplication exists and before the first
+        # theme application. QPalette() later inherits the active palette,
+        # so it cannot be used to recover this platform/application baseline.
+        self._baseline_palette: QPalette | None = None
 
     def apply_theme(self, theme_key: str) -> bool:
         """
@@ -88,6 +94,8 @@ class ThemeService(metaclass=SingletonMeta):
         previous_stylesheet = app.styleSheet()
         previous_search_paths = QDir.searchPaths(THEME_SEARCH_PATH)
         previous_palette = app.palette()
+        if self._baseline_palette is None:
+            self._baseline_palette = QPalette(previous_palette)
         previous_scheme = QGuiApplication.styleHints().colorScheme()
         icons = Icons()
         previous_icon_paths = icons._icons_paths
@@ -110,10 +118,27 @@ class ThemeService(metaclass=SingletonMeta):
 
             self._apply_color_scheme()
 
-            palette = themes.build_palette()
-            if palette is not None:
-                app.setPalette(palette)
-                palette_applied = True
+            palette = themes.build_palette(self._baseline_palette)
+            if palette is None:
+                palette = QPalette(self._baseline_palette)
+            # Always replace the palette, including for QSS-only themes.
+            # Clearing QSS does not undo an explicit application palette;
+            # Qt also uses it to generate disabled icons and native frames.
+            palette_applied = True
+            app.setPalette(palette)
+            log.debug(
+                "Theme '%s' palette applied (overrides=%s): "
+                "Window %s -> %s, Disabled.Window %s -> %s.",
+                metadata.key, bool(metadata.manifest.palette),
+                previous_palette.color(QPalette.ColorRole.Window).name(),
+                palette.color(QPalette.ColorRole.Window).name(),
+                previous_palette.color(
+                    QPalette.ColorGroup.Disabled, QPalette.ColorRole.Window
+                ).name(),
+                palette.color(
+                    QPalette.ColorGroup.Disabled, QPalette.ColorRole.Window
+                ).name(),
+            )
 
             # Qt can retain dark-only QWidget backgrounds when directly
             # replacing a stylesheet; clearing first resets those rules.
