@@ -289,7 +289,9 @@ def test_export_forms_show_no_error_when_they_are_created(app, strategy_name):
     dialog = create_dialog(app, strategy_name)
     strategy = dialog._export_strategy
 
-    assert strategy._error_label.isHidden()
+    # Without a LaTeX engine the form shows it from the beginning, on purpose
+    no_engine = strategy_name == "pdf_latex" and not any(shutil.which(e) for e in ("xelatex", "lualatex", "pdflatex"))
+    assert strategy._error_label.isHidden() != no_engine
     if strategy_name in ("html", "latex"):
         suffix = "exported-html" if strategy_name == "html" else "exported-latex"
         assert strategy._folder_name_input.text().endswith("-" + suffix)
