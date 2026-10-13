@@ -17,6 +17,7 @@ from typing import Callable
 # --------------------------------------------------------------------------
 
 from PyQt6.QtCore import QSize
+from PyQt6.QtGui import QFontDatabase
 from PyQt6.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -24,6 +25,7 @@ from PyQt6.QtWidgets import (
     QComboBox,
     QSizePolicy,
     QProgressBar,
+    QPlainTextEdit,
 )
 
 
@@ -49,7 +51,15 @@ class ExportDialog(ProteusDialog):
     """
     Class for the PROTEUS application print to pdf dialog form. It is used
     to display a dialog form with the print to pdf options.
+
+    If the export strategy emits exportLogSignal (e.g. the output of the LaTeX
+    engine), the text is shown in a panel below the export options.
     """
+
+    # Maximum number of lines kept in the output panel and minimum width of
+    # the dialog while the panel is shown
+    LOG_MAX_LINES: int = 5000
+    LOG_DIALOG_MIN_WIDTH: int = 720
 
     # ----------------------------------------------------------------------
     # Method     : __init__
@@ -74,6 +84,8 @@ class ExportDialog(ProteusDialog):
 
         # Widgets
         self.progress_bar: QProgressBar = None
+        self.log_label: QLabel = None
+        self.log_view: QPlainTextEdit = None
         self.export_format_selector: QComboBox = None
         self.export_widget_holder: QVBoxLayout = None
 
@@ -109,6 +121,17 @@ class ExportDialog(ProteusDialog):
         self.progress_bar.setValue(0)
         # self.progress_bar.setTextVisible(False)
         self.progress_bar.hide()
+
+        # Output of the export strategy, hidden until it emits some text
+        self.log_label = QLabel(_("export_dialog.log.label"))
+        self.log_label.hide()
+        self.log_view = QPlainTextEdit()
+        self.log_view.setReadOnly(True)
+        self.log_view.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
+        self.log_view.setMaximumBlockCount(self.LOG_MAX_LINES)
+        self.log_view.setFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
+        self.log_view.setMinimumHeight(220)
+        self.log_view.hide()
 
         # Export format selector ---------------------------------
         export_format_label = QLabel(_("export_dialog.export_strategy.label"))
@@ -146,6 +169,8 @@ class ExportDialog(ProteusDialog):
         main_layout.addWidget(export_format_label)
         main_layout.addWidget(self.export_format_selector)
         main_layout.addLayout(self.export_widget_holder)
+        main_layout.addWidget(self.log_label)
+        main_layout.addWidget(self.log_view, 1)
         main_layout.addStretch()
 
         self.set_content_layout(main_layout)
@@ -204,6 +229,8 @@ class ExportDialog(ProteusDialog):
         self._export_strategy.readyToExportSignal.connect(self.accept_button.setEnabled)
         self._export_strategy.exportFinishedSignal.connect(self.export_finished_dialog)
         self._export_strategy.exportProgressSignal.connect(self._progress_changed)
+        self._export_strategy.exportLogSignal.connect(self._append_log)
+        self._clear_log()
 
     # ----------------------------------------------------------------------
     # Method     : export_button_clicked
@@ -217,6 +244,7 @@ class ExportDialog(ProteusDialog):
         Handle the export button click. Call the export strategy export
         method and disable the button box to avoid multiple exports.
         """
+        self._clear_log()
         self.progress_bar.show()
         self._exporting = True
         # The strategy cannot be replaced while it is exporting
@@ -253,7 +281,12 @@ class ExportDialog(ProteusDialog):
                 _("export_dialog.finished.dialog.error.text"),
             )
 
-            self.close()
+            # The dialog stays open, so that the user can read the output of
+            # the export (if any) and try again
+            self.progress_bar.hide()
+            self.progress_bar.setValue(0)
+            self.export_format_selector.setEnabled(True)
+            self.accept_button.setEnabled(True)
 
     # ----------------------------------------------------------------------
     # Method     : done
@@ -290,6 +323,56 @@ class ExportDialog(ProteusDialog):
         """
         progress = min(100, max(0, progress))
         self.progress_bar.setValue(progress)
+
+    # ----------------------------------------------------------------------
+    # Method     : _append_log
+    # Description: Handle the export log signal.
+    # Date       : 13/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _append_log(self, text: str) -> None:
+        """
+        Handle the export log signal: add the text at the end of the output
+        panel, showing it the first time. The panel scrolls to the end unless
+        the user has scrolled up to read it.
+
+        :param text: Text to add to the panel.
+        """
+        if not text:
+            return
+
+        if self.log_view.isHidden():
+            self.log_label.show()
+            self.log_view.show()
+            self.setMinimumWidth(self.LOG_DIALOG_MIN_WIDTH)
+            self.adjustSize()
+
+        scroll_bar = self.log_view.verticalScrollBar()
+        at_end: bool = scroll_bar.value() >= scroll_bar.maximum() - 4
+
+        cursor = self.log_view.textCursor()
+        cursor.movePosition(cursor.MoveOperation.End)
+        cursor.insertText(text)
+
+        if at_end:
+            scroll_bar.setValue(scroll_bar.maximum())
+
+    # ----------------------------------------------------------------------
+    # Method     : _clear_log
+    # Description: Empty and hide the output panel.
+    # Date       : 13/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _clear_log(self) -> None:
+        """
+        Empty the output panel and hide it until the export strategy emits
+        some text again.
+        """
+        self.log_view.clear()
+        self.log_label.hide()
+        self.log_view.hide()
 
     # ======================================================================
     # Dialog static methods (create and show the form window)

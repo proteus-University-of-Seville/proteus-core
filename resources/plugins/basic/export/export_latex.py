@@ -15,6 +15,7 @@
 
 from pathlib import Path
 from typing import Callable, Dict, List, Set
+import codecs
 import hashlib
 import logging
 import re
@@ -157,6 +158,27 @@ def latex_rerun_needed(
     if passes >= LATEX_MAX_PASSES:
         return False
     return digest != previous_digest or LATEX_RERUN_PATTERN.search(log_text) is not None
+
+
+class LaTeXOutputDecoder:
+    """
+    Decodes the output of the LaTeX engine, which arrives in pieces that may
+    split a multibyte character, to the text shown to the user: UTF-8 (the
+    characters that cannot be decoded are replaced) with "\\n" line ends.
+    """
+
+    def __init__(self) -> None:
+        self._decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
+
+    def decode(self, data: bytes, final: bool = False) -> str:
+        """
+        :param data: Next piece of the output.
+        :param final: True if it is the last piece.
+        :return: The text decoded so far (an incomplete character at the end
+                 is kept for the next call, unless it is the final one).
+        """
+        text: str = self._decoder.decode(data, final)
+        return text.replace("\r\n", "\n").replace("\r", "")
 
 
 def _copy_asset(asset: str, assets_folder: Path, destination: Path) -> str:
@@ -563,8 +585,9 @@ class ExportPDFLaTeX(ExportPDF):
     written in a temporary folder and compiled with a LaTeX engine found in
     the PATH (xelatex, lualatex or pdflatex). The engine runs in a QProcess
     so that the application is not blocked, until the auxiliary files are
-    stable (see latex_rerun_needed). If the compilation fails, the LaTeX
-    log is copied next to the selected PDF file.
+    stable (see latex_rerun_needed). Its output is emitted in exportLogSignal,
+    to be shown to the user. If the compilation fails, the LaTeX log is
+    copied next to the selected PDF file.
     """
 
     # Default file name: <document acronym>_latex.pdf
@@ -575,6 +598,7 @@ class ExportPDFLaTeX(ExportPDF):
         self._template_selector: QComboBox = None
         self._engine_selector: QComboBox = None
         self._process: QProcess = None
+        self._decoder: LaTeXOutputDecoder = None
         self._task: LaTeXSourcesTask = None
         self._build_folder: Path = None
         self._pass: int = 0
@@ -596,6 +620,7 @@ class ExportPDFLaTeX(ExportPDF):
             tex: str = prepare_latex_sources(self._controller, template, self._build_folder)
         except Exception as e:
             log.error(f"Error generating LaTeX with template '{template.name}': {e}")
+            self.exportLogSignal.emit(f"Error generating LaTeX with template '{template.name}': {e}\n")
             self._finish(False)
             return
 
@@ -612,6 +637,7 @@ class ExportPDFLaTeX(ExportPDF):
             return
 
         if not success:
+            self.exportLogSignal.emit(f"Error writing the LaTeX sources: {result}\n")
             self._finish(False)
             return
 
@@ -633,9 +659,29 @@ class ExportPDFLaTeX(ExportPDF):
         self._process.setWorkingDirectory(self._build_folder.as_posix())
         self._process.finished.connect(self._engine_finished)
         self._process.errorOccurred.connect(self._engine_error)
+
+        # The output of the engine (standard output and error) is shown to the user
+        self._decoder = LaTeXOutputDecoder()
+        self._process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+        self._process.readyReadStandardOutput.connect(self._read_engine_output)
+        self.exportLogSignal.emit(f"=== {self._engine_selector.currentText()} (pass {self._pass}) ===\n")
+
         self._process.start(
             engine, ["-interaction=nonstopmode", "-halt-on-error", LATEX_MAIN_FILE]
         )
+
+    def _read_engine_output(self, final: bool = False) -> None:
+        """
+        Emits the output of the engine received since the last call.
+
+        :param final: True if the engine has finished.
+        """
+        if self._process is None or self._decoder is None:
+            return
+
+        text: str = self._decoder.decode(bytes(self._process.readAllStandardOutput()), final)
+        if text:
+            self.exportLogSignal.emit(text)
 
     def _engine_error(self, error: QProcess.ProcessError) -> None:
         # Only errors that prevent the process from running are handled
@@ -644,14 +690,19 @@ class ExportPDFLaTeX(ExportPDF):
             return
         if error == QProcess.ProcessError.FailedToStart:
             log.error(f"LaTeX engine '{self._engine_selector.currentData()}' failed to start")
+            self.exportLogSignal.emit(f"=== The LaTeX engine '{self._engine_selector.currentText()}' could not be started ===\n")
             self._finish(False)
 
     def _engine_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> None:
         if self._cancelled:
             return
 
+        # What the engine wrote at the end may not have been read yet
+        self._read_engine_output(final=True)
+
         if exit_code != 0 or exit_status != QProcess.ExitStatus.NormalExit:
             log.error(f"LaTeX compilation failed (pass {self._pass}, exit code {exit_code})")
+            self.exportLogSignal.emit(f"\n=== LaTeX compilation failed (exit code {exit_code}) ===\n")
             self._finish(False)
             return
 

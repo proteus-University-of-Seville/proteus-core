@@ -139,6 +139,7 @@ settings_dialog_warning.text: "Los cambios se aplicarán al reiniciar la aplicac
 # ---------------------------------------------------------------------------
 export_dialog.title: "Exportar vista: {}"
 export_dialog.export_strategy.label: "Formato de exportación:"
+export_dialog.log.label: \"Salida del compilador:\"
 export_dialog.export_html.filepath.label: "Seleccione una carpeta de destino:"
 export_dialog.finished.dialog.title: "Exportación finalizada"
 export_dialog.finished.dialog.text: "El documento se ha exportado correctamente en la ruta {}"

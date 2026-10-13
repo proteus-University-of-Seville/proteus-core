@@ -332,3 +332,70 @@ def test_export_dialog_cancels_running_export(app):
     dialog.reject()
     assert cancelled == [True]
     dialog.deleteLater()
+
+
+def test_export_dialog_shows_the_output_of_the_strategy(app):
+    """
+    The panel with the output of the export is hidden until the strategy
+    emits some text, which is added at the end of the panel. The panel is
+    emptied and hidden when a new export starts.
+    """
+    # Arrange ----------------------------------------------------------
+    load_project(main_window=app, project_name=TEST_PROJECT_NAME)
+    StateManager().set_current_document(TEST_DOCUMENT_ID)
+    dialog = ExportDialog(controller=app._controller)
+    dialog._export_strategy.export = lambda: None
+    hidden_at_first = dialog.log_view.isHidden() and dialog.log_label.isHidden()
+
+    # Act --------------------------------------------------------------
+    dialog._export_strategy.exportLogSignal.emit("first line\n")
+    dialog._export_strategy.exportLogSignal.emit("second ")
+    dialog._export_strategy.exportLogSignal.emit("line\n")
+    shown = not dialog.log_view.isHidden() and not dialog.log_label.isHidden()
+    text = dialog.log_view.toPlainText()
+    dialog.export_button_clicked()
+
+    # Assert -----------------------------------------------------------
+    assert hidden_at_first
+    assert shown
+    assert text == "first line\nsecond line\n"
+    assert dialog.log_view.isHidden() and dialog.log_view.toPlainText() == ""
+    dialog._exporting = False
+    dialog.deleteLater()
+
+
+def test_export_dialog_stays_open_after_an_error_only(app, monkeypatch):
+    """
+    If the export fails the dialog stays open, with the output of the export
+    and the options enabled to try again; if it succeeds, it is closed.
+    """
+    # Arrange ----------------------------------------------------------
+    from proteus.views.components.dialogs.base_dialogs import MessageBox
+
+    monkeypatch.setattr(MessageBox, "critical", staticmethod(lambda *args, **kwargs: None))
+    monkeypatch.setattr(MessageBox, "information", staticmethod(lambda *args, **kwargs: None))
+    load_project(main_window=app, project_name=TEST_PROJECT_NAME)
+    StateManager().set_current_document(TEST_DOCUMENT_ID)
+    dialog = ExportDialog(controller=app._controller)
+    dialog._export_strategy.export = lambda: None
+    dialog.show()
+
+    # Act: an error ----------------------------------------------------
+    dialog.export_button_clicked()
+    dialog._export_strategy.exportLogSignal.emit("! LaTeX Error\n")
+    dialog._export_strategy.exportFinishedSignal.emit("file.pdf", False)
+
+    # Assert -----------------------------------------------------------
+    assert dialog.isVisible(), "The dialog must stay open after an error"
+    assert dialog.log_view.toPlainText() == "! LaTeX Error\n"
+    assert dialog.export_format_selector.isEnabled()
+    assert dialog.accept_button.isEnabled()
+    assert dialog.progress_bar.isHidden()
+
+    # Act: a successful export -----------------------------------------
+    dialog.export_button_clicked()
+    dialog._export_strategy.exportFinishedSignal.emit("file.pdf", True)
+
+    # Assert -----------------------------------------------------------
+    assert not dialog.isVisible(), "The dialog must be closed after a successful export"
+    dialog.deleteLater()

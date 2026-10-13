@@ -35,6 +35,7 @@ from basic.export import export_latex  # noqa: E402
 from basic.export.export_latex import (  # noqa: E402
     LATEX_MAX_PASSES,
     LATEX_MIN_PASSES,
+    LaTeXOutputDecoder,
     LaTeXSourcesTask,
     latex_auxiliary_digest,
     latex_rerun_needed,
@@ -150,3 +151,39 @@ def test_latex_sources_task_cancelled_after_finishing(tmp_path: Path):
 
     assert not task.cancel()
     assert (tmp_path / "main.tex").exists()
+
+
+def test_latex_output_decoder_normalizes_line_ends():
+    """
+    The output of the engine is shown with "\\n" line ends, whatever it uses.
+    """
+    decoder = LaTeXOutputDecoder()
+
+    assert decoder.decode(b"one\r\ntwo\rthree\n") == "one\ntwothree\n"
+
+
+def test_latex_output_decoder_keeps_split_characters():
+    """
+    A multibyte character split between two pieces of the output is decoded
+    when the second piece arrives, not replaced by an error character.
+    """
+    data = "Introducci\u00f3n \u2192 \u00fa".encode("utf-8")
+    decoder = LaTeXOutputDecoder()
+
+    # Every byte arrives separately
+    text = "".join(decoder.decode(data[i : i + 1]) for i in range(len(data)))
+    text += decoder.decode(b"", final=True)
+
+    assert text == "Introducci\u00f3n \u2192 \u00fa"
+
+
+def test_latex_output_decoder_replaces_invalid_bytes():
+    """
+    Bytes that are not UTF-8 (e.g. a path in the code page of the console)
+    do not stop the export: they are replaced.
+    """
+    decoder = LaTeXOutputDecoder()
+
+    text = decoder.decode(b"C:\\Users\\Mar\xeda\n", final=True)
+
+    assert text.startswith("C:\\Users\\Mar") and text.endswith("\n")

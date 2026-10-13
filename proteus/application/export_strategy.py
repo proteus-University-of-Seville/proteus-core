@@ -47,6 +47,10 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
     to perform the export.
     - exportProgressSignal: emitted to update the progress of the export
     process (progress bar in the export dialog 0-100).
+    - exportLogSignal: emitted with a piece of text that the strategy wants
+    to show to the user while it is exporting (e.g. the output of a compiler),
+    in a text panel of the export dialog. It is optional: the panel is only
+    shown if the strategy emits it.
 
     Export strategies use Controller to access the backend information
     directly and perform the necessary operations to export the current
@@ -56,6 +60,7 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
     exportFinishedSignal = pyqtSignal(str, bool)
     readyToExportSignal = pyqtSignal(bool)
     exportProgressSignal = pyqtSignal(int)
+    exportLogSignal = pyqtSignal(str)
 
     def __init__(self, controller: Controller) -> None:
         super().__init__()
