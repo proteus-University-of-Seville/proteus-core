@@ -42,6 +42,25 @@ log = logging.getLogger(__name__)
 
 
 # --------------------------------------------------------------------------
+# Function: class_group
+# --------------------------------------------------------------------------
+def class_group(object_classes: List[str], class_list: List[str]) -> int:
+    """
+    Position, in the given list of classes, of the first class that the object
+    has. Objects are grouped by it in the rows and columns of a traceability
+    matrix.
+
+    :param object_classes: Classes of the object.
+    :param class_list: Classes of the matrix, in the order they must be shown.
+    :return: The position of the class, or the length of the list if none.
+    """
+    for position, class_tag in enumerate(class_list):
+        if class_tag in object_classes:
+            return position
+    return len(class_list)
+
+
+# --------------------------------------------------------------------------
 # Class: TraceabilityMatrixHelper
 # Description: This class provides helper functions to work with the
 #              traceability matrix.
@@ -82,6 +101,10 @@ class TraceabilityMatrixHelper(ProteusComponent):
         The object information retrieved is the Id and Code. If
         proteus code is not found, name is used instead.
 
+        The objects are grouped by class, in the order of the given classes
+        (an object belongs to the first of them that it has), and sorted by
+        label inside each group.
+
         The XML format is the following:
             <object id="1234">
                 <label>Object label</label>
@@ -113,10 +136,13 @@ class TraceabilityMatrixHelper(ProteusComponent):
                 obj_label = obj.get_property(PROTEUS_NAME).value
 
             # Create the object information item and add it to the list
-            objects_information.append(ObjectMatrixInformation(obj.id, obj_label))
+            objects_information.append(
+                ObjectMatrixInformation(obj.id, obj_label, class_group(obj.classes, class_list))
+            )
 
-        # Sort the objects by label
-        objects_information.sort(key=lambda obj: obj.label)
+        # Sort the objects by the position of their class in the list of
+        # classes and, inside each class, by label
+        objects_information.sort(key=lambda obj: (obj.group, obj.label))
 
         # Node-set ------------------------------------------------------------
         node_set: List[ET._Element] = []
@@ -204,9 +230,12 @@ class ObjectMatrixInformation:
     The object information retrieved is the Id and matrix label.
     """
 
-    def __init__(self, id: ProteusID, label: str):
+    def __init__(self, id: ProteusID, label: str, group: int = 0):
         self.id = id
         self.label = label
+        # Position of the class of the object in the list of classes of the
+        # matrix, which is the order in which the classes are shown
+        self.group = group
 
     def generate_node(self) -> ET._Element:
         """
