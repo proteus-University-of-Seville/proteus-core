@@ -27,7 +27,7 @@
         <xsl:variable name="target_object" select="//object[@id=$target_id]" />
         <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
         <xsl:variable name="target_name">
-          <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]</xsl:if>
+          <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]<xsl:text>&#160;</xsl:text></xsl:if>
           <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
         </xsl:variable>
 
@@ -49,7 +49,7 @@
       <xsl:variable name="target_object" select="//object[@id=$target_id]" />
       <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
       <xsl:variable name="target_name">
-        <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/></xsl:if>
+        <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]<xsl:text>&#160;</xsl:text></xsl:if>
         <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
       </xsl:variable>
 

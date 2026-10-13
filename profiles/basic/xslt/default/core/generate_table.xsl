@@ -250,7 +250,7 @@
               <xsl:value-of select="$code"/>
               <xsl:text>]</xsl:text>
             </span>
-            <xsl:text> </xsl:text>
+            <xsl:text>&#160;</xsl:text>
           </xsl:if>
           <strong class="child_name">
             <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
