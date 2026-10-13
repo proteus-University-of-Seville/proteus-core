@@ -4,9 +4,12 @@ progress bar (including the busy mode), the elapsed time and the text panel
 filled by the export strategies.
 """
 
+import os
 import shutil
+import sys
 
 import pytest
+from PyQt6.QtCore import QObject, QTimer, pyqtSignal
 
 from proteus.application.export_strategy import ExportStrategy
 from proteus.application.resources.plugins import Plugins
@@ -128,16 +131,38 @@ def export_to_pdf(app, qtbot, tmp_path, monkeypatch, strategy_name: str):
     return progresses, text, results[0], panel_shown, output
 
 
-def test_pdf_from_html_tells_its_stages(app, qtbot, tmp_path, monkeypatch):
+class FakeWebEnginePage(QObject):
     """
-    The export to PDF from HTML shows the panel with its stages, the progress
-    of the loading of the page, a busy bar while the PDF is generated and the
-    final summary.
+    Replaces QWebEnginePage in the tests of the export to PDF from HTML: it
+    loads and "prints" at once, writing a small file. The real one needs a
+    Chromium that does not run in every environment (it crashes the whole
+    process with the virtual display of the continuous integration).
     """
-    progresses, text, success, panel_shown, output = export_to_pdf(
-        app, qtbot, tmp_path, monkeypatch, "pdf"
-    )
 
+    loadProgress = pyqtSignal(int)
+    loadFinished = pyqtSignal(bool)
+    pdfPrintingFinished = pyqtSignal(str, bool)
+
+    def load(self, url) -> None:
+        QTimer.singleShot(0, self._loaded)
+
+    def _loaded(self) -> None:
+        self.loadProgress.emit(30)
+        self.loadProgress.emit(100)
+        self.loadFinished.emit(True)
+
+    def printToPdf(self, file_path, page_layout) -> None:
+        with open(file_path, "wb") as pdf:
+            pdf.write(b"%PDF-1.4\n" + b"0" * 4096)
+        QTimer.singleShot(0, lambda: self.pdfPrintingFinished.emit(file_path, True))
+
+
+def check_pdf_from_html_feedback(progresses, text, success, panel_shown, output):
+    """
+    What the export to PDF from HTML tells the user: the panel with its
+    stages, the progress of the loading of the page, a busy bar while the PDF
+    is generated and the final summary.
+    """
     stages = [
         _("export_dialog.progress.pdf.generating_html"),
         _("export_dialog.progress.pdf.loading_page"),
@@ -152,6 +177,27 @@ def test_pdf_from_html_tells_its_stages(app, qtbot, tmp_path, monkeypatch):
     assert progresses[-1] == 100
     assert all(10 <= p <= 50 for p in progresses[1 : progresses.index(ExportStrategy.PROGRESS_BUSY)])
     assert " KB" in text.splitlines()[-1]
+
+
+def test_pdf_from_html_tells_its_stages(app, qtbot, tmp_path, monkeypatch):
+    """
+    The export to PDF from HTML tells its stages (with a simulated page).
+    """
+    strategy_class = Plugins().get_export_strategies()["pdf"]
+    monkeypatch.setattr(sys.modules[strategy_class.__module__], "QWebEnginePage", FakeWebEnginePage)
+
+    check_pdf_from_html_feedback(*export_to_pdf(app, qtbot, tmp_path, monkeypatch, "pdf"))
+
+
+@pytest.mark.skipif(
+    os.environ.get("CI") == "true",
+    reason="QtWebEngine crashes the process printing to PDF with the virtual display of the CI",
+)
+def test_pdf_from_html_tells_its_stages_with_the_real_engine(app, qtbot, tmp_path, monkeypatch):
+    """
+    The same with the real QWebEnginePage, which prints the PDF.
+    """
+    check_pdf_from_html_feedback(*export_to_pdf(app, qtbot, tmp_path, monkeypatch, "pdf"))
 
 
 @pytest.mark.skipif(shutil.which("xelatex") is None, reason="xelatex is not installed")
