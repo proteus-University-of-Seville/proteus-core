@@ -10,13 +10,14 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import time
 from typing import Callable
 
 # --------------------------------------------------------------------------
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QSize, QTimer
 from PyQt6.QtGui import QFontDatabase
 from PyQt6.QtWidgets import (
     QWidget,
@@ -82,8 +83,15 @@ class ExportDialog(ProteusDialog):
         # True from the export button click until the export finishes
         self._exporting: bool = False
 
+        # Time elapsed since the export button click, updated every second
+        self._export_started: float = 0.0
+        self._elapsed_timer: QTimer = QTimer(self)
+        self._elapsed_timer.setInterval(1000)
+        self._elapsed_timer.timeout.connect(self._update_elapsed)
+
         # Widgets
         self.progress_bar: QProgressBar = None
+        self.elapsed_label: QLabel = None
         self.log_label: QLabel = None
         self.log_view: QPlainTextEdit = None
         self.export_format_selector: QComboBox = None
@@ -121,6 +129,9 @@ class ExportDialog(ProteusDialog):
         self.progress_bar.setValue(0)
         # self.progress_bar.setTextVisible(False)
         self.progress_bar.hide()
+
+        self.elapsed_label = QLabel()
+        self.elapsed_label.hide()
 
         # Output of the export strategy, hidden until it emits some text
         self.log_label = QLabel(_("export_dialog.log.label"))
@@ -166,6 +177,7 @@ class ExportDialog(ProteusDialog):
         # Main layout setup ---------------------------------
         main_layout = QVBoxLayout()
         main_layout.addWidget(self.progress_bar)
+        main_layout.addWidget(self.elapsed_label)
         main_layout.addWidget(export_format_label)
         main_layout.addWidget(self.export_format_selector)
         main_layout.addLayout(self.export_widget_holder)
@@ -245,7 +257,10 @@ class ExportDialog(ProteusDialog):
         method and disable the button box to avoid multiple exports.
         """
         self._clear_log()
+        self.progress_bar.setRange(0, 100)
+        self.progress_bar.setValue(0)
         self.progress_bar.show()
+        self._start_elapsed()
         self._exporting = True
         # The strategy cannot be replaced while it is exporting
         self.export_format_selector.setEnabled(False)
@@ -267,6 +282,7 @@ class ExportDialog(ProteusDialog):
         :param success: True if the export was successful, False otherwise.
         """
         self._exporting = False
+        self._elapsed_timer.stop()
 
         if success:
             MessageBox.information(
@@ -284,6 +300,7 @@ class ExportDialog(ProteusDialog):
             # The dialog stays open, so that the user can read the output of
             # the export (if any) and try again
             self.progress_bar.hide()
+            self.progress_bar.setRange(0, 100)
             self.progress_bar.setValue(0)
             self.export_format_selector.setEnabled(True)
             self.accept_button.setEnabled(True)
@@ -302,6 +319,8 @@ class ExportDialog(ProteusDialog):
         key (reject). If an export is running, it is cancelled, so that no
         process or temporary file is left behind.
         """
+        self._elapsed_timer.stop()
+
         if self._exporting and self._export_strategy is not None:
             self._exporting = False
             self._export_strategy.cancel()
@@ -319,9 +338,17 @@ class ExportDialog(ProteusDialog):
         """
         Handle the export progress signal.
 
-        :param progress: The export progress in percentage.
+        :param progress: The export progress in percentage, or
+                         ExportStrategy.PROGRESS_BUSY if it is not known.
         """
+        if progress == ExportStrategy.PROGRESS_BUSY:
+            # Unknown progress: the bar is animated, without a percentage
+            self.progress_bar.setRange(0, 0)
+            return
+
         progress = min(100, max(0, progress))
+        if self.progress_bar.maximum() == 0:
+            self.progress_bar.setRange(0, 100)
         self.progress_bar.setValue(progress)
 
     # ----------------------------------------------------------------------
@@ -357,6 +384,40 @@ class ExportDialog(ProteusDialog):
 
         if at_end:
             scroll_bar.setValue(scroll_bar.maximum())
+
+    # ----------------------------------------------------------------------
+    # Method     : _start_elapsed
+    # Description: Start showing the time elapsed since the export started.
+    # Date       : 13/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _start_elapsed(self) -> None:
+        """
+        Start showing the time elapsed since the export started. The label
+        changes every second, so that the user can see that the application
+        is working even if the export strategy has nothing to say.
+        """
+        self._export_started = time.monotonic()
+        self._update_elapsed()
+        self.elapsed_label.show()
+        self._elapsed_timer.start()
+
+    # ----------------------------------------------------------------------
+    # Method     : _update_elapsed
+    # Description: Update the elapsed time label.
+    # Date       : 13/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _update_elapsed(self) -> None:
+        """
+        Update the elapsed time label (minutes and seconds).
+        """
+        seconds: int = int(time.monotonic() - self._export_started)
+        self.elapsed_label.setText(
+            _("export_dialog.elapsed", f"{seconds // 60}:{seconds % 60:02d}")
+        )
 
     # ----------------------------------------------------------------------
     # Method     : _clear_log

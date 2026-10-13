@@ -21,6 +21,7 @@ import logging
 import re
 import shutil
 import tempfile
+import time
 import threading
 import urllib.request
 
@@ -28,7 +29,7 @@ import urllib.request
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QObject, QProcess, QRunnable, QThreadPool, pyqtSignal
+from PyQt6.QtCore import QObject, QProcess, QRunnable, QThreadPool, QTimer, pyqtSignal
 from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import QWidget, QLabel, QComboBox
 
@@ -158,6 +159,41 @@ def latex_rerun_needed(
     if passes >= LATEX_MAX_PASSES:
         return False
     return digest != previous_digest or LATEX_RERUN_PATTERN.search(log_text) is not None
+
+
+class LaTeXPageProgress:
+    """
+    Follows, in the output of the LaTeX engine, the pages that it writes
+    ("[8", "[15{...}]") and the total number of pages of the document at the
+    end ("Output written on main.pdf (33 pages)"). The output arrives in
+    pieces, so the end of the text is kept for the next call, since a page
+    number or the final line may be split between two pieces.
+    """
+
+    # A page number is followed by "]", "{", "<" or a space, which excludes
+    # other numbers in brackets such as the dates of the packages "[2023/06/01"
+    PAGE_PATTERN = re.compile(r"\[(\d+)(?=[\]{<\s])")
+    TOTAL_PATTERN = re.compile(r"Output written on[\s\S]{0,200}?\((\d+)\s+pages?")
+    BUFFER_SIZE = 250
+
+    def __init__(self) -> None:
+        self._buffer: str = ""
+        self.page: int = 0
+        self.total_pages: int | None = None
+
+    def feed(self, text: str) -> int:
+        """
+        :param text: Next piece of the output.
+        :return: Last page written so far.
+        """
+        self._buffer += text
+        for match in self.PAGE_PATTERN.finditer(self._buffer):
+            self.page = max(self.page, int(match.group(1)))
+        match = self.TOTAL_PATTERN.search(self._buffer)
+        if match:
+            self.total_pages = int(match.group(1))
+        self._buffer = self._buffer[-self.BUFFER_SIZE :]
+        return self.page
 
 
 class LaTeXOutputDecoder:
@@ -599,6 +635,10 @@ class ExportPDFLaTeX(ExportPDF):
         self._engine_selector: QComboBox = None
         self._process: QProcess = None
         self._decoder: LaTeXOutputDecoder = None
+        self._pages: LaTeXPageProgress = None
+        self._total_pages: int | None = None
+        self._last_progress: int = 0
+        self._started: float = 0.0
         self._task: LaTeXSourcesTask = None
         self._build_folder: Path = None
         self._pass: int = 0
@@ -612,15 +652,32 @@ class ExportPDFLaTeX(ExportPDF):
         pass in _sources_written.
         """
         self._cancelled = False
-        template: Template = self._template_selector.currentData()
+        self._started = time.monotonic()
+        self._total_pages = None
+        self._last_progress = 0
         self._build_folder = Path(tempfile.mkdtemp(prefix="proteus-latex-"))
 
+        self.report(_("export_dialog.progress.latex.preparing"), 5)
+
+        # The LaTeX is generated in the application thread, which cannot paint
+        # while it works: the message is shown before
+        QTimer.singleShot(0, self._prepare_sources)
+
+    def _prepare_sources(self) -> None:
+        """
+        Generates the LaTeX in the application thread and starts writing the
+        sources in a worker thread.
+        """
+        if self._cancelled:
+            return
+
+        template: Template = self._template_selector.currentData()
+
         try:
-            self.exportProgressSignal.emit(5)
             tex: str = prepare_latex_sources(self._controller, template, self._build_folder)
         except Exception as e:
             log.error(f"Error generating LaTeX with template '{template.name}': {e}")
-            self.exportLogSignal.emit(f"Error generating LaTeX with template '{template.name}': {e}\n")
+            self.report(_("export_dialog.progress.latex.prepare_error", template.name, e))
             self._finish(False)
             return
 
@@ -637,7 +694,7 @@ class ExportPDFLaTeX(ExportPDF):
             return
 
         if not success:
-            self.exportLogSignal.emit(f"Error writing the LaTeX sources: {result}\n")
+            self.report(_("export_dialog.progress.latex.sources_error", result))
             self._finish(False)
             return
 
@@ -662,9 +719,16 @@ class ExportPDFLaTeX(ExportPDF):
 
         # The output of the engine (standard output and error) is shown to the user
         self._decoder = LaTeXOutputDecoder()
+        self._pages = LaTeXPageProgress()
         self._process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
         self._process.readyReadStandardOutput.connect(self._read_engine_output)
-        self.exportLogSignal.emit(f"=== {self._engine_selector.currentText()} (pass {self._pass}) ===\n")
+        self.report(_("export_dialog.progress.latex.pass", self._engine_selector.currentText(), self._pass))
+
+        # The progress follows the pages written, which is a fraction of the
+        # pass that is known if the total number of pages is (it is not in
+        # the first pass or in the passes that are not expected)
+        if self._total_pages is None or self._pass > LATEX_MIN_PASSES:
+            self.exportProgressSignal.emit(self.PROGRESS_BUSY)
 
         self._process.start(
             engine, ["-interaction=nonstopmode", "-halt-on-error", LATEX_MAIN_FILE]
@@ -682,6 +746,24 @@ class ExportPDFLaTeX(ExportPDF):
         text: str = self._decoder.decode(bytes(self._process.readAllStandardOutput()), final)
         if text:
             self.exportLogSignal.emit(text)
+            self._update_page_progress(self._pages.feed(text))
+
+    def _update_page_progress(self, page: int) -> None:
+        """
+        Updates the progress bar with the page that the engine is writing, if
+        the total number of pages is known: the pass takes the part of the
+        progress bar between the end of the previous one and its own end.
+        """
+        if not self._total_pages or page <= 0 or self._pass > LATEX_MIN_PASSES:
+            return
+
+        start: int = 20 + 70 * (self._pass - 1) // LATEX_MIN_PASSES
+        end: int = 20 + 70 * self._pass // LATEX_MIN_PASSES
+        progress: int = start + (end - start) * min(page, self._total_pages) // self._total_pages
+
+        if progress > self._last_progress:
+            self._last_progress = progress
+            self.exportProgressSignal.emit(progress)
 
     def _engine_error(self, error: QProcess.ProcessError) -> None:
         # Only errors that prevent the process from running are handled
@@ -690,7 +772,7 @@ class ExportPDFLaTeX(ExportPDF):
             return
         if error == QProcess.ProcessError.FailedToStart:
             log.error(f"LaTeX engine '{self._engine_selector.currentData()}' failed to start")
-            self.exportLogSignal.emit(f"=== The LaTeX engine '{self._engine_selector.currentText()}' could not be started ===\n")
+            self.report(_("export_dialog.progress.latex.engine_start_error", self._engine_selector.currentText()))
             self._finish(False)
 
     def _engine_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> None:
@@ -699,16 +781,19 @@ class ExportPDFLaTeX(ExportPDF):
 
         # What the engine wrote at the end may not have been read yet
         self._read_engine_output(final=True)
+        if self._pages.total_pages:
+            self._total_pages = self._pages.total_pages
 
         if exit_code != 0 or exit_status != QProcess.ExitStatus.NormalExit:
             log.error(f"LaTeX compilation failed (pass {self._pass}, exit code {exit_code})")
-            self.exportLogSignal.emit(f"\n=== LaTeX compilation failed (exit code {exit_code}) ===\n")
+            self.report("\n" + _("export_dialog.progress.latex.failed", exit_code))
             self._finish(False)
             return
 
         # Usually LATEX_MIN_PASSES are run: the progress bar is computed for
         # them and stays at 90% during any extra pass
-        self.exportProgressSignal.emit(min(90, 20 + 70 * self._pass // LATEX_MIN_PASSES))
+        self._last_progress = min(90, 20 + 70 * self._pass // LATEX_MIN_PASSES)
+        self.exportProgressSignal.emit(self._last_progress)
 
         previous_digest: str = self._digest
         self._digest = latex_auxiliary_digest(self._build_folder)
@@ -771,7 +856,14 @@ class ExportPDFLaTeX(ExportPDF):
             shutil.rmtree(self._build_folder, ignore_errors=True)
 
         if success:
-            self.exportProgressSignal.emit(100)
+            self.report(
+                _(
+                    "export_dialog.progress.done",
+                    file_path.stat().st_size // 1024,
+                    round(time.monotonic() - self._started),
+                ),
+                100,
+            )
         self.exportFinishedSignal.emit(file_path.as_posix(), success)
 
     def exportFormWidget(self) -> QWidget:

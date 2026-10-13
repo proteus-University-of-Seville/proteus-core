@@ -10,6 +10,7 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import time
 from pathlib import Path
 
 # --------------------------------------------------------------------------
@@ -19,7 +20,7 @@ from pathlib import Path
 
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtGui import QPageLayout, QPageSize
-from PyQt6.QtCore import QMarginsF, QUrl
+from PyQt6.QtCore import QMarginsF, QTimer, QUrl
 from PyQt6.QtWidgets import (
     QWidget,
     QLineEdit,
@@ -84,6 +85,12 @@ class ExportPDF(ExportStrategy):
         self._browse_button: QPushButton = None
         self._error_label: QLabel = None
 
+        # Export state
+        self.page: QWebEnginePage = None
+        self._started: float = 0.0
+        self._cancelled: bool = False
+        self._heartbeat: QTimer = None
+
     # ======================================================================
     # Implementation of the abstract methods
     # ======================================================================
@@ -102,54 +109,129 @@ class ExportPDF(ExportStrategy):
         It uses PyQt6 QWebEnginePage.printToPdf() method to perform the export.
         It does not instantiate QWebChannel objects.
 
+        The user is told what is happening (see ExportStrategy.report): the
+        progress bar follows the loading of the page and then it shows that
+        the PDF is being generated, which takes a while and gives no
+        progress, and a message is added to the text panel every few seconds.
+
         Emits the exportFinishedSignal with the path to the exported file and
         a boolean indicating if the export was successful.
         """
         # NOTE: Page loading and pdf printing are asynchronous, so we need to
         # wait until the page is loaded to print the pdf and the variable page
         # must be a instance attribute to avoid garbage collection.
-        # To solve this problem, helper functions are used to ensure that they
-        # are executed in the correct order.
-        self.page: QWebEnginePage = QWebEnginePage()
+        self._cancelled = False
+        self._started = time.monotonic()
+        self.page = QWebEnginePage()
 
-        def load_page() -> None:
-            # Get current application state
-            current_view = StateManager().get_current_view()
+        self.report(_("export_dialog.progress.pdf.generating_html"), 5)
 
-            # Generate html view
-            html_view_path: str = self._controller.get_html_view_path(xslt_name=current_view)
+        # The HTML is generated in the application thread, which cannot paint
+        # while it works: the message is shown before
+        QTimer.singleShot(0, self._load_page)
 
-            url: QUrl = QUrl.fromLocalFile(html_view_path)
-            self.page.load(url)
+    def _load_page(self) -> None:
+        """
+        Generates the HTML of the current view and loads it in the page.
+        """
+        if self._cancelled:
+            return
 
-            self.exportProgressSignal.emit(33)
+        # Get current application state
+        current_view = StateManager().get_current_view()
 
-        def print_page() -> None:
-            self.exportProgressSignal.emit(65)
-            # Define the margin values (in millimeters)
-            margins: QMarginsF = QMarginsF(25, 25, 25, 25)
+        # Generate html view
+        html_view_path: str = self._controller.get_html_view_path(xslt_name=current_view)
 
-            # Create a QPageLayout object from the options dictionary
-            page_layout = QPageLayout(
-                QPageSize(QPageSize.PageSizeId.A4),
-                QPageLayout.Orientation.Portrait,
-                margins,
+        self.report(_("export_dialog.progress.pdf.loading_page"), 10)
+        self.page.loadProgress.connect(self._load_progress)
+        self.page.loadFinished.connect(self._print_page)
+        self.page.pdfPrintingFinished.connect(self._printing_finished)
+        self.page.load(QUrl.fromLocalFile(html_view_path))
+
+    def _load_progress(self, progress: int) -> None:
+        """
+        The loading of the page takes the progress from 10% to 50%.
+        """
+        if not self._cancelled:
+            self.exportProgressSignal.emit(10 + 40 * progress // 100)
+
+    def _print_page(self, loaded: bool) -> None:
+        """
+        Prints the loaded page to PDF.
+        """
+        if self._cancelled:
+            return
+
+        file_path: str = self._input.text()
+
+        if not loaded:
+            self.report(_("export_dialog.progress.pdf.load_failed"))
+            self.exportFinishedSignal.emit(file_path, False)
+            return
+
+        self.report(_("export_dialog.progress.pdf.printing"), self.PROGRESS_BUSY)
+
+        # Define the margin values (in millimeters)
+        margins: QMarginsF = QMarginsF(25, 25, 25, 25)
+
+        # Create a QPageLayout object from the options dictionary
+        page_layout = QPageLayout(
+            QPageSize(QPageSize.PageSizeId.A4),
+            QPageLayout.Orientation.Portrait,
+            margins,
+        )
+
+        # The printing gives no progress: tell the user that it is working
+        self._heartbeat = QTimer(self)
+        self._heartbeat.setInterval(3000)
+        self._heartbeat.timeout.connect(self._printing_heartbeat)
+        self._heartbeat.start()
+
+        # Print to pdf the current view with margins
+        self.page.printToPdf(file_path, page_layout)
+
+    def _printing_heartbeat(self) -> None:
+        """
+        Tells the user that the PDF is still being generated.
+        """
+        seconds: int = int(time.monotonic() - self._started)
+        self.report(_("export_dialog.progress.pdf.printing_elapsed", seconds))
+
+    def _printing_finished(self, file_path: str, success: bool) -> None:
+        """
+        The PDF has been written (or not): emits the finished signal.
+        """
+        if self._heartbeat is not None:
+            self._heartbeat.stop()
+
+        if self._cancelled:
+            # Nobody is waiting for the file
+            Path(file_path).unlink(missing_ok=True)
+            return
+
+        if success:
+            self.report(
+                _(
+                    "export_dialog.progress.done",
+                    Path(file_path).stat().st_size // 1024,
+                    round(time.monotonic() - self._started),
+                ),
+                100,
             )
+        else:
+            self.report(_("export_dialog.progress.pdf.failed"))
 
-            # Print to pdf the current view with margins
-            file_path: str = self._input.text()
-            self.page.printToPdf(file_path, page_layout)
+        self.exportFinishedSignal.emit(file_path, success)
 
-        # Create the page and print it to pdf
-        load_page()
-        self.page.loadFinished.connect(print_page)
-        # Show a dialog when the pdf printing is finished
-        self.page.pdfPrintingFinished.connect(
-            lambda: self.exportProgressSignal.emit(100)
-        )
-        self.page.pdfPrintingFinished.connect(
-            lambda path, success: self.exportFinishedSignal.emit(path, success)
-        )
+    def cancel(self) -> None:
+        """
+        Cancels the export: the PDF that is being generated, if any, is
+        removed when it is written.
+        """
+        self._cancelled = True
+        if self._heartbeat is not None:
+            self._heartbeat.stop()
 
     # ----------------------------------------------------------------------
     # Method     : exportFormWidget

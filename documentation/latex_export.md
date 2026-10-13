@@ -134,6 +134,24 @@ running and remove their partial output without emitting `exportFinishedSignal`:
 The export format cannot be changed while an export is running.
 
 
+What the user sees while exporting
+----------------------------------
+
+The export dialog is modal, but it shows that the export is working. The strategies tell what
+they are doing with `ExportStrategy.report(message, progress)`: the message is added to a text
+panel (`exportLogSignal`), which is shown the first time it receives some text, and the progress
+bar is updated. `ExportStrategy.PROGRESS_BUSY` (`-1`) makes the bar busy (animated, without a
+percentage) while the progress is not known. The dialog also shows the time elapsed since the
+export started. If the export fails, the dialog stays open with the text.
+
+* PDF from HTML: the bar follows the loading of the page (from 10% to 50%) and it is busy while
+  `printToPdf` generates the PDF, which gives no progress. A message is added every 3 s.
+* PDF from LaTeX: the panel shows the output of the engine (standard output and error, decoded
+  by `LaTeXOutputDecoder`). The bar is busy in the first pass, since the total number of pages
+  is not known yet; in the next ones it follows the pages written, which `LaTeXPageProgress`
+  reads from the output, up to the end of the pass.
+
+
 Bibliography and citations
 --------------------------
 

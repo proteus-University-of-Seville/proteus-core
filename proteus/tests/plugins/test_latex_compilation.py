@@ -36,6 +36,7 @@ from basic.export.export_latex import (  # noqa: E402
     LATEX_MAX_PASSES,
     LATEX_MIN_PASSES,
     LaTeXOutputDecoder,
+    LaTeXPageProgress,
     LaTeXSourcesTask,
     latex_auxiliary_digest,
     latex_rerun_needed,
@@ -187,3 +188,49 @@ def test_latex_output_decoder_replaces_invalid_bytes():
     text = decoder.decode(b"C:\\Users\\Mar\xeda\n", final=True)
 
     assert text.startswith("C:\\Users\\Mar") and text.endswith("\n")
+
+
+def test_latex_page_progress_follows_the_pages_split_in_pieces():
+    """
+    The pages written by the engine are followed even if their number is
+    split between two pieces of the output.
+    """
+    progress = LaTeXPageProgress()
+
+    assert progress.feed("Loading fonts [1{C:/Users/x/pdftex.map}] [2") == 1
+    # "[2" and "3]" make "[23]"
+    assert progress.feed("3] [") == 23
+    assert progress.feed("24]") == 24
+    assert progress.total_pages is None
+
+
+def test_latex_page_progress_ignores_other_numbers_in_brackets():
+    """
+    Dates and versions of the packages in brackets are not pages.
+    """
+    progress = LaTeXPageProgress()
+
+    progress.feed("(C:\\texmf\\foo.sty [2023/06/01 v1.2] [1.0] [v3] [])")
+
+    assert progress.page == 0
+
+
+@pytest.mark.parametrize(
+    "pieces, expected",
+    [
+        (["Output written on main.pdf (33 pages).\n"], 33),
+        (["Output written on main.pdf (33 pa", "ges).\n"], 33),
+        (["Output written on main.pdf (1 page, 2048 bytes).\n"], 1),
+    ],
+)
+def test_latex_page_progress_total_pages(pieces, expected):
+    """
+    The total number of pages is read at the end of the output, even if it is
+    split between two pieces.
+    """
+    progress = LaTeXPageProgress()
+
+    for piece in pieces:
+        progress.feed(piece)
+
+    assert progress.total_pages == expected
