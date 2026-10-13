@@ -8,6 +8,10 @@
     <traceProperty name="sources" category="general" acceptedTargets="stakeholder" traceType=":Proteus-information-source"/>
     <markdownProperty name="text" category="detail"><![CDATA[A **Paragraph** is the basic unit of free text in a document. Its *Text* property is written in **Markdown**, so it can include emphasis, lists, links and tables. It also has *Date* and *Version* to track when it changed. A paragraph cannot contain child objects.
 
+**Images in Markdown**
+
+Any Markdown text (not only the one of a paragraph: also the *Description* of a requirement, a figure, a glossary item, etc.) can include a figure with the syntax `![alternative text](assets:///file.png)`, where `file.png` is an image of the project *assets* folder. The address of an image on the Internet can also be used: `![alternative text](https://server/image.png)`. If the image is wider than the text, it is scaled down to fit. It is shown in the HTML view and in the LaTeX and PDF exports.
+
 **Traceability**
 
 - *Can be traced from other objects:* **Yes**. It has the `traceable-object` class, so the *Dependencies* of other objects can point to it (it can also be the target of a symbolic link).
