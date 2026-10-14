@@ -75,7 +75,7 @@
     <!-- key of the label of the row. The row is at the end of the table   -->
     <!-- (children_position 'end') or, in a list, right after the          -->
     <!-- description row, if there is one ('after_description').           -->
-    <xsl:param name="children_style" select="'cards'"/>
+    <xsl:param name="children_style" select="'list'"/>
     <xsl:param name="children_label_key" select="'xslt.children'"/>
     <xsl:param name="children_position" select="'end'"/>
 
@@ -263,6 +263,14 @@
           <strong class="child_name">
             <xsl:value-of select="properties/*[@name=':Proteus-name']"/>
           </strong>
+          <!-- Short text properties (e.g. the type of an attribute) follow the name -->
+          <xsl:for-each select="properties/stringProperty[string-length(normalize-space(.)) > 0][not(@name=':Proteus-name' or @name=':Proteus-code' or @name=':Proteus-date' or @name='version')]">
+            <xsl:text> (</xsl:text>
+            <xsl:value-of select="proteus-utils:i18n(concat('archetype.prop_name.', @name))"/>
+            <xsl:text>: </xsl:text>
+            <xsl:value-of select="normalize-space(.)"/>
+            <xsl:text>)</xsl:text>
+          </xsl:for-each>
           <xsl:if test="normalize-space($description) != ''">
             <xsl:text>: </xsl:text>
             <xsl:call-template name="generate_markdown">
