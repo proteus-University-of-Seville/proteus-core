@@ -108,6 +108,18 @@
   </xsl:template>
 
   <!-- ============================================= -->
+  <!-- unitProperty                                  -->
+  <!-- ============================================= -->
+
+  <!-- "<value> <unit>", e.g. "2.5 hour". Units are   -->
+  <!-- keys translated like in the application GUI.  -->
+  <xsl:template match="unitProperty">
+    <xsl:value-of select="format-number(value, '#.###')"/>
+    <xsl:text> </xsl:text>
+    <xsl:value-of select="proteus-utils:i18n(concat('archetype.enum_units.', unit))"/>
+  </xsl:template>
+
+  <!-- ============================================= -->
   <!-- fileProperty                                  -->
   <!-- ============================================= -->
 

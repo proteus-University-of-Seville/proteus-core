@@ -153,6 +153,20 @@
   </xsl:template>
 
   <!-- ============================================= -->
+  <!-- unitProperty                                  -->
+  <!-- ============================================= -->
+
+  <!-- "<value> <unit>", e.g. "2.5 hour". Units are   -->
+  <!-- keys translated like in the application GUI.  -->
+  <xsl:template match="unitProperty">
+    <xsl:value-of select="format-number(value, '#.###')"/>
+    <xsl:text> </xsl:text>
+    <xsl:call-template name="label">
+      <xsl:with-param name="key" select="concat('archetype.enum_units.', unit)"/>
+    </xsl:call-template>
+  </xsl:template>
+
+  <!-- ============================================= -->
   <!-- enumProperty                                  -->
   <!-- ============================================= -->
 
