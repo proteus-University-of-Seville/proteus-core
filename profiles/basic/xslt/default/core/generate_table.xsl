@@ -37,6 +37,8 @@
     <xsl:param name="span" select="1"/>
     <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-code,:Proteus-date,version,authors,sources,'"/>
     <xsl:param name="included_properties"/>
+    <!-- Properties shown at the full width of the table (see generate_property_row) -->
+    <xsl:param name="wide_properties" select="',diagram,'"/>
 
     <!-- Objects with a :Proteus-code (e.g. madeja's requirements engineering -->
     <!-- archetypes) show it in brackets before the name, instead of as a     -->
@@ -159,6 +161,7 @@
           <xsl:call-template name="generate_property_row">
             <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
             <xsl:with-param name="span" select="$span"/>
+            <xsl:with-param name="wide" select="contains($wide_properties,concat(',', current()/@name, ','))"/>
           </xsl:call-template>
 
           <!-- Children right after the description -->

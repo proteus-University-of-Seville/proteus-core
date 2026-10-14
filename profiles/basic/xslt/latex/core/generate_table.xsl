@@ -40,6 +40,8 @@
     <xsl:param name="postfix"/>
     <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-code,:Proteus-date,version,authors,sources,'"/>
     <xsl:param name="included_properties"/>
+    <!-- Properties shown at the full width of the table (see generate_property_row) -->
+    <xsl:param name="wide_properties" select="',diagram,'"/>
     <xsl:param name="code" select="properties/*[@name=':Proteus-code']"/>
     <xsl:param name="extra_rows_before"/>
     <xsl:param name="extra_rows"/>
@@ -118,6 +120,7 @@
     <xsl:for-each select="properties/*[not(contains($all_excluded_properties,concat(',', @name, ',')))]">
       <xsl:call-template name="generate_property_row">
         <xsl:with-param name="included" select="contains($included_properties,concat(',', current()/@name, ','))"/>
+        <xsl:with-param name="wide" select="contains($wide_properties,concat(',', current()/@name, ','))"/>
       </xsl:call-template>
 
       <!-- Children right after the description -->

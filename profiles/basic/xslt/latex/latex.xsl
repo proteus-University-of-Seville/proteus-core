@@ -45,8 +45,9 @@
   <xsl:include href="archetypes/general/figure.xsl" />
   <xsl:include href="archetypes/general/symbolic_link.xsl" />
 
-  <!-- Advanced archetype modules (organizations, stakeholders and -->
-  <!-- meetings use the default property card)                     -->
+  <!-- Advanced archetype modules (organizations and stakeholders use -->
+  <!-- the default property card)                                     -->
+  <xsl:include href="archetypes/advanced/meeting.xsl" />
   <xsl:include href="archetypes/advanced/traceability_matrix.xsl" />
 
   <!-- Default archetype module -->

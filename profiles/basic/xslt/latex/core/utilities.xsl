@@ -114,23 +114,33 @@
     <xsl:param name="label" select="proteus-utils:i18n(concat('archetype.prop_name.', current()/@name))"/>
     <xsl:param name="included" select="false()"/>
     <xsl:param name="alternative"/>
-    <xsl:param name="diagram" select="@name='diagram'"/>
+    <xsl:param name="wide" select="false()"/>
 
     <xsl:variable name="hasContent" select="(string-length(current()//text()) > 0) and (normalize-space(current()) != 'tbd')"/>
     <xsl:variable name="hasChildren" select="boolean(current()/*)"/>
 
     <xsl:if test="$hasContent or $hasChildren or $included">
       <xsl:choose>
-        <!-- A diagram takes both columns of the table, as in the HTML   -->
-        <!-- template: its label and, below it, the image, whose width   -->
-        <!-- (a fraction of \linewidth) is relative to the width of the  -->
-        <!-- cell, i.e. of the table without the paddings and the rules. -->
-        <xsl:when test="$diagram and $hasContent and not($alternative)">
-          <xsl:text>\multicolumn{2}{|c|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{\raggedright{\small\bfseries\color{proteusink!75}</xsl:text>
+        <!-- A wide property takes both columns of the table, as in the HTML  -->
+        <!-- template: its label in a row of its own and, below it, the       -->
+        <!-- content. Its width is relative to the width of the cell, i.e. of -->
+        <!-- the table without the paddings and the rules.                    -->
+        <xsl:when test="$wide and not($alternative)">
+          <xsl:text>\multicolumn{2}{|l|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{\raggedright{\small\bfseries\color{proteusink!75}</xsl:text>
           <xsl:value-of select="proteus-utils:latex_escape(string($label))"/>
-          <xsl:text>}\par\vspace{0.4em}\centering </xsl:text>
+          <xsl:text>}}} \\*&#10;</xsl:text>
+          <xsl:text>\multicolumn{2}{|l|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{</xsl:text>
+          <!-- Images are centred; texts are left-aligned -->
+          <xsl:choose>
+            <xsl:when test="current()[self::fileProperty]">
+              <xsl:text>\centering </xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>\raggedright </xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
           <xsl:apply-templates select="current()"/>
-          <xsl:text>\par}} \\ \hline&#10;</xsl:text>
+          <xsl:text>\strut}} \\ \hline&#10;</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="proteus-utils:latex_escape(string($label))"/>
