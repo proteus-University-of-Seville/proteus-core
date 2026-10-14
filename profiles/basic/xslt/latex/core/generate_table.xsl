@@ -40,6 +40,11 @@
     <xsl:param name="postfix"/>
     <xsl:param name="excluded_properties" select="',:Proteus-name,:Proteus-code,:Proteus-date,version,authors,sources,'"/>
     <xsl:param name="included_properties"/>
+    <!-- Wide properties (see generate_property_row) keep their name and their     -->
+    <!-- content in the same cell. The alternative that was discarded put the name  -->
+    <!-- in a row of its own, and the content in the row below it: in HTML, a th   -->
+    <!-- with colspan and then a td with colspan; in LaTeX, two \multicolumn rows,  -->
+    <!-- the first one ending with \* so that it is not separated from its content. -->
     <!-- Properties shown at the full width of the table (see generate_property_row) -->
     <xsl:param name="wide_properties" select="',diagram,'"/>
     <xsl:param name="code" select="properties/*[@name=':Proteus-code']"/>
