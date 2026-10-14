@@ -64,16 +64,13 @@
 
     <xsl:if test="$hasContent or $hasChildren or $included">
       <xsl:choose>
-        <!-- A wide property takes both columns: its label in a row of its own -->
-        <!-- and its content in the row below, at the full width of the table.  -->
+        <!-- A wide property takes the whole row: its name above its content -->
         <xsl:when test="$wide and not($alternative)">
           <tr>
-            <th colspan="{$span + 1}">
-              <xsl:value-of select="$label"/>
-            </th>
-          </tr>
-          <tr>
-            <td colspan="{$span + 1}">
+            <td colspan="{$span + 1}" class="wide_property">
+              <div class="wide_property_label">
+                <xsl:value-of select="$label"/>
+              </div>
               <xsl:apply-templates select="current()"/>
             </td>
           </tr>

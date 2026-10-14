@@ -121,15 +121,13 @@
 
     <xsl:if test="$hasContent or $hasChildren or $included">
       <xsl:choose>
-        <!-- A wide property takes both columns of the table, as in the HTML  -->
-        <!-- template: its label in a row of its own and, below it, the       -->
-        <!-- content. Its width is relative to the width of the cell, i.e. of -->
-        <!-- the table without the paddings and the rules.                    -->
+        <!-- A wide property takes the whole table: its name above its content  -->
+        <!-- in a single cell. Its width is relative to the width of the cell,  -->
+        <!-- i.e. of the table without the paddings and the rules.              -->
         <xsl:when test="$wide and not($alternative)">
           <xsl:text>\multicolumn{2}{|l|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{\raggedright{\small\bfseries\color{proteusink!75}</xsl:text>
           <xsl:value-of select="proteus-utils:latex_escape(string($label))"/>
-          <xsl:text>}}} \\*&#10;</xsl:text>
-          <xsl:text>\multicolumn{2}{|l|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{</xsl:text>
+          <xsl:text>}\par\vspace{0.4em}</xsl:text>
           <!-- Images are centred; texts are left-aligned -->
           <xsl:choose>
             <xsl:when test="current()[self::fileProperty]">

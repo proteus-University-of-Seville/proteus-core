@@ -217,6 +217,14 @@ table.proteus_table > tr > th:first-child {
   border-right: 1px solid var(--line);
 }
 
+/* wide properties (diagrams, meeting results): the name above the content, */
+/* in the same cell                                                          */
+table.proteus_table .wide_property_label {
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 0.4em;
+}
+
 /* step-by-step sequence (e.g. madeja's use-case "ordinary sequence"): the */
 /* step number column shrinks to fit its own header/content ("Step" or    */
 /* "Paso", or the number itself, whichever is narrower) via the standard  */
