@@ -124,6 +124,12 @@
         <!-- A wide property takes the whole table: its name above its content  -->
         <!-- in a single cell. Its width is relative to the width of the cell,  -->
         <!-- i.e. of the table without the paddings and the rules.              -->
+        <!-- Former layout, not used: two rows of the table, the name first and the
+             content below it. The first row ends with a starred line break, so
+             that no page break separates it from its content:
+             \multicolumn{2}{|l|}{\parbox[t]{<width>}{\raggedright{\small\bfseries <name>}}} \\*
+             \multicolumn{2}{|l|}{\parbox[t]{<width>}{<content>}} \\ \hline
+        -->
         <xsl:when test="$wide and not($alternative)">
           <xsl:text>\multicolumn{2}{|l|}{\parbox[t]{\dimexpr\ProteusTableWidth-2\tabcolsep-2\arrayrulewidth\relax}{\raggedright{\small\bfseries\color{proteusink!75}</xsl:text>
           <xsl:value-of select="proteus-utils:latex_escape(string($label))"/>
