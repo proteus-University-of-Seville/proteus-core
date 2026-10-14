@@ -30,6 +30,19 @@
       <xsl:if test="$target_code">[<xsl:value-of select="$target_code"/>]<xsl:text>&#160;</xsl:text></xsl:if>
       <xsl:value-of select="$target_object/properties/*[@name=':Proteus-name']" />
     </a>
+
+    <!-- A stakeholder shows its organization in brackets, if it works for one -->
+    <xsl:if test="contains(concat(' ', normalize-space($target_object/@classes), ' '), ' stakeholder ')">
+      <xsl:variable name="organization"
+        select="//object[@id = $target_object/properties/traceProperty[@name='works-for']/trace[@traceType=':Proteus-works-for']/@target][1]"/>
+      <xsl:if test="$organization">
+        <xsl:text> (</xsl:text>
+        <xsl:call-template name="trace_target_link">
+          <xsl:with-param name="target_object" select="$organization"/>
+        </xsl:call-template>
+        <xsl:text>)</xsl:text>
+      </xsl:if>
+    </xsl:if>
   </xsl:template>
 
   <!-- List mode -->
