@@ -1151,7 +1151,6 @@ dependencies = [
     { name = "rich" },
     { name = "shortuuid" },
     { name = "strenum" },
-    { name = "trieregex" },
     { name = "typing-extensions" },
 ]
 
@@ -1185,7 +1184,6 @@ requires-dist = [
     { name = "rich", specifier = ">=15.0.0" },
     { name = "shortuuid", specifier = "==1.0.13" },
     { name = "strenum", specifier = "==0.4.15" },
-    { name = "trieregex", specifier = "==1.0.0" },
     { name = "typing-extensions", specifier = "==4.15.0" },
 ]
 
@@ -2000,12 +1998,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/cd/e80b62269fc78fc36c9af5a6b89c835baa8af28ff5ad28c7028d60860320/tomli-2.4.1-cp314-cp314t-win_arm64.whl", hash = "sha256:eab21f45c7f66c13f2a9e0e1535309cee140182a9cdae1e041d02e47291e8396", size = 100393, upload-time = "2026-03-25T20:22:02.137Z" },
     { url = "https://files.pythonhosted.org/packages/7b/61/cceae43728b7de99d9b847560c262873a1f6c98202171fd5ed62640b494b/tomli-2.4.1-py3-none-any.whl", hash = "sha256:0d85819802132122da43cb86656f8d1f8c6587d54ae7dcaf30e90533028b49fe", size = 14583, upload-time = "2026-03-25T20:22:03.012Z" },
 ]
-
-[[package]]
-name = "trieregex"
-version = "1.0.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/06/48/d22ed66693fe643e7a376b2178bc91bd32771de3d6730ffe288da6b95964/trieregex-1.0.0.tar.gz", hash = "sha256:a34dd31d04aa169e1989971a315fcbd524126330c7f2f9f16991b0a8c9084eaf", size = 11276, upload-time = "2020-06-23T11:42:10.111Z" }
 
 [[package]]
 name = "truststore"

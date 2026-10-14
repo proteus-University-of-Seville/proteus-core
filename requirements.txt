@@ -275,8 +275,6 @@ strenum==0.4.15
     # via proteus
 tomli==2.4.1 ; python_full_version <= '3.11'
     # via coverage
-trieregex==1.0.0
-    # via proteus
 truststore==0.10.4 ; sys_platform != 'emscripten'
     # via
     #   httpcore2
