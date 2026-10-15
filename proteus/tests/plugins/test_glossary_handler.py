@@ -171,3 +171,17 @@ def test_deleted_case_significant_items_are_not_highlighted(glossary):
 
     assert GlossaryHandler.object_ids_by_exact_item == {}
     assert linked("IT", "it1") == 0
+
+
+def test_items_in_links_are_not_highlighted(glossary):
+    """
+    A Markdown link to another object may contain a glossary item in its
+    text: it is not highlighted, since a link cannot contain another link.
+    """
+    glossary(glossary_item("l1", "loan"))
+
+    text = 'See <a href="#appendix"><em>Current loan policy</em></a> for each loan.'
+    html = GlossaryHandler.highlight_glossary_items(None, text)
+
+    assert linked(text, "l1") == 1
+    assert '<a href="#appendix"><em>Current loan policy</em></a>' in html

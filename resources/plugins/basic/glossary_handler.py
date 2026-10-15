@@ -145,6 +145,12 @@ class GlossaryHandler(ProteusComponent):
         r"(?s)<code>((?!</code>).)*</code>", re.IGNORECASE
     )
 
+    # Links already in the text (e.g. Markdown links to other objects): an
+    # item inside them is not highlighted, since a link cannot contain another
+    link_pattern: re.Pattern = re.compile(
+        r"(?s)<a\b[^>]*>((?!</a>).)*</a>", re.IGNORECASE
+    )
+
     markdown_instance = markdown.Markdown(
         output_format="plain"
     )  # This is used to convert markdown to plaintext
@@ -483,7 +489,9 @@ class GlossaryHandler(ProteusComponent):
         If the glossary item has multiple descriptions, all descriptions
         are displayed in the tooltip. Glossary items that are inside a
         code block are not highlighted, this is done to prevent HTML
-        loops errors when the tooltip is added.
+        loops errors when the tooltip is added. Glossary items inside a
+        link (e.g. a Markdown link to another object) are not highlighted
+        either, since a link cannot contain another link.
 
         Method used in the XSLT stylesheet.
         """
@@ -496,14 +504,10 @@ class GlossaryHandler(ProteusComponent):
                 match_text: str = match.group()
                 match_start: int = match.start()
 
-                # Check if the match is inside a code block
-                code_block_matches = GlossaryHandler.code_block_pattern.finditer(text)
-                for code_block_match in code_block_matches:
-                    code_block_start = code_block_match.start()
-                    code_block_end = code_block_match.end()
-
-                    # If the match is inside a code block, return the match without decoration
-                    if code_block_start <= match_start <= code_block_end:
+                # If the match is inside a code block or a link, return the
+                # match without decoration
+                for skipped_start, skipped_end in skipped_spans:
+                    if skipped_start <= match_start <= skipped_end:
                         return match_text
 
                 # Get ids linked to the item: as it is written if it is a case
@@ -531,6 +535,17 @@ class GlossaryHandler(ProteusComponent):
 
             if GlossaryHandler.pattern is None:
                 return text
+
+            # Spans of the code blocks and links of the text, where items are
+            # not highlighted
+            skipped_spans = [
+                skipped.span()
+                for skipped_pattern in (
+                    GlossaryHandler.code_block_pattern,
+                    GlossaryHandler.link_pattern,
+                )
+                for skipped in skipped_pattern.finditer(text)
+            ]
 
             # Replace the items with the decorated items
             text = re.sub(GlossaryHandler.pattern, highlight_item, text)
