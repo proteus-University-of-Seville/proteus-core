@@ -419,6 +419,60 @@ def test_clone_object_recalculates_descendant_traces(
     ), "Sample object has no traces to objects inside the cloned subtree"
 
 
+def test_clone_object_recalculates_markdown_links(
+    sample_object: Object,
+    sample_document: Object,
+    sample_project: Project,
+):
+    """
+    Test Object clone_object redirects the links of Markdown texts
+    ([text](#id)) to objects of the cloned subtree to their clones, and
+    keeps the links to other objects, as it does with the traces.
+    """
+    from proteus.model.properties import MarkdownProperty
+
+    # Helper to list an object and its descendants in depth-first order
+    def _flatten(object: Object) -> list[Object]:
+        objects = [object]
+        for child in object.children:
+            objects.extend(_flatten(child))
+        return objects
+
+    original_objects = _flatten(sample_object)
+    assert len(original_objects) > 1, "Sample object has no descendants"
+    inside_id = original_objects[-1].id
+    outside_id = sample_document.id
+
+    # A Markdown text of the subtree with links inside and outside it
+    holder, markdown = next(
+        (o, p)
+        for o in original_objects
+        for p in o.properties.values()
+        if isinstance(p, MarkdownProperty)
+    )
+    text = (
+        f"See [the last one](#{inside_id}), [the document](#{outside_id}), "
+        f"[unknown](#notAnId) and `[code](#{inside_id})`.\n\n"
+        f"[ref]: #{inside_id}"
+    )
+    holder.properties[markdown.name] = markdown.clone(text)
+
+    new_object = sample_object.clone_object(sample_document, sample_project)
+    cloned_objects = _flatten(new_object)
+    ids_map = {o.id: c.id for o, c in zip(original_objects, cloned_objects)}
+
+    cloned_holder = cloned_objects[original_objects.index(holder)]
+    new_inside_id = ids_map[inside_id]
+
+    assert cloned_holder.get_property(markdown.name).value == (
+        f"See [the last one](#{new_inside_id}), [the document](#{outside_id}), "
+        f"[unknown](#notAnId) and `[code](#{new_inside_id})`.\n\n"
+        f"[ref]: #{new_inside_id}"
+    )
+    # The original text is not modified
+    assert holder.get_property(markdown.name).value == text
+
+
 def test_set_property(sample_object: Object):
     """
     Test Abstract Object set_property method
