@@ -8,6 +8,6 @@
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>
   <documents>
-    <document id="empty-doc"/>
+    <document id="sample-doc"/>
   </documents>
 </project>

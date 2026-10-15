@@ -11,7 +11,7 @@
       <trace target="FCZXbSnRe6vf" traceType=":Proteus-information-source"/>
       <trace target="7yibW4RWaF5C" traceType=":Proteus-information-source"/>
     </traceProperty>
-    <markdownProperty name="text" category="detail"><![CDATA[Los usuarios de la biblioteca deben poder **renovar sus préstamos en curso** desde el portal web de BiblioUS en cualquier momento, sin acudir a un mostrador de préstamo. Una renovación amplía la fecha de devolución en el periodo de préstamo correspondiente al tipo de usuario (véase el *Apéndice: Normativa de préstamo vigente*), contado desde la fecha de renovación.
+    <markdownProperty name="text" category="detail"><![CDATA[Los usuarios de la biblioteca deben poder **renovar sus préstamos en curso** desde el portal web de BiblioUS en cualquier momento, sin acudir a un mostrador de préstamo. Una renovación amplía la fecha de devolución en el periodo de préstamo correspondiente al tipo de usuario (véase el [*Apéndice: Normativa de préstamo vigente*](#ppav7SqyNSur)), contado desde la fecha de renovación.
 
 El sistema debe **rechazar** una renovación cuando:
 

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<object id="empty-doc" classes=":Proteus-document" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-any">
+<object id="sample-doc" classes=":Proteus-document" acceptedChildren=":Proteus-any" acceptedParents=":Proteus-any">
   <properties>
     <stringProperty name=":Proteus-acronym" category="general"><![CDATA[SAMPLE]]></stringProperty>
     <stringProperty name=":Proteus-name" category="general"><![CDATA[Sample document]]></stringProperty>
