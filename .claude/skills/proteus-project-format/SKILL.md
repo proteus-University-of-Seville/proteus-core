@@ -41,6 +41,9 @@ Project archetypes (in a profile, `archetypes/<lang>/projects/<name>/`) use the 
 but the project file is named **`project.xml`**; PROTEUS renames it to `proteus.xml` when
 creating a project. Document archetypes (`archetypes/<lang>/documents/<name>/`) have a
 `document.xml` pointer (`<document id="the-doc-id"/>`) plus `objects/` and optional `assets/`.
+The documents of project archetypes are document archetypes too (keyed
+`<project folder>/<document id>`), except those with `documentArchetype="false"` in the
+`<document>` element of `project.xml`.
 
 ## Files
 

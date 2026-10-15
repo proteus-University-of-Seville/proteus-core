@@ -7,6 +7,7 @@ from typing import Any
 
 from proteus.model import PROTEUS_NAME, ProteusID
 from proteus.model.object import Object
+from proteus.model.archetype_repository import get_archetype_key
 from proteus.model.project import Project
 from proteus.model.properties import CodeProperty, Property, TraceProperty, UnitProperty
 from proteus.model.properties.unit_property import Measurement
@@ -67,7 +68,7 @@ class Gateway:
             (
                 item
                 for item in self.get_creatable_archetypes(parent_id)
-                if item.id == archetype_id
+                if get_archetype_key(item) == archetype_id
             ),
             None,
         )
@@ -77,7 +78,7 @@ class Gateway:
             )
 
         if isinstance(parent, Project):
-            new_id = self._controller.create_document(archetype.id)
+            new_id = self._controller.create_document(get_archetype_key(archetype))
         else:
             new_id = self._controller.create_object(archetype.id, parent_id)
 

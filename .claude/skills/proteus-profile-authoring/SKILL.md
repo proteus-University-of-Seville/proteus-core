@@ -67,7 +67,11 @@ the `proteus-project-format` skill.
 3. Languages: keep `archetypes/languages.xml` and `i18n/languages.xml` consistent; every
    language listed needs a full `archetypes/<lang>/` set and an `i18n/<lang>/` folder.
 4. Project archetypes (`archetypes/<lang>/projects/`): rename folders, edit `project.xml`
-   (`id`, name, description). Give each language its own project `id`.
+   (`id`, name, description). Give each language its own project `id`. Every document
+   of a project archetype is also offered as a document archetype ("<document> (from the
+   «<project>» project)"), unless its `<document>` element in `project.xml` has
+   `documentArchetype="false"`; do not duplicate those documents in `documents/`, which
+   is optional (basic has none).
 5. Document archetypes: one folder per document type; `document.xml` points to the
    document object in `objects/`, which lists its children (sections, paragraphs...) as
    `<child id>` of files in the same `objects/` folder.

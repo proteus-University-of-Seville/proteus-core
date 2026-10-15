@@ -25,7 +25,7 @@ import pytest
 from proteus.model import ProteusID
 from proteus.model.project import Project
 from proteus.model.object import Object
-from proteus.model.archetype_repository import ArchetypeRepository
+from proteus.model.archetype_repository import ArchetypeRepository, get_archetype_key
 from proteus.services.archetype_service import ArchetypeService
 
 
@@ -180,7 +180,7 @@ def test_archetype_index_load(archetype_service: ArchetypeService):
         project.id for project in project_archetypes
     )
     document_archetypes_ids: List[ProteusID] = set(
-        document.id for document in document_archetypes
+        get_archetype_key(document) for document in document_archetypes
     )
     object_archetypes_ids: List[ProteusID] = set()
     for archetype_class_dict in object_archetypes.values():
@@ -207,7 +207,7 @@ def test_archetype_index_load(archetype_service: ArchetypeService):
 
 # test_get_archetype_by_id -------------------------------------------------
 @pytest.mark.parametrize(
-    "id", ["paragraph", "empty", "empty-doc"]
+    "id", ["paragraph", "empty", "basic-profile-empty/empty-doc"]
 )
 def test_get_archetype_by_id(id: str, archetype_service: ArchetypeService):
     """
@@ -681,3 +681,20 @@ def test_get_first_level_object_archetypes_does_not_modify_the_cache(
         ids(archetype_service.get_object_archetypes()) == cached_before
     ), "The cached object archetypes were modified"
     assert len(archetype_service.get_all_object_archetypes()) == 5
+
+
+# test_project_document_archetypes_by_key ------------------------------------
+def test_project_document_archetypes_by_key(archetype_service: ArchetypeService):
+    """
+    The documents of the project archetypes are in the archetype index by
+    their key, not by their id, which is the same as that of a document
+    archetype in the basic profile.
+    """
+    document_archetypes = archetype_service.get_document_archetypes()
+    from_projects = [d for d in document_archetypes if d.archetype_origin is not None]
+
+    assert from_projects, "The basic profile project archetypes have documents"
+    for document in from_projects:
+        key = get_archetype_key(document)
+        assert key != document.id
+        assert archetype_service._get_archetype_by_id(key) is document

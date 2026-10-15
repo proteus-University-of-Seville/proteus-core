@@ -92,6 +92,27 @@ renames `project.xml` to `proteus.xml`. When a document is created from a docume
 archetype, its objects are cloned into the project (with new IDs, see below) and the
 assets they reference are copied into the project's `assets/` directory.
 
+The documents of the project archetypes are document archetypes too: the "new document"
+dialog lists them after the document archetypes, with the name of the project archetype
+they come from ("<document> (from the «<project>» project)"). Internally they are
+identified as `<project archetype folder>/<document id>`, since their ids may be repeated
+in the document archetypes or in other project archetypes. A document of a project
+archetype can be excluded with an attribute in the project file:
+
+```xml
+<documents>
+  <document id="ers"/>
+  <document id="draft" documentArchetype="false"/>
+</documents>
+```
+
+The attribute only matters in the archetype: projects created from it do not keep it.
+The `documents/` directory is optional: the basic profile has none, so its document
+archetypes are the documents of its project archetypes (empty and sample).
+Traces and Markdown links from a document of a project archetype to objects of *other*
+documents of that project archetype are lost (traces) or left pointing to a missing id
+(links) when the document is created on its own; exclude such documents if needed.
+
 ## How Documents Are Stored
 
 In storage terms, a document is just a Proteus object whose `classes` attribute contains `:Proteus-document`.

@@ -59,6 +59,7 @@ app.open_last_project.text: "¿Desea abrir el último proyecto?"
 # ---------------------------------------------------------------------------
 new_document_dialog.title: "Nuevo documento"
 new_document_dialog.combobox.label: "Seleccione un arquetipo de documento:"
+new_document_dialog.archetype.from_project: "{} (del proyecto «{}»)"
 new_document_dialog.archetype.description: "Descripción:"
 new_document_dialog.archetype.description.empty: "No hay descripción disponible"
 new_document_dialog.error.no_archetype_selected: "Debe seleccionar un arquetipo de documento"

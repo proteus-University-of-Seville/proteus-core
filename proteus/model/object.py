@@ -114,6 +114,13 @@ class Object(AbstractObject):
     file.
     """
 
+    # Only set in the document archetypes that the archetype repository loads
+    # from the project archetypes (see ArchetypeRepository): the key that
+    # identifies them among the archetypes and the name of the project
+    # archetype they come from. None in any other object.
+    archetype_key: str = None
+    archetype_origin: str = None
+
     # ----------------------------------------------------------------------
     # Method: load (static)
     # Description: It loads a PROTEUS object from disk into memory
@@ -705,6 +712,11 @@ class Object(AbstractObject):
         # This improves performance but It is necessary to manually deepcopy properties
         new_object = copy.copy(self)
         new_object.properties = copy.deepcopy(self.properties)
+
+        # A clone is not an archetype, even if it comes from a document of a
+        # project archetype
+        new_object.archetype_key = None
+        new_object.archetype_origin = None
 
         # Reset children
         new_object._children = []

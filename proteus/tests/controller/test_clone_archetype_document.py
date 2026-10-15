@@ -26,6 +26,7 @@ from proteus.model import PROTEUS_NAME
 from proteus.model.abstract_object import ProteusState
 from proteus.services.project_service import ProjectService
 from proteus.services.archetype_service import ArchetypeService
+from proteus.model.archetype_repository import get_archetype_key
 from proteus.controller.commands.clone_archetype_document import (
     CloneArchetypeDocumentCommand,
 )
@@ -90,7 +91,7 @@ def test_clone_archetype_document_command_redo(
 
     # Act -----------------------------
     command = CloneArchetypeDocumentCommand(
-        object_archetype.id,
+        get_archetype_key(object_archetype),
         sample_project_service,
         sample_archetype_service,
     )
@@ -148,7 +149,7 @@ def test_clone_archetype_object_command_undo(
 
     # Act -----------------------------
     command = CloneArchetypeDocumentCommand(
-        object_archetype.id,
+        get_archetype_key(object_archetype),
         sample_project_service,
         sample_archetype_service,
     )
@@ -200,7 +201,7 @@ def test_clone_archetype_object_command_redo_after_undo(
 
     # Act -----------------------------
     command = CloneArchetypeDocumentCommand(
-        object_archetype.id,
+        get_archetype_key(object_archetype),
         sample_project_service,
         sample_archetype_service,
     )

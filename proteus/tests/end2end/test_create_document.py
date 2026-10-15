@@ -134,3 +134,42 @@ def test_create_document(app):
         main_window._state_manager.get_current_object() is None
     ), "No object should be selected in the new document"
 
+
+def test_create_document_from_a_project_archetype(app):
+    """
+    The documents of the project archetypes are offered in the new document
+    dialog, with the project archetype they come from, and a document can be
+    created from them.
+    """
+    main_window: MainWindow = app
+    load_project(main_window=main_window, project_name=PROJECT_NAME)
+
+    dialog: NewDocumentDialog = get_dialog(main_window.main_menu.add_document_button.click)
+    combo = dialog.archetype_combo
+    items = [(combo.itemText(i), combo.itemData(i)) for i in range(combo.count())]
+
+    # Documents of project archetypes: key '<project archetype>/<document id>'
+    # and the project archetype in the text
+    from_projects = [(text, key) for text, key in items if "/" in key]
+    assert from_projects, f"No documents of project archetypes in the dialog: {items}"
+    assert all("(" in text and "»" in text for text, _ in from_projects), from_projects
+    # Document archetypes go first
+    assert items[: len(items) - len(from_projects)] == [
+        item for item in items if "/" not in item[1]
+    ]
+
+    # Create a document from the empty one, which has no assets, so that the
+    # sample project is not modified (assets are copied when the document is
+    # created)
+    text, key = next(item for item in from_projects if item[1].endswith("/empty-doc"))
+    combo.setCurrentIndex(combo.findData(key))
+    archetype = main_window._controller.get_archetype_by_id(key)
+    dialog.accept_button.click()
+
+    documents = main_window._controller.get_current_project().get_descendants()
+    assert len(documents) == 1
+    assert (
+        documents[0].get_property(":Proteus-name").value
+        == archetype.get_property(":Proteus-name").value
+    )
+    assert documents[0].id != archetype.id
