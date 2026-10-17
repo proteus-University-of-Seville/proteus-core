@@ -25,6 +25,7 @@ from __future__ import annotations  # it has to be the first import
 import pathlib
 import os
 import logging
+import re
 from typing import List, NewType, Union, Dict
 import copy
 import shutil
@@ -68,6 +69,7 @@ from proteus.model.properties import (
     DateProperty,
     CodeProperty,
     TraceProperty,
+    MarkdownProperty,
 )
 from proteus.model.properties.code_property import ProteusCode
 from proteus.application.resources.translator import translate as _
@@ -84,6 +86,11 @@ ProteusClassTag = NewType("ProteusClassTag", str)
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
+
+# Links of Markdown texts to objects of the project: inline links
+# ([text](#id)) and reference definitions ([label]: #id). Group 1 is
+# what precedes the id, group 2 the id.
+MARKDOWN_OBJECT_LINK_PATTERN = re.compile(r"(\]\(\s*#|\]:\s*#)([^\s)\"'<>]+)")
 
 
 # --------------------------------------------------------------------------
@@ -106,6 +113,13 @@ class Object(AbstractObject):
     An already created object can be loaded by providing the path to its XML
     file.
     """
+
+    # Only set in the document archetypes that the archetype repository loads
+    # from the project archetypes (see ArchetypeRepository): the key that
+    # identifies them among the archetypes and the name of the project
+    # archetype they come from. None in any other object.
+    archetype_key: str = None
+    archetype_origin: str = None
 
     # ----------------------------------------------------------------------
     # Method: load (static)
@@ -532,6 +546,10 @@ class Object(AbstractObject):
 
         Traces that target an object not present in the project will be discarded.
 
+        Links of Markdown texts to objects ([text](#id)) are handled like the
+        traces: those to objects within the cloned 'universe' are redirected to
+        the cloned objects, the rest are kept as they are.
+
         :param parent: Parent of the new object.
         :param project: Project where the object will be saved.
         :param position: Position in the children list where the child will be added.
@@ -550,6 +568,9 @@ class Object(AbstractObject):
 
         # Recalculate traces
         self._recalculate_traces(cloned_object, ids_map, project)
+
+        # Recalculate the links of Markdown texts to objects
+        self._recalculate_markdown_links(cloned_object, ids_map)
 
         # Return the cloned object
         return cloned_object
@@ -692,6 +713,11 @@ class Object(AbstractObject):
         new_object = copy.copy(self)
         new_object.properties = copy.deepcopy(self.properties)
 
+        # A clone is not an archetype, even if it comes from a document of a
+        # project archetype
+        new_object.archetype_key = None
+        new_object.archetype_origin = None
+
         # Reset children
         new_object._children = []
 
@@ -802,6 +828,30 @@ class Object(AbstractObject):
         for child in object.children:
             # Recalculate traces
             self._recalculate_traces(child, ids_map, project)
+
+    def _recalculate_markdown_links(self, object: Object, ids_map: dict) -> None:
+        """
+        Recalculate the links of the Markdown texts of an object to other
+        objects ([text](#id)) given a map with the ids correlation. Links to
+        cloned objects are redirected to their clones; links to other objects
+        are kept as they are. It works recursively, iterating over the object
+        descendants.
+
+        :param object: Object whose Markdown texts are recalculated.
+        :param ids_map: Dictionary with the ids of the objects that have been cloned and their new ids.
+        """
+        for property in list(object.properties.values()):
+            if isinstance(property, MarkdownProperty) and property.value:
+                new_value: str = MARKDOWN_OBJECT_LINK_PATTERN.sub(
+                    lambda match: match.group(1) + ids_map.get(match.group(2), match.group(2)),
+                    property.value,
+                )
+                if new_value != property.value:
+                    object.set_property(property.clone(new_value))
+
+        # Iterate over children
+        for child in object.children:
+            self._recalculate_markdown_links(child, ids_map)
 
     def _calculate_biggest_code(self, project: Project) -> Dict[str, ProteusCode]:
         """

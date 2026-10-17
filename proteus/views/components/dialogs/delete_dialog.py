@@ -121,7 +121,7 @@ class DeleteDialog(ProteusDialog):
             message_traces: str = _("delete_dialog.traces_explanation")
             message_traces_label: QLabel = QLabel(message_traces)
             message_traces_label.setWordWrap(True)
-            message_traces_label.setStyleSheet("font-weight: bold;")
+            message_traces_label.setObjectName("message_traces_label")
             layout.addWidget(message_traces_label)
 
             # Create the tree widget and set expand policy

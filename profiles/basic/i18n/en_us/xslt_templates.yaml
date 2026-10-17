@@ -8,3 +8,5 @@
 
 xslt_templates.default: "Basic PROTEUS view"
 xslt_templates.description.default: "Basic PROTEUS view template."
+xslt_templates.latex: "LaTeX document"
+xslt_templates.description.latex: "LaTeX template used by the LaTeX and PDF (from LaTeX) export formats."

@@ -25,7 +25,7 @@ import pytest
 from pytestqt.qtbot import QtBot
 import time
 from PyQt6.QtWidgets import QApplication, QDialog, QWidget
-from PyQt6.QtCore import QTimer
+from PyQt6.QtCore import QTimer, QEvent
 
 # --------------------------------------------------------------------------
 # Project specific imports
@@ -95,7 +95,29 @@ def app(qtbot: QtBot, mocker):
 
     # Return the main window when it is exposed
     with qtbot.waitExposed(main_window):
-        return main_window
+        pass
+
+    yield main_window
+
+    # Destroy the main window (and its children) deterministically. Its
+    # components are connected to the singleton PROTEUS events, so if they
+    # stay alive until the garbage collector frees them they react to the
+    # events emitted by later tests whose project they do not know. PyQt
+    # breaks the connections of bound methods as soon as the C++ receiver
+    # is destroyed.
+    destroy_main_window(main_window)
+
+
+def destroy_main_window(main_window: MainWindow):
+    """
+    Closes and deletes the main window, flushing every pending deferred
+    deletion (components removed with deleteLater during the test included)
+    so no widget remains connected to the PROTEUS events after the test.
+    """
+    main_window.close()
+    main_window.deleteLater()
+    QApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete.value)
+    QApplication.processEvents()
 
 
 def load_project(

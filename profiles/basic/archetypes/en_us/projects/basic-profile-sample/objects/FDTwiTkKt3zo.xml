@@ -11,7 +11,7 @@
       <trace target="FCZXbSnRe6vf" traceType=":Proteus-information-source"/>
       <trace target="7yibW4RWaF5C" traceType=":Proteus-information-source"/>
     </traceProperty>
-    <markdownProperty name="text" category="detail"><![CDATA[Library users must be able to **renew their active loans** from the BiblioUS web portal at any time, without going to a circulation desk. A renewal extends the due date by the loan period for the user's type (see *Appendix: Current loan policy*), counting from the renewal date.
+    <markdownProperty name="text" category="detail"><![CDATA[Library users must be able to **renew their active loans** from the BiblioUS web portal at any time, without going to a circulation desk. A renewal extends the due date by the loan period for the user's type (see [*Appendix: Current loan policy*](#ppav7SqyNSur)), counting from the renewal date.
 
 The system must **reject** a renewal when:
 

@@ -21,7 +21,6 @@ from html import escape
 # --------------------------------------------------------------------------
 
 import markdown
-from trieregex import TrieRegEx as TRE
 
 # --------------------------------------------------------------------------
 # Plugin imports
@@ -48,6 +47,30 @@ log = logging.getLogger(__name__)
 
 GLOSSARY_CLASS = "glossary-item"
 GLOSSARY_DESCRIPTION = "description"
+
+
+def is_case_significant(term: str) -> bool:
+    """
+    True if the capitalization of a glossary term is significant, so that it
+    must be found in the text with the same capitalization. This is the case
+    of acronyms and similar terms: a term is case significant if any of its
+    words has an uppercase letter that is not its first letter (e.g. 'IT',
+    'IoT', 'SaaS', 'eID', 'KPIs') or is a single uppercase letter (e.g. 'C').
+
+    Other terms, including those written with initial capitals (e.g.
+    'Member' or 'Municipal Sports Board'), are found regardless of their
+    capitalization. Otherwise, the acronym 'IT' would be found in every 'it'
+    of an English text.
+
+    :param term: Glossary term (name, synonym or plural form)
+    """
+    for word in term.split():
+        letters: List[str] = [character for character in word if character.isalpha()]
+        if len(letters) == 1 and letters[0].isupper():
+            return True
+        if any(letter.isupper() for letter in letters[1:]):
+            return True
+    return False
 
 
 # ==========================================================================
@@ -92,8 +115,11 @@ class GlossaryHandler(ProteusComponent):
     Glossary handler class for the MADEJA plugin. Implements the neccesary
     logic to handle glossary items highlighting in the document html view.
 
-    Glossary items are not case sensitive. If a glossary item contains multiple
-    words separated by commas, each word is considered a glossary item. When
+    Glossary items are not case sensitive, except those whose capitalization is
+    significant, such as acronyms (see is_case_significant): 'IT' is found in
+    'IT' but not in 'it' or 'It'. The name, each synonym and each plural form
+    of a glossary item are considered separately. If a glossary item contains
+    multiple words separated by commas, each word is considered a glossary item. When
     highlighting the glossary items, the first glossary item found is used to
     link the item to the description, all descriptions will be displayed in the
     tooltip.
@@ -107,13 +133,22 @@ class GlossaryHandler(ProteusComponent):
     items_descriptions: Dict[ProteusID, str] = dict()  # k: ProteusID, v: description
     object_ids_by_item: Dict[
         str, MutableSet[ProteusID]
-    ] = dict()  # k: glossary item name, v: Set[ProteusID]
+    ] = dict()  # k: glossary item name (lowercase), v: Set[ProteusID]
+    object_ids_by_exact_item: Dict[
+        str, MutableSet[ProteusID]
+    ] = dict()  # k: case significant glossary item name, v: Set[ProteusID]
     
     pattern: re.Pattern = None
 
     # NOTE: This pattern is build using <code> tags because text is already converted to html
     code_block_pattern: re.Pattern = re.compile(
         r"(?s)<code>((?!</code>).)*</code>", re.IGNORECASE
+    )
+
+    # Links already in the text (e.g. Markdown links to other objects): an
+    # item inside them is not highlighted, since a link cannot contain another
+    link_pattern: re.Pattern = re.compile(
+        r"(?s)<a\b[^>]*>((?!</a>).)*</a>", re.IGNORECASE
     )
 
     markdown_instance = markdown.Markdown(
@@ -155,6 +190,7 @@ class GlossaryHandler(ProteusComponent):
         # Clear the glossary items
         GlossaryHandler.items_descriptions = dict()
         GlossaryHandler.object_ids_by_item = dict()
+        GlossaryHandler.object_ids_by_exact_item = dict()
 
         # Iterate over the project objects
         # NOTE: Iterating using ids to make it more readable
@@ -290,7 +326,9 @@ class GlossaryHandler(ProteusComponent):
         is stored by item name, adding the object id to the list of ids
         linked to the glossary item name (this allows multiple descriptions).
 
-        Glossary items names are stripped and converted to lowercase.
+        Glossary items names are stripped and converted to lowercase, except
+        those whose capitalization is significant (see is_case_significant),
+        which are stored as they are written.
 
         :param object: Object to add
         """
@@ -342,13 +380,17 @@ class GlossaryHandler(ProteusComponent):
                 # Store the description by id
                 GlossaryHandler.items_descriptions[object.id] = description
 
-                # Store the id by item
-                lowercased_item = item.lower()
-                id_list: MutableSet[ProteusID] = GlossaryHandler.object_ids_by_item.get(
-                    lowercased_item, set()
-                )
+                # Store the id by item: as it is written if its capitalization
+                # is significant, in lowercase otherwise
+                if is_case_significant(item):
+                    ids_by_item = GlossaryHandler.object_ids_by_exact_item
+                    key = item
+                else:
+                    ids_by_item = GlossaryHandler.object_ids_by_item
+                    key = item.lower()
+                id_list: MutableSet[ProteusID] = ids_by_item.get(key, set())
                 id_list.add(object.id)
-                GlossaryHandler.object_ids_by_item[lowercased_item] = id_list
+                ids_by_item[key] = id_list
 
     # --------------------------------------------------------------------------
     # Method: _delete_glossary_item
@@ -369,45 +411,62 @@ class GlossaryHandler(ProteusComponent):
         if object_id in GlossaryHandler.items_descriptions:
             GlossaryHandler.items_descriptions.pop(object_id)
 
-        # Check if the item is in the stored ids by item
-        items_with_empty_ids: List[str] = []
-        for item, ids in GlossaryHandler.object_ids_by_item.items():
-            if object_id in ids:
-                ids.remove(object_id)
+        # Check if the item is in the stored ids by item (case significant or not)
+        for ids_by_item in (
+            GlossaryHandler.object_ids_by_item,
+            GlossaryHandler.object_ids_by_exact_item,
+        ):
+            items_with_empty_ids: List[str] = []
+            for item, ids in ids_by_item.items():
+                if object_id in ids:
+                    ids.remove(object_id)
 
-            if len(ids) == 0:
-                items_with_empty_ids.append(item)
+                if len(ids) == 0:
+                    items_with_empty_ids.append(item)
 
-        # Remove the items with empty ids
-        for item in items_with_empty_ids:
-            GlossaryHandler.object_ids_by_item.pop(item)
+            # Remove the items with empty ids
+            for item in items_with_empty_ids:
+                ids_by_item.pop(item)
 
     def _setup_pattern(self) -> None:
         """
         It sets up the regex pattern to highlight the glossary items.
 
-        The pattern is created from a list of glossary items. The list is
-        is converted to a TrieRegEx object and then to a regex pattern.
+        The pattern is an alternation of the glossary items, longest first, so
+        that items that contain other items are found first. It ignores case,
+        except for the case significant items (see is_case_significant), which
+        are wrapped in a group that does not ignore it. Both kinds of items are
+        in the same alternation so that the longest item always wins.
         """
         old_pattern = GlossaryHandler.pattern
         try:
             GlossaryHandler.pattern = None
 
-            # Get the glossary items
-            glossary_items: List[str] = list(GlossaryHandler.object_ids_by_item.keys())
+            # Get the glossary items: (item, case significant)
+            glossary_items: List[tuple] = [
+                (item, False) for item in GlossaryHandler.object_ids_by_item
+            ] + [
+                (item, True) for item in GlossaryHandler.object_ids_by_exact_item
+            ]
 
             if len(glossary_items) == 0:
                 return
 
-            # Order the items by length so items that contain other items are processed first
-            glossary_items = sorted(glossary_items, key=len, reverse=True)
+            # Order the items by length so items that contain other items are
+            # processed first. With the same length, case significant items
+            # first, so 'IT' is linked to the acronym even if there is an 'it'.
+            glossary_items = sorted(
+                glossary_items, key=lambda entry: (len(entry[0]), entry[1]), reverse=True
+            )
 
-            # Create the TrieRegEx object
-            trie = TRE(*glossary_items)
+            alternatives: List[str] = [
+                f"(?-i:{re.escape(item)})" if case_significant else re.escape(item)
+                for item, case_significant in glossary_items
+            ]
 
             # Create the pattern
             GlossaryHandler.pattern = re.compile(
-                rf"\b(?<!-){trie.regex()}(?!-)\b", re.IGNORECASE
+                rf"\b(?<!-)(?:{'|'.join(alternatives)})(?!-)\b", re.IGNORECASE
             )
         except Exception as e:
             log.error(
@@ -430,7 +489,9 @@ class GlossaryHandler(ProteusComponent):
         If the glossary item has multiple descriptions, all descriptions
         are displayed in the tooltip. Glossary items that are inside a
         code block are not highlighted, this is done to prevent HTML
-        loops errors when the tooltip is added.
+        loops errors when the tooltip is added. Glossary items inside a
+        link (e.g. a Markdown link to another object) are not highlighted
+        either, since a link cannot contain another link.
 
         Method used in the XSLT stylesheet.
         """
@@ -443,21 +504,17 @@ class GlossaryHandler(ProteusComponent):
                 match_text: str = match.group()
                 match_start: int = match.start()
 
-                # Check if the match is inside a code block
-                code_block_matches = GlossaryHandler.code_block_pattern.finditer(text)
-                for code_block_match in code_block_matches:
-                    code_block_start = code_block_match.start()
-                    code_block_end = code_block_match.end()
-
-                    # If the match is inside a code block, return the match without decoration
-                    if code_block_start <= match_start <= code_block_end:
+                # If the match is inside a code block or a link, return the
+                # match without decoration
+                for skipped_start, skipped_end in skipped_spans:
+                    if skipped_start <= match_start <= skipped_end:
                         return match_text
 
-                # Get the item
-                item = match_text.lower()
-
-                # Get ids linked to the item
-                item_linked_ids = GlossaryHandler.object_ids_by_item[item]
+                # Get ids linked to the item: as it is written if it is a case
+                # significant item, in lowercase otherwise
+                item_linked_ids = GlossaryHandler.object_ids_by_exact_item.get(match_text)
+                if item_linked_ids is None:
+                    item_linked_ids = GlossaryHandler.object_ids_by_item[match_text.lower()]
                 descriptions: List[str] = [
                     GlossaryHandler.items_descriptions[item_id]
                     for item_id in item_linked_ids
@@ -478,6 +535,17 @@ class GlossaryHandler(ProteusComponent):
 
             if GlossaryHandler.pattern is None:
                 return text
+
+            # Spans of the code blocks and links of the text, where items are
+            # not highlighted
+            skipped_spans = [
+                skipped.span()
+                for skipped_pattern in (
+                    GlossaryHandler.code_block_pattern,
+                    GlossaryHandler.link_pattern,
+                )
+                for skipped in skipped_pattern.finditer(text)
+            ]
 
             # Replace the items with the decorated items
             text = re.sub(GlossaryHandler.pattern, highlight_item, text)

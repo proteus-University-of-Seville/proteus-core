@@ -47,26 +47,41 @@ import proteus.tests.fixtures as fixtures
 # Time property tests
 # --------------------------------------------------------------------------
 
+# Expected value of an invalid time: the current time, which has to be
+# calculated when the test runs, not when the tests are collected (the whole
+# suite may take longer than the tolerance)
+NOW = 'now'
+
+
+def expected_time_as_string(expected: str) -> str:
+    """
+    The given expected time, or the current time if it is NOW.
+    """
+    if expected == NOW:
+        return datetime.datetime.now().time().strftime(TIME_FORMAT)
+    return expected
+
+
 @pytest.mark.parametrize('name',         [str(), 'test name'     ])
 @pytest.mark.parametrize('category',     [str(), 'test category' ])
 @pytest.mark.parametrize('value, expected_value', 
     [
         ('20:10:02', '20:10:02'),
-        (str(),        datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('26:10:02',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('20:61:02',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('20:10:99',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('not a time', datetime.datetime.now().time().strftime(TIME_FORMAT))
+        (str(),        NOW),
+        ('26:10:02',   NOW),
+        ('20:61:02',   NOW),
+        ('20:10:99',   NOW),
+        ('not a time', NOW)
     ]
 )
 @pytest.mark.parametrize('new_value, expected_new_value',
     [
         ('20:10:02', '20:10:02'),
-        (str(),        datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('26:10:02',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('20:61:02',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('20:10:99',   datetime.datetime.now().time().strftime(TIME_FORMAT)),
-        ('not a time', datetime.datetime.now().time().strftime(TIME_FORMAT))
+        (str(),        NOW),
+        ('26:10:02',   NOW),
+        ('20:61:02',   NOW),
+        ('20:10:99',   NOW),
+        ('not a time', NOW)
     ]
 )
 
@@ -77,16 +92,16 @@ def test_time_properties(name, category, value, expected_value, new_value, expec
     """
     # Create property from XML element
     property_tag = TIME_PROPERTY_TAG
+    expected_value = expected_time_as_string(expected_value)
     (property, name, category) = fixtures.create_property(property_tag, name, category, value)
 
     # Create a time from the expected_value string
     # This could be avoided passing times as expected value
     expected_value_as_time = datetime.datetime.strptime(expected_value, TIME_FORMAT).time()
 
-    # Maximum number of seconds between test function call and creation of property
-    # TODO: This would cause a fail if takes more that epsilon_seconds to run all tests
-    # in the application. Consider refactor to avoid test fail in slow machines.
-    epsilon_seconds = 120
+    # Maximum number of seconds between the calculation of the expected time and
+    # the creation of the property (both in this test)
+    epsilon_seconds = 10
 
     # To calculate the difference between two times, they have to be converted into datetime
     # https://stackoverflow.com/questions/43305577/python-calculate-the-difference-between-two-datetime-time-objects
@@ -121,6 +136,7 @@ def test_time_properties(name, category, value, expected_value, new_value, expec
     assert(delta.total_seconds() < epsilon_seconds)    
 
     # Clone the property changing value
+    expected_new_value = expected_time_as_string(expected_new_value)
     evolved_property = property.clone(str(new_value))
 
     # Create a time from the expected_new_value string    

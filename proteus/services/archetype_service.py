@@ -33,7 +33,7 @@ from proteus.model import (
 )
 from proteus.model.project import Project
 from proteus.model.object import Object
-from proteus.model.archetype_repository import ArchetypeRepository
+from proteus.model.archetype_repository import ArchetypeRepository, get_archetype_key
 
 # logging configuration
 log = logging.getLogger(__name__)
@@ -133,15 +133,19 @@ class ArchetypeService:
                 self._document_archetypes, list
             ), f"Could not load document archetypes. ArchetypeRepository returned {self._document_archetypes}"
 
-            # Populate the archetype index
+            # Populate the archetype index. The documents of the project
+            # archetypes are indexed by their key, since their ids may be
+            # repeated (see get_archetype_key)
             for document in self._document_archetypes:
+                key: str = get_archetype_key(document)
+
                 # Check for collisions
                 assert (
-                    document.id not in self.archetype_index
-                ), f"Document archetype id '{document.id}' already exists in the archetype index"
+                    key not in self.archetype_index
+                ), f"Document archetype id '{key}' already exists in the archetype index"
 
                 # Add the document archetype to the archetype index
-                self.archetype_index[document.id] = document
+                self.archetype_index[key] = document
 
         return self._document_archetypes
 
@@ -256,30 +260,26 @@ class ArchetypeService:
         :return: A dict with key archetype group/category type and value
         dict of object lists by class (its main  class).
         """
-        # Copy the dict of object archetypes to pop second level objects
-        archetypes: Dict[str, Dict[str, List[Object]]] = (
-            self.get_object_archetypes().copy()
-        )
+        # Build a new dict with the first level objects only. The cached dict
+        # of object archetypes (and its inner dicts and lists) must not be
+        # modified: second level objects are still needed elsewhere (e.g. in
+        # the context menu of the objects that accept them).
+        archetypes: Dict[str, Dict[str, List[Object]]] = {}
 
-        # Iterate over the archetype groups and classes
-        for group in archetypes.keys():
+        for group, archetypes_by_class in self.get_object_archetypes().items():
+            archetypes[group] = {}
 
-            empty_keys: List[str] = []
+            for _class, archetype_list in archetypes_by_class.items():
+                first_level_archetypes: List[Object] = [
+                    archetype
+                    for archetype in archetype_list
+                    if PROTEUS_ANY in archetype.acceptedParents
+                    or PROTEUS_DOCUMENT in archetype.acceptedParents
+                ]
 
-            for _class in archetypes[group].keys():
-                # Remove the second level objects
-                for object in archetypes[group][_class]:
-                    if (
-                        PROTEUS_ANY not in object.acceptedParents
-                        and PROTEUS_DOCUMENT not in object.acceptedParents
-                    ):
-                        archetypes[group][_class].remove(object)
-                        if len(archetypes[group][_class]) == 0:
-                            empty_keys.append(_class)
-
-            # Remove empty keys
-            for key in empty_keys:
-                archetypes[group].pop(key)
+                # Classes with no first level objects are not included
+                if first_level_archetypes:
+                    archetypes[group][_class] = first_level_archetypes
 
         return archetypes
 

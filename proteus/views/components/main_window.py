@@ -29,8 +29,10 @@ from proteus.model.object import Object
 from proteus.application.metrics import Metrics
 from proteus.application.resources.translator import translate as _
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.main_menu import MainMenu
+from proteus.views.components.git_panel import GitPanel
 from proteus.views.components.project_container import ProjectContainer
 from proteus.application.events import (
     SelectObjectEvent,
@@ -38,6 +40,7 @@ from proteus.application.events import (
     ModifyObjectEvent,
     ClipboardChangedEvent,
     UpdateMetricsEvent,
+    ThemeChangedEvent,
 )
 from proteus.application.state.exporter import write_state_to_file
 from proteus.application.clipboard import Clipboard, ClipboardStatus
@@ -124,6 +127,14 @@ class MainWindow(QMainWindow, ProteusComponent):
         self.statusBar().addPermanentWidget(self.clipboard_indicator)
         self.statusBar().addPermanentWidget(self.metrics_indicator)
 
+        self.git_panel = GitPanel(self)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.git_panel)
+        git_tab = self.git_panel.create_ribbon()
+        self.main_menu.tab_widget.addTab(git_tab, "Git")
+        self.main_menu.tab_widget.currentChanged.connect(
+            lambda _: self.git_panel.reveal() if self.main_menu.tab_widget.currentWidget() is git_tab else None
+        )
+
         log.info("Main window component created")
 
     # ---------------------------------------------------------------------
@@ -141,11 +152,13 @@ class MainWindow(QMainWindow, ProteusComponent):
             - OPEN PROJECT -> update_on_open_project
             - SELECT OBJECT -> update_on_select_object
             - MODIFY OBJECT -> update_on_modify_object
+            - THEME CHANGED -> update_on_theme_changed
         """
 
         OpenProjectEvent().connect(self.update_on_open_project)
         SelectObjectEvent().connect(self.update_on_select_object)
         ModifyObjectEvent().connect(self.update_on_modify_object)
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
 
     # ======================================================================
     # Component update methods (triggered by PROTEUS application events)
@@ -274,6 +287,17 @@ class MainWindow(QMainWindow, ProteusComponent):
     # Component slots methods
     # ======================================================================
 
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply the window icon when the application theme changes.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        proteus_icon = Icons().icon(ProteusIconType.App, "proteus_icon")
+        self.setWindowIcon(proteus_icon)
+
     # ----------------------------------------------------------------------
     # Method     : closeEvent
     # Description: Handle the close event for the main window.
@@ -295,6 +319,19 @@ class MainWindow(QMainWindow, ProteusComponent):
 
         :param event: Close event
         """
+
+        if self.git_panel.busy and not self.git_panel._quiet:
+            event.ignore()
+            return
+
+        if self.git_panel.blocked:
+            if self._controller.check_unsaved_changes():
+                from proteus.views.components.git_panel import text
+                if not self.git_panel.confirm(text("discard_memory")):
+                    event.ignore()
+                    return
+            event.accept()
+            return
 
         def close_without_saving():
             # Clean the command stack
@@ -391,7 +428,8 @@ class ClipboardIndicator(QWidget, ProteusComponent):
         # Create icon label
         self._clipboard_icon_label = QLabel()
         icon = Icons().icon(ProteusIconType.App, "clipboard_icon")
-        self._clipboard_icon_label.setPixmap(icon.pixmap(16, 16))
+        icon_size: int = Themes().metric("icon_size_statusbar", 16)
+        self._clipboard_icon_label.setPixmap(icon.pixmap(icon_size, icon_size))
 
         # Create an horizontal layout
         layout = QHBoxLayout()
@@ -415,9 +453,26 @@ class ClipboardIndicator(QWidget, ProteusComponent):
 
         ClipboardIndicator component subscribes to the following events:
             - CLIPBOARD CHANGED -> update_on_clipboard_changed
+            - THEME CHANGED -> update_on_theme_changed
         """
 
         ClipboardChangedEvent().connect(self.update_on_clipboard_changed)
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply the status bar icons when the application theme changes.
+        The clipboard status update re-reads every icon and pixmap.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        icon_size: int = Themes().metric("icon_size_statusbar", 16)
+        icon = Icons().icon(ProteusIconType.App, "clipboard_icon")
+        self._clipboard_icon_label.setPixmap(icon.pixmap(icon_size, icon_size))
+
+        self.update_on_clipboard_changed()
 
     def update_on_clipboard_changed(self) -> None:
         """
@@ -455,7 +510,8 @@ class ClipboardIndicator(QWidget, ProteusComponent):
         elif clipboard_status == ClipboardStatus.CUT:
             self._clipboard_message_label.setText(_("clipboard.indicator.status.cut"))
 
-        self._object_icon_label.setPixmap(object_icon.pixmap(16, 16))
+        icon_size: int = Themes().metric("icon_size_statusbar", 16)
+        self._object_icon_label.setPixmap(object_icon.pixmap(icon_size, icon_size))
         self._object_information_label.setText(object_name)
 
         self._object_icon_label.show()

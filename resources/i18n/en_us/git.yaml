@@ -1,0 +1,200 @@
+git.title: Source Control
+git.open_project: Open a PROTEUS project to detect its repository.
+git.branches: Branches
+git.refresh: Refresh
+git.init: Initialize repository
+git.clone: Clone repository
+git.create_branch: Create branch…
+git.rename_branch: Rename current branch
+git.delete_branch: Delete merged local branch
+git.fetch: Fetch
+git.pull: Pull
+git.push: Push
+git.publish_branch: Publish branch
+git.remotes: Remotes
+git.identity: Commit identity (this repository)
+git.history: History
+git.merge: Merge branch
+git.rebase: Rebase onto branch
+git.continue: Continue operation
+git.abort: Abort operation
+git.stash: Stash changes
+git.apply_stash: Apply stash
+git.revert: Revert commit
+git.cherry_pick: Cherry-pick commit
+git.tag: Create tag
+git.publish_github: Create repository on GitHub…
+git.git_path: Choose Git executable
+git.message: Commit message · Ctrl+Enter to commit
+git.commit: Commit
+git.stage: Stage
+git.unstage: Unstage
+git.diff: Diff
+git.discard: Discard
+git.working: Git operation in progress…
+git.no_repository: No Git repository
+git.conflicts: Conflicts
+git.staged: Staged changes
+git.changes: Changes
+git.empty: No entries available.
+git.save_first: Save pending document changes before continuing?
+git.clean_first: Commit or stash all repository changes before this operation.
+git.resolve_first: Resolve conflicts in Source Control before editing documents.
+git.reload_failed: Document editing is paused. Restore a valid project or resolve
+  the conflicts, then reload.
+git.discard_tracked: Discard applies to tracked files without conflicts. Untracked
+  files are kept.
+git.discard_confirm: 'Discard worktree changes in these files? Their staged versions
+  will be restored:'
+git.init_confirm: Initialize Git in this project directory?
+git.url: Repository URL
+git.clone_destination: New destination folder
+git.destination_exists: Choose a destination that does not exist.
+git.pull_strategy: Pull strategy
+git.add_remote: Add remote
+git.edit_remote: Edit remote URL
+git.remove_remote: Remove remote
+git.remote_name: Remote name
+git.user_name: Author name
+git.user_email: Author email
+git.abort_confirm: Abort the current Git operation?
+git.commit_reference: Commit reference (hash)
+git.confirm_operation: Apply this operation to the current branch?
+git.gh_required: Install GitHub CLI (gh) and run gh auth login first. GitHub credentials
+  are managed by gh.
+git.github_name: GitHub repository (owner/name)
+git.visibility: Repository visibility
+git.publish_confirm: Create this repository on GitHub and push the current branch?
+git.resolve: Resolve
+git.reload: Reload project from disk
+git.resolve_save: Save resolution and stage file
+git.resolve_delete: Resolve by deleting file
+git.base: Base
+git.ours: Current
+git.theirs: Incoming
+git.resolution: Resolution (editable)
+git.external_changes: Files changed outside PROTEUS. Reload the project before editing
+  or saving.
+git.scope: This project is inside a larger repository. Git operations affect the entire
+  repository.
+git.stage_all: Stage all changes
+git.unstage_all: Unstage all changes
+git.stage_hunk: Stage a change hunk
+git.ignore: Ignore untracked files
+git.worktrees: List worktrees
+git.add_worktree: Create worktree
+git.discard_memory: Discard unsaved edits in memory and use the files on disk?
+git.repository: Repository
+git.synchronize: Synchronize
+git.origin_exists: This repository already has origin. Use Push / Publish branch or
+  configure a different remote before creating a GitHub repository.
+git.trust: Trust repository for this session
+git.trust_confirm: Allow Git to use this repository even if another account owns it?
+  Git may run its configured hooks when you commit or push.
+git.choose_root: Choose the repository root containing .git.
+git.copy_path: Copy repository path
+git.more_actions: More Git actions
+git.no_project: No project open
+git.no_remote: Local repository · no remote configured
+git.branch_unpublished: Branch has no upstream
+git.clean_worktree: No pending changes
+git.files_changed: '{} changed files'
+git.detecting: Detecting repository…
+git.no_repository_help: This project is not under Git. Initialize a repository or
+  clone one from the Repository menu.
+git.panel: Git panel
+git.panel_tip: Show or hide the Source Control panel
+git.github_browser: GitHub CLI is optional. Your browser will open to create a repository.
+  Afterwards, add its URL in Remotes and publish your branch.
+git.tip_fetch: Download remote references without changing your documents
+git.tip_pull: Bring remote changes into the current branch
+git.tip_push: Send local commits to the tracking remote
+git.tip_publish_branch: Push the current branch and set its upstream; does not create
+  a repository
+git.tip_publish_github: Create a new repository on GitHub (optional)
+git.tip_commit: Create a local commit containing only staged changes
+git.history_search: Filter by message, author, branch or commit hash…
+git.graph: Graph
+git.commit_subject: Message
+git.commit_author: Author
+git.commit_date: Date
+git.commit_hash: Commit
+git.commit_refs: Branches / tags
+git.select_commit: Select a commit to inspect its changes.
+git.load_more_commits: Load more commits
+git.commits_loaded: '{} commits loaded'
+git.loading_commit: Loading commit details…
+git.project_location: 'Project: {}'
+git.branch_search: Select a branch or tag to check out…
+git.branch_source: Select the starting branch or tag…
+git.detach_reference: Select a reference or enter a commit hash…
+git.picker_create: Create new branch…
+git.picker_create_from: Create new branch from…
+git.picker_detach: Check out detached…
+git.reference_local: local branches
+git.reference_remote: remote branches
+git.reference_tag: tags
+git.current_branch: current
+git.picker_keys: ↑ ↓ Navigate   ·   Enter Select   ·   Esc Cancel
+git.days_ago: '{} days ago'
+git.today: today
+git.highlight_document: Highlight changes in document
+git.highlight_help: Highlight saved objects changed since the last commit. Click a
+  change to navigate to the object.
+git.document_object: Document object
+git.review_document: Review document changes
+git.structure: Contents and order
+git.no_content_change: No content changes; only storage format differs.
+git.comparison: Removed text is marked on the left; added text is marked on the right.
+git.last_commit: Last commit
+git.prepared_version: Staged version
+git.saved_document: Saved document
+git.document_content: Document content
+git.technical_xml: Technical XML diff
+git.show_in_document: Show in document
+git.stage_object: Stage complete object
+git.unstage_object: Unstage object
+git.property_settings: Property settings
+git.review_changed: This object changed after the review. Review it again before staging.
+git.one_file_changed: 1 changed file
+
+git.version_absent: "Not present in this version"
+git.comparison_tab: "Changes"
+
+git.save_remote: Save remote
+
+git.pull_pending: There are pending local changes. Stash them temporarily and restore them after pulling, or create a commit before continuing.
+git.stash_pull: Stash and pull
+git.commit_pull: Commit and pull
+git.stash_retained: Your changes remain in a PROTEUS stash. Review the repository state before restoring them using Apply stash.
+git.stage_all_commit: Stage all repository changes and create the commit?
+git.push_first_commit: There are no commits yet. Create the first commit before publishing the branch.
+git.push_nothing: There are no commits to push.
+git.push_uncommitted: There are uncommitted local changes. Create a commit before pushing them.
+
+git.remote_branch_collision: A local branch with that name already exists and does not track the selected remote branch. Create a tracking branch with another name or open the existing local branch.
+git.remote_create_named: Create local with another name…
+git.remote_use_local: Open existing local branch
+
+git.no_stashes: There are no saved stashes.
+
+git.configure_remote_first: Configure a remote using the Remotes button before publishing this branch.
+
+git.tracking_required: Publish the branch or configure its upstream before pulling.
+git.no_other_branches: There are no other branches available for this operation.
+
+git.worktree_path: Folder
+git.worktree_state: Status
+git.worktree_current: Current
+git.worktree_bare: Bare repository
+git.worktree_locked: Locked
+git.worktree_prunable: Folder unavailable
+
+git.operation_completed: "{}: operation completed."
+git.cancel: "Cancel"
+git.remote_invalid: "Enter a valid remote name that is not already in use."
+git.remote_unchanged: "The URL has not changed."
+
+git.worktree_branch: Branch
+
+git.invalid_remote_url: Invalid remote URL

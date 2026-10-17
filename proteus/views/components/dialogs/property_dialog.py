@@ -17,7 +17,7 @@ from typing import Union, List, Dict, Any
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QWidget,
@@ -157,7 +157,7 @@ class PropertyDialog(ProteusDialog):
             icon_type = ProteusIconType.App
 
         # Dialog settings (icon is set later) ---------------------------
-        self.sizeHint = lambda: QSize(500, 300)
+        self.resize(500, 300)
 
         window_name: str = self.object.get_property(PROTEUS_NAME).value
         self.setWindowTitle(window_name)

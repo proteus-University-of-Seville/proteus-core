@@ -2,8 +2,7 @@
 /* File: theme.qss (light)                                                   */
 /* Description: PROTEUS light theme. Reproduces the historical look of the   */
 /*              application. Icon URLs use the "theme:" search path which    */
-/*              is configured to fall back to resources/, so the existing    */
-/*              icon assets are reused without duplication.                  */
+/*              checks the active theme before the light baseline theme.     */
 /* ========================================================================= */
 
 /* ========================================================================= */
@@ -12,7 +11,7 @@
 
 /*Error label displayed in forms =========================================== */
 QLabel#error_label{
-    color: red;
+    color: @error;
     font: bold;
 }
 
@@ -20,13 +19,30 @@ QLabel#error_label{
 /* Set via QWidget.setProperty("descriptionState", "empty"|"filled") and a   */
 /* polish/unpolish nudge — see proteus.views.forms.style_helpers.            */
 QLabel[descriptionState="empty"] {
-    color: red;
+    color: @error;
     font-style: italic;
 }
 
 QLabel[descriptionState="filled"] {
-    color: black;
+    color: @text_muted;
     font-style: italic;
+}
+
+/* Emphasis labels (themable replacement for inline setStyleSheet) ---------- */
+QLabel#setting_info_label,
+QLabel#message_traces_label,
+QLabel#message_label {
+    font-weight: bold;
+}
+
+QLabel#app_name_label {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+QLabel#app_version_label {
+    font-size: 16px;
+    font-weight: bold;
 }
 
 /* Remove outline dotted border */
@@ -43,14 +59,14 @@ QAbstractItemView::item:selected {
 /* QListWidget ------------------------------------------------------------- */
 
 QListWidget {
-    border: 1px solid gainsboro;
+    border: 1px solid @border;
     border-radius: 1px;
 }
 
 /* QCalendarWidget --------------------------------------------------------- */
 QCalendarWidget QToolButton {
     font: bold;
-  	color: white;
+    color: @calendar_text;
     background-color: transparent;
 
     padding-right: 0.7em;
@@ -65,23 +81,23 @@ QCalendarWidget QToolButton::menu-indicator {
 }
 
 QCalendarWidget QToolButton::hover {
-    background-color: #004589;
-    border-color: #004589;
+    background-color: @calendar_hover;
+    border-color: @calendar_hover;
     border-radius: 0;
 }
 
 QCalendarWidget QToolButton:pressed {
-    background-color: #89c4ff;
+    background-color: @calendar_pressed;
 }
 
 QCalendarWidget QAbstractItemView::item:selected {
-    background-color: #0080ff;
+    background-color: @calendar_accent;
 }
 
 /* These are internal PyQt widget names, this is a workaround to modify
 QCalendarWidget style since it was affected by other app general styles */
 QCalendarWidget #qt_calendar_navigationbar {
-    background-color: #0080ff;
+    background-color: @calendar_accent;
 }
 
 QCalendarWidget #qt_calendar_prevmonth {
@@ -104,12 +120,12 @@ QListWidget::item {
 }
 
 QTreeView::item:hover, QListWidget::item:hover {
-    background-color: azure;
+    background-color: @hover_bg;
 }
 
 QTreeView::item:selected, QListWidget::item:selected {
-    background-color: lightcyan;
-    color: black;
+    background-color: @selection_bg;
+    color: @selection_text;
 }
 
 
@@ -132,7 +148,7 @@ QTreeView::branch:has-children:!has-siblings:closed:selected,
 QTreeView::branch:closed:has-children:has-siblings:selected,
 QTreeView::branch:open:has-children:!has-siblings:selected,
 QTreeView::branch:open:has-children:has-siblings:selected {
-    background-color: lightcyan;
+    background-color: @selection_bg;
 }
 
 QTreeView::branch:has-siblings:!adjoins-item:hover,
@@ -142,7 +158,7 @@ QTreeView::branch:has-children:!has-siblings:closed:hover,
 QTreeView::branch:closed:has-children:has-siblings:hover,
 QTreeView::branch:open:has-children:!has-siblings:hover,
 QTreeView::branch:open:has-children:has-siblings:hover {
-    background-color: azure;
+    background-color: @hover_bg;
 }
 
 QTreeView::branch:has-siblings:!adjoins-item {
@@ -177,19 +193,19 @@ QComboBox {
 }
 
 QComboBox:hover {
-    background-color: azure;
-    border: 1px solid skyblue;
+    background-color: @hover_bg;
+    border: 1px solid @hover_border;
 }
 
 QComboBox:disabled {
-    background-color: #f3f3f3;
-    border: 1px solid #e1e1e1;
+    background-color: @disabled_bg;
+    border: 1px solid @border_subtle;
 }
 
 /* QComboBox AbstractItemView ---------------------------------------------- */
 
 QComboBox QAbstractItemView {
-    border: 1px solid skyblue;
+    border: 1px solid @hover_border;
     border-bottom-left-radius: 1px;
     border-bottom-right-radius: 1px;
 }
@@ -199,8 +215,8 @@ QComboBox QAbstractItemView::item {
 }
 
 QComboBox QAbstractItemView::item:hover {
-    background-color: azure;
-    color: black;
+    background-color: @hover_bg;
+    color: @hover_text;
 }
 
 
@@ -210,7 +226,7 @@ QComboBox::drop-down {
     subcontrol-position: top right;
 
     border: 0;
-    border-left: 1px solid gainsboro;
+    border-left: 1px solid @border;
     padding: 0.15em;
 }
 
@@ -228,7 +244,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
 
 /* Tabs style -------------------------------------------------------------- */
 QTabBar::tab {
-    background-color: #f9f9f9;
+    background-color: @tab_surface;
     min-width: 3em;
     padding: 0.2em;
     padding-left: 0.5em;
@@ -236,9 +252,9 @@ QTabBar::tab {
 
     border-top-left-radius: 1px;
     border-top-right-radius: 1px;
-    border-top: 1px solid #e1e1e1;
-    border-left: 1px solid #e1e1e1;
-    border-right: 1px solid #e1e1e1;
+    border-top: 1px solid @border_subtle;
+    border-left: 1px solid @border_subtle;
+    border-right: 1px solid @border_subtle;
 }
 
 QTabBar::tab:selected {
@@ -247,12 +263,12 @@ QTabBar::tab:selected {
 
 QTabBar::tab:hover:!selected {
     margin-top: 0;
-    background-color: azure;
+    background-color: @hover_bg;
 }
 
 QTabBar::tab:!selected {
     margin-top: 0.2em;
-    background-color: #ececec;
+    background-color: @tab_surface_inactive;
 }
 
 /* QToolButton | QPushButton ----------------------------------------------- */
@@ -269,10 +285,10 @@ QPushButton {
 
 QToolButton, QPushButton {
     /* background */
-    background-color: white;
+    background-color: @button_surface;
 
     /* border */
-    border: 1px solid gainsboro;
+    border: 1px solid @border;
     border-radius: 3px;
 
     /* margin */
@@ -280,17 +296,17 @@ QToolButton, QPushButton {
 }
 
 QToolButton:hover, QPushButton:hover {
-    background-color: azure;
-    border: 1px solid skyblue;
+    background-color: @hover_bg;
+    border: 1px solid @hover_border;
 }
 
 QToolButton:pressed, QPushButton:pressed {
-    background-color: lightcyan;
+    background-color: @pressed_bg;
 }
 
 QToolButton:disabled, QPushButton:disabled {
-    background-color: #f3f3f3;
-    border: 1px solid #e1e1e1;
+    background-color: @disabled_bg;
+    border: 1px solid @border_subtle;
 }
 
 
@@ -301,20 +317,20 @@ QCheckBox {
 }
 
 QCheckBox:hover {
-    background-color: azure;
-    border: 1px solid skyblue;
+    background-color: @hover_bg;
+    border: 1px solid @hover_border;
     border-radius: 3px;
 }
 
 QCheckBox:pressed {
-    background-color: lightcyan;
+    background-color: @pressed_bg;
 }
 
 /* QGroupBox --------------------------------------------------------------- */
 /* Used in dialogs (settings, property editors, trace editors) — a thin
    subtle border reads cleaner than the default native 2px frame. */
 QGroupBox {
-    border: 1px solid gainsboro;
+    border: 1px solid @border;
     border-radius: 3px;
     margin-top: 0.6em;
 }
@@ -347,10 +363,10 @@ QGroupBox::title {
 /* QWidget subclass */
 
 #ProjectContainer QSplitter::handle {
-    border-left: 1px solid slategray;
-    border-right: 1px solid slategray;
+    border-left: 1px solid @border_strong;
+    border-right: 1px solid @border_strong;
 
-    background-color: #f1f1f1;
+    background-color: @splitter_surface;
 }
 
 #ProjectContainer QSplitter::handle:horizontal {
@@ -362,14 +378,14 @@ QGroupBox::title {
 /* ========================================================================= */
 
 #MetricsIndicator QWidget {
-    background-color: #ffe7e7e7;
+    background-color: @statusbar_surface;
     padding: 0.1em;
-    border: 1px solid gainsboro;
+    border: 1px solid @border;
 }
 
 #clipboard_indicator {
-    background-color: #ffe7e7e7;
-    border: 1px solid gainsboro;
+    background-color: @statusbar_surface;
+    border: 1px solid @border;
 }
 
 #clipboard_indicator QLabel {
@@ -384,7 +400,7 @@ QGroupBox::title {
 /* Profile information icon (menu) */
 #MainMenu #profile_information {
     min-width: 140px;
-    border-left: 1px solid slategray;
+    border-left: 1px solid @border_strong;
     padding-left: 0;
     margin-left: 0;
 }
@@ -397,17 +413,17 @@ QGroupBox::title {
 
 /* Menu bottom border */
 #MainMenu #main_menu_container {
-    border-bottom: 1px solid slategray;
+    border-bottom: 1px solid @border_strong;
 }
 
 
 /* Main menu background colors */
 #MainMenu QWidget#main_tab {
-    background-color: #f9f9f9;
+    background-color: @chrome_surface;
 }
 
 #MainMenu QWidget#archetype_tab {
-    background-color: #f9f9f9;
+    background-color: @chrome_surface;
 }
 
 
@@ -469,7 +485,7 @@ QGroupBox::title {
 /* ========================================================================= */
 /* Dialogs                                                                   */
 /* ========================================================================= */
-#dialog_content_widget { background-color: #f9f9f9; }
+#dialog_content_widget { background-color: @chrome_surface; }
 
 #PropertyDialog #dialog_content_widget { background-color: transparent; }
 
@@ -490,6 +506,6 @@ QWizard QPushButton {
 }
 
 QWizard QLineEdit:disabled {
-    background-color: #ffffff;
-    border: 1px solid #e1e1e1;
+    background-color: @wizard_disabled_bg;
+    border: 1px solid @border_subtle;
 }

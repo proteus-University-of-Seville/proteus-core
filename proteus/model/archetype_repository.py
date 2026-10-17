@@ -44,6 +44,9 @@ from proteus.model import (
     OBJECTS_REPOSITORY,
     ASSETS_REPOSITORY,
     ID_ATTRIBUTE,
+    DOCUMENTS_TAG,
+    PROPERTIES_TAG,
+    PROTEUS_NAME,
     ProteusClassTag,
 )
 from proteus.model.project import Project
@@ -65,6 +68,23 @@ PROJECT_REPOSITORY_STRUCTURE = [
     GITIGNORE_FILE,
 ]
 DOCUMENT_REPOSITORY_STRUCTURE = [OBJECTS_REPOSITORY, ASSETS_REPOSITORY, DOCUMENT_FILE]
+
+# Attribute of the <document> elements of the project file of a project
+# archetype. Every document of a project archetype is also a document
+# archetype, except those with documentArchetype="false".
+DOCUMENT_ARCHETYPE_ATTRIBUTE = "documentArchetype"
+
+
+def get_archetype_key(archetype) -> str:
+    """
+    Key that identifies an archetype among the loaded archetypes: its id,
+    except for the documents of the project archetypes, whose ids may be
+    repeated in the document archetypes or in other project archetypes
+    ('<project archetype directory>/<document id>').
+
+    :param archetype: Project, document or object archetype.
+    """
+    return getattr(archetype, "archetype_key", None) or archetype.id
 OBJECT_REPOSITORY_STRUCTURE = [OBJECTS_REPOSITORY, ASSETS_REPOSITORY, OBJECTS_FILE]
 
 
@@ -237,6 +257,8 @@ class ArchetypeRepository:
         """
         Method that loads the document archetypes from an archetype repository.
         If no archetype repository is provided, it will use the default one.
+        Besides the document archetypes, the documents of the project archetypes
+        are loaded too (see _load_project_document_archetypes), after them.
 
         :param archetypes_folder: The path to the archetype repository.
 
@@ -252,14 +274,20 @@ class ArchetypeRepository:
         # TODO: this means that ALL archetypes must be in one subdirectory, i.e., that
         #       no archetypes are supposed to be in the root directory, AND that only one
         #       level of subdirectories is allowed.
-        subdirs: list[str] = [
-            f for f in listdir(archetypes_dir) if isdir(join(archetypes_dir, f))
-        ]
+        # The directory is optional: a profile may only offer the documents of
+        # its project archetypes (see _load_project_document_archetypes)
+        subdirs: list[str] = []
+        if isdir(archetypes_dir):
+            subdirs = [
+                f for f in listdir(archetypes_dir) if isdir(join(archetypes_dir, f))
+            ]
 
-        # Check there is no files in the root directory
-        assert all(
-            [not isfile(join(archetypes_dir, f)) for f in listdir(archetypes_dir)]
-        ), f"Unexpected files in {archetypes_dir}. Check the document archetypes directory structure."
+            # Check there is no files in the root directory
+            assert all(
+                [not isfile(join(archetypes_dir, f)) for f in listdir(archetypes_dir)]
+            ), f"Unexpected files in {archetypes_dir}. Check the document archetypes directory structure."
+        else:
+            log.info(f"No document archetypes directory in {archetypes_folder}")
 
         document_archetype_list: list[Object] = list()
 
@@ -308,6 +336,76 @@ class ArchetypeRepository:
 
             # We add it to the list
             document_archetype_list.append(document_archetype)
+
+        # The documents of the project archetypes are also document archetypes
+        document_archetype_list.extend(
+            ArchetypeRepository._load_project_document_archetypes(archetypes_folder)
+        )
+
+        return document_archetype_list
+
+    # ----------------------------------------------------------------------
+    # Method: _load_project_document_archetypes (static)
+    # Description: It loads the documents of the project archetypes as
+    #              document archetypes
+    # ----------------------------------------------------------------------
+    @staticmethod
+    def _load_project_document_archetypes(archetypes_folder: Path) -> list[Object]:
+        """
+        Loads the documents of the project archetypes as document archetypes,
+        except those with documentArchetype="false" in the project file.
+        Each one gets an archetype_key ('<project archetype directory>/<document
+        id>'), since the same document may also be a document archetype or be
+        in other project archetypes, and an archetype_origin (the name of the
+        project archetype), so that the user can tell where it comes from.
+
+        :param archetypes_folder: The path to the archetype repository.
+        :return: A list of documents (Objects), by project archetype and in the
+                 order of the documents in each project.
+        """
+        projects_dir: str = join(archetypes_folder, ArchetypesType.PROJECTS)
+        if not isdir(projects_dir):
+            return []
+
+        document_archetype_list: list[Object] = []
+        for subdir in listdir(projects_dir):
+            # The structure of the project archetypes is checked when they are
+            # loaded (see load_project_archetypes)
+            project_file: str = join(projects_dir, subdir, PROJECT_FILE)
+            if not isfile(project_file):
+                continue
+
+            root: ET._Element = ET.parse(project_file).getroot()
+            name_element: ET._Element = root.find(
+                f"{PROPERTIES_TAG}/*[@name='{PROTEUS_NAME}']"
+            )
+            project_name: str = (
+                (name_element.text or "").strip() if name_element is not None else ""
+            ) or subdir
+
+            documents_element: ET._Element = root.find(DOCUMENTS_TAG)
+            if documents_element is None:
+                continue
+
+            for document_element in documents_element:
+                is_archetype: str = document_element.attrib.get(
+                    DOCUMENT_ARCHETYPE_ATTRIBUTE, "true"
+                )
+                if is_archetype.strip().lower() == "false":
+                    continue
+
+                document_id: str = document_element.attrib[ID_ATTRIBUTE]
+                document_file: str = join(
+                    projects_dir, subdir, OBJECTS_REPOSITORY, f"{document_id}.xml"
+                )
+                assert isfile(
+                    document_file
+                ), f"Document '{document_id}' of project archetype '{subdir}' not found: {document_file}."
+
+                document_archetype: Object = Object(document_file)
+                document_archetype.archetype_key = f"{subdir}/{document_id}"
+                document_archetype.archetype_origin = project_name
+                document_archetype_list.append(document_archetype)
 
         return document_archetype_list
 
@@ -498,8 +596,9 @@ class ArchetypeRepository:
         # Check it does not exist
         assert not archetype_dir.exists(), f"Directory '{archetype_dir}' already exists"
 
-        # Create the directory
-        archetype_dir.mkdir()
+        # Create the directory (and the document archetypes directory, which
+        # is optional, if the profile does not have it yet)
+        archetype_dir.mkdir(parents=True)
 
         # Create the document.xml file
         document_pointer_file: Path = archetype_dir / DOCUMENT_FILE

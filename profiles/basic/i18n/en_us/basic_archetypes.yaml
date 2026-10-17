@@ -100,3 +100,13 @@ archetype.prop_name.version: "Version"
 archetype.prop_name.web: "Website"
 archetype.prop_name.width: "Width (%)"
 archetype.prop_name.works-for: "Works for"
+
+# Units of measure (unitProperty properties)
+archetype.enum_units.year: "year"
+archetype.enum_units.month: "month"
+archetype.enum_units.week: "week"
+archetype.enum_units.day: "day"
+archetype.enum_units.hour: "hour"
+archetype.enum_units.minute: "minute"
+archetype.enum_units.second: "second"
+archetype.enum_units.millisecond: "millisecond"

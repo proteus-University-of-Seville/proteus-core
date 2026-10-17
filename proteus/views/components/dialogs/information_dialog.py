@@ -78,10 +78,10 @@ class InformationDialog(ProteusDialog):
 
         # App name and version
         app_name = QLabel("PROTEUS")
-        app_name.setStyleSheet("font-size: 20px; font-weight: bold;")
+        app_name.setObjectName("app_name_label")
 
         app_version = QLabel(PROTEUS_VERSION)
-        app_version.setStyleSheet("font-size: 16px; font-weight: bold;")
+        app_version.setObjectName("app_version_label")
         app_version.setContentsMargins(0, 0, 0, 20)
 
         # App description

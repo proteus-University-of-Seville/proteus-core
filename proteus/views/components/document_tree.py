@@ -52,7 +52,7 @@ from proteus.model.properties.code_property import ProteusCode
 from proteus.model.properties.property import Property
 from proteus.application.resources.translator import translate as _
 from proteus.application.resources.icons import Icons, ProteusIconType
-from proteus.application.resources.themes import Themes
+from proteus.application.resources.themes import Themes, DEFAULT_STATE_COLORS
 from proteus.application.clipboard import Clipboard
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.dialogs.base_dialogs import MessageBox
@@ -66,6 +66,7 @@ from proteus.application.events import (
     DeleteObjectEvent,
     SortChildrenEvent,
     ChangeObjectPositionEvent,
+    ThemeChangedEvent,
 )
 
 
@@ -78,7 +79,7 @@ log = logging.getLogger(__name__)  # Logger
 # --------------------------------------------------------------------------
 
 # Map ProteusState to the key used in Themes().state_colors() so theme files
-# can override every state's color from a single state_colors.json.
+# can override every state's color from the theme.json state_colors section.
 _STATE_TO_THEME_KEY = {
     ProteusState.FRESH: "fresh",
     ProteusState.DIRTY: "dirty",
@@ -100,7 +101,7 @@ def tree_item_brush(state: ProteusState) -> QBrush:
     if color is None or not color.isValid():
         # Defensive default — shouldn't trigger in practice because
         # Themes.state_colors merges DEFAULT_STATE_COLORS on every call.
-        color = QColor("#000000")
+        color = QColor(DEFAULT_STATE_COLORS["clean"])
     return QBrush(color)
 
 
@@ -182,7 +183,8 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         """
         # Set header
         self.header().setVisible(False)
-        self.setIconSize(QSize(22, 22))
+        icon_size: int = Themes().metric("icon_size_tree", 22)
+        self.setIconSize(QSize(icon_size, icon_size))
 
         # Set drag and drop properties
         self.setDragEnabled(True)
@@ -245,6 +247,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
             - SELECT OBJECT -> update_on_select_object
             - SORT CHILDREN -> update_on_sort_children
             - CHANGE OBJECT POSITION -> update_on_change_object_position
+            - THEME CHANGED -> update_on_theme_changed
         """
         AddObjectEvent().connect(self.update_on_add_object)
         SaveProjectEvent().connect(self.update_on_save_project)
@@ -253,6 +256,7 @@ class DocumentTree(QTreeWidget, ProteusComponent):
         SelectObjectEvent().connect(self.update_on_select_object)
         SortChildrenEvent().connect(self.update_on_sort_children)
         ChangeObjectPositionEvent().connect(self.update_on_change_object_position)
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
 
     # ----------------------------------------------------------------------
     # Method     : _populate_tree
@@ -801,6 +805,25 @@ class DocumentTree(QTreeWidget, ProteusComponent):
     # ======================================================================
     # Component slots methods (connected to the component signals)
     # ======================================================================
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply item icons, state brushes and the tree icon size when the
+        application theme changes. Every tree item is re-setup from its
+        object (icon, foreground brush and text) and section indexes are
+        recalculated.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        icon_size: int = Themes().metric("icon_size_tree", 22)
+        self.setIconSize(QSize(icon_size, icon_size))
+
+        for tree_item in self.tree_items.values():
+            self._tree_item_setup(tree_item)
+
+        self.update_indexes()
 
     # ======================================================================
     # Component overriden methods

@@ -25,7 +25,7 @@ import pytest
 from proteus.model import ProteusID
 from proteus.model.project import Project
 from proteus.model.object import Object
-from proteus.model.archetype_repository import ArchetypeRepository
+from proteus.model.archetype_repository import ArchetypeRepository, get_archetype_key
 from proteus.services.archetype_service import ArchetypeService
 
 
@@ -180,7 +180,7 @@ def test_archetype_index_load(archetype_service: ArchetypeService):
         project.id for project in project_archetypes
     )
     document_archetypes_ids: List[ProteusID] = set(
-        document.id for document in document_archetypes
+        get_archetype_key(document) for document in document_archetypes
     )
     object_archetypes_ids: List[ProteusID] = set()
     for archetype_class_dict in object_archetypes.values():
@@ -207,7 +207,7 @@ def test_archetype_index_load(archetype_service: ArchetypeService):
 
 # test_get_archetype_by_id -------------------------------------------------
 @pytest.mark.parametrize(
-    "id", ["paragraph", "empty", "empty-doc"]
+    "id", ["paragraph", "empty", "basic-profile-empty/empty-doc"]
 )
 def test_get_archetype_by_id(id: str, archetype_service: ArchetypeService):
     """
@@ -622,3 +622,79 @@ def test_create_object_negative(
     # Call the create_project method
     with pytest.raises(AssertionError):
         archetype_service.create_object(archetype_id, parent, project)
+
+
+def test_get_first_level_object_archetypes_does_not_modify_the_cache(
+    mocker, archetype_service: ArchetypeService
+):
+    """
+    First level archetypes (those accepting :Proteus-any or :Proteus-document
+    as parent) are shown in the toolbar. Computing them must not remove the
+    second level archetypes from the cached dict of object archetypes, and
+    every second level archetype must be filtered out, also when several of
+    them share a main class.
+    """
+
+    # Arrange -------------------------
+    def archetype(id: str, accepted_parents: List[str]) -> Object:
+        mock = mocker.MagicMock(spec=Object)
+        mock.id = id
+        mock.acceptedParents = accepted_parents
+        return mock
+
+    first = archetype("first", [":Proteus-any"])
+    step_1 = archetype("step-1", ["use-case"])
+    step_2 = archetype("step-2", ["use-case"])
+    mixed_second = archetype("mixed-second", ["use-case"])
+    mixed_first = archetype("mixed-first", [":Proteus-document", "section"])
+
+    mocker.patch.object(
+        ArchetypeRepository,
+        "load_object_archetypes",
+        return_value={
+            "general": {
+                "first": [first],
+                "step": [step_1, step_2],
+                "mixed": [mixed_second, mixed_first],
+            }
+        },
+    )
+
+    def ids(archetypes: Dict[str, Dict[str, List[Object]]]):
+        return {
+            group: {cls: [a.id for a in lst] for cls, lst in by_class.items()}
+            for group, by_class in archetypes.items()
+        }
+
+    cached_before = ids(archetype_service.get_object_archetypes())
+
+    # Act -----------------------------
+    first_level = ids(archetype_service.get_first_level_object_archetypes())
+    first_level_again = ids(archetype_service.get_first_level_object_archetypes())
+
+    # Assert --------------------------
+    assert first_level == {
+        "general": {"first": ["first"], "mixed": ["mixed-first"]}
+    }, f"Unexpected first level archetypes: {first_level}"
+    assert first_level_again == first_level
+    assert (
+        ids(archetype_service.get_object_archetypes()) == cached_before
+    ), "The cached object archetypes were modified"
+    assert len(archetype_service.get_all_object_archetypes()) == 5
+
+
+# test_project_document_archetypes_by_key ------------------------------------
+def test_project_document_archetypes_by_key(archetype_service: ArchetypeService):
+    """
+    The documents of the project archetypes are in the archetype index by
+    their key, not by their id, which is the same as that of a document
+    archetype in the basic profile.
+    """
+    document_archetypes = archetype_service.get_document_archetypes()
+    from_projects = [d for d in document_archetypes if d.archetype_origin is not None]
+
+    assert from_projects, "The basic profile project archetypes have documents"
+    for document in from_projects:
+        key = get_archetype_key(document)
+        assert key != document.id
+        assert archetype_service._get_archetype_by_id(key) is document

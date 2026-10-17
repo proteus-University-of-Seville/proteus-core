@@ -27,7 +27,7 @@ import lxml.etree as ET
 
 from proteus import PROTEUS_TEMP_DIR
 from proteus.model import ProteusID, ProteusClassTag, ASSETS_REPOSITORY
-from proteus.application import ASSETS_DUMMY_SEARCH_PATH, TEMPLATE_DUMMY_SEARCH_PATH
+from proteus.application import TEMPLATE_DUMMY_SEARCH_PATH, replace_assets_urls
 from proteus.application.metrics import Metrics
 from proteus.controller.commands.update_properties import UpdatePropertiesCommand
 from proteus.controller.commands.clone_archetype_object import (
@@ -661,6 +661,30 @@ class Controller:
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
+    def reload_project_from_disk(self, project_path: str) -> None:
+        """Validate a disk snapshot before replacing the currently open model.
+
+        Git operations can replace every object. Undo and clipboard entries from
+        the previous snapshot must never be applied to the newly loaded model.
+        """
+        candidate = ProjectService()
+        candidate.load_project(project_path)
+        state = StateManager()
+        document_id = state.get_current_document()
+        object_id = state.get_current_object() if document_id else None
+        self._project_service = candidate
+        self.stack.clear()
+        from proteus.application.clipboard import Clipboard
+        Clipboard().clear()
+        state.clear()
+        state.current_project_path = Path(project_path)
+        OpenProjectEvent().notify()
+        if document_id in candidate.project_index:
+            state.set_current_document(document_id)
+            selected = candidate.project_index.get(object_id)
+            if isinstance(selected, Object) and selected.get_document().id == document_id:
+                state.set_current_object(object_id, document_id)
+
     @proteus_action
     def save_project(self) -> None:
         """
@@ -860,9 +884,7 @@ class Controller:
         ).as_posix()
         xslt_dir = Config().profile_settings.xslt_directory.as_posix()
 
-        html_string = html_string.replace(
-            f"{ASSETS_DUMMY_SEARCH_PATH}:///", f"file:///{assets_dir}/"
-        )
+        html_string = replace_assets_urls(html_string, f"file:///{assets_dir}/")
         html_string = html_string.replace(
             f"{TEMPLATE_DUMMY_SEARCH_PATH}:///", f"file:///{xslt_dir}/"
         )
@@ -883,10 +905,45 @@ class Controller:
     # ----------------------------------------------------------------------
     def get_available_xslt(self) -> List[str]:
         """
-        Get the available xslt templates in the xslt folder.
+        Get the available xslt templates in the xslt folder that can be
+        shown as views (HTML output). Templates with other output formats
+        (e.g. LaTeX) are only used by export strategies, see
+        get_templates_by_output_format().
         """
         templates: List[Template] = self._render_service.get_templates()
-        return [template.name for template in templates]
+        return [template.name for template in templates if template.is_view]
+
+    # ----------------------------------------------------------------------
+    # Method     : get_templates_by_output_format
+    # Description: Get the templates that generate the given output format.
+    # Date       : 07/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def get_templates_by_output_format(self, output_format: str) -> List[Template]:
+        """
+        Get the templates loaded from the xslt directory that generate the
+        given output format (e.g. 'latex').
+        """
+        templates: List[Template] = self._render_service.get_templates()
+        return [t for t in templates if t.output_format == output_format]
+
+    # ----------------------------------------------------------------------
+    # Method     : render_template
+    # Description: Render the project with the given template.
+    # Date       : 07/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def render_template(self, template_name: str) -> str:
+        """
+        Render the project XML with the given template and return the result
+        as a string, whatever its output format is (HTML, LaTeX...). Search
+        paths (assets:///, templates:///) are not replaced.
+        """
+        log.info(f"Rendering project with template '{template_name}'.")
+        xml: ET.Element = self._project_service.generate_project_xml()
+        return self._render_service.render(xml, template_name)
 
     # ----------------------------------------------------------------------
     # Method     : get_template_by_name

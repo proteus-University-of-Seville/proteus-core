@@ -9,7 +9,7 @@
     <fileProperty name="file" category="detail" tooltip="file-info"><![CDATA[]]></fileProperty>
     <urlProperty name="url" category="detail"><![CDATA[https://www.us.es/sites/default/files/2019-05/marca-US-principal.jpg]]></urlProperty>
     <integerProperty name="width" category="detail" tooltip="width-info">25</integerProperty>
-    <markdownProperty name="description" category="detail"><![CDATA[Figure 2. Official University of Seville brand mark, loaded from the university's website. The BiblioUS web interface must show it in its header, and referencing it remotely means it follows any change to the corporate identity.]]></markdownProperty>
+    <markdownProperty name="description" category="detail"><![CDATA[Official University of Seville brand mark, loaded from the university's website. The BiblioUS web interface must show it in its header, and referencing it remotely means it follows any change to the corporate identity.]]></markdownProperty>
     <traceProperty name="dependencies" category="dependencies" acceptedTargets="traceable-object" traceType=":Proteus-dependency"/>
     <markdownProperty name="comments" category="comments"><![CDATA[]]></markdownProperty>
   </properties>

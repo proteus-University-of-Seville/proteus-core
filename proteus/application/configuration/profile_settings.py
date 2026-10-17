@@ -352,7 +352,9 @@ class ProfileSettings:
         for template_dir in self.xslt_directory.iterdir():
             try:
                 template = Template.load(template_dir)
-                self.listed_templates.append(template.name)
+                # Only views (HTML templates) can be the default view
+                if template.is_view:
+                    self.listed_templates.append(template.name)
             except Exception as e:
                 log.error(
                     f"Could not load template from '{template_dir}'. It will be ignored in profile settings. Error: {e}"

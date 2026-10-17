@@ -22,6 +22,8 @@ from PyQt6.QtWidgets import QHBoxLayout, QSizePolicy, QSplitter, QWidget
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.application.resources.themes import Themes
+from proteus.application.events import ThemeChangedEvent
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.documents_container import DocumentsContainer
 from proteus.views.components.views_container import ViewsContainer
@@ -72,6 +74,7 @@ class ProjectContainer(QWidget, ProteusComponent):
 
         # Create the component
         self.create_component()
+        self.subscribe()
 
     # ----------------------------------------------------------------------
     # Method     : create_component
@@ -100,7 +103,6 @@ class ProjectContainer(QWidget, ProteusComponent):
         self.documents_container.setSizePolicy(
             QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
         )
-        self.documents_container.setMinimumWidth(200)
 
         # ViewsContainer -----------------------------------------------------
         self.views_container: ViewsContainer = ViewsContainer(
@@ -109,7 +111,7 @@ class ProjectContainer(QWidget, ProteusComponent):
         self.views_container.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred
         )
-        self.views_container.setMinimumWidth(400)
+        self._apply_theme_widths()
 
         # Add tree and render to splitter
         splitter.addWidget(self.documents_container)
@@ -126,6 +128,18 @@ class ProjectContainer(QWidget, ProteusComponent):
         self.setLayout(tab_layout)
 
         log.info("Project container component created")
+
+    def subscribe(self) -> None:
+        """Refresh the existing splitter children when theme metrics change."""
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """Apply the active theme's minimum widths without rebuilding views."""
+        self._apply_theme_widths()
+
+    def _apply_theme_widths(self) -> None:
+        self.documents_container.setMinimumWidth(Themes().metric("tree_min_width", 200))
+        self.views_container.setMinimumWidth(Themes().metric("views_min_width", 400))
 
     # ======================================================================
     # Component update methods (triggered by PROTEUS application events)

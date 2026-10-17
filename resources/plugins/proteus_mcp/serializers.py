@@ -9,6 +9,7 @@ from typing import Iterable
 from proteus.application.resources.translator import translate
 from proteus.model import PROTEUS_CODE, PROTEUS_NAME
 from proteus.model.abstract_object import ProteusState
+from proteus.model.archetype_repository import get_archetype_key
 from proteus.model.properties import CodeProperty, Property, TraceProperty
 
 
@@ -69,7 +70,9 @@ def archetype_schema(archetype, gateway) -> dict:
     """Serialize an archetype as a generic creation schema."""
     properties = [property_schema(prop, gateway) for prop in archetype.properties.values()]
     return {
-        "archetype_id": archetype.id,
+        "archetype_id": get_archetype_key(archetype),
+        # Project archetype a document archetype comes from, if any
+        "from_project_archetype": getattr(archetype, "archetype_origin", None),
         "classes": list(getattr(archetype, "classes", []) or []),
         "class_labels": class_labels(getattr(archetype, "classes", []) or []),
         "accepted_parents": list(getattr(archetype, "acceptedParents", []) or []),

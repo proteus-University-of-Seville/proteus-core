@@ -38,15 +38,16 @@
   <!-- meeting template                                                   -->
   <!-- ================================================================== -->
 
-  <!--
   <xsl:template
     match="object[contains(concat(' ', normalize-space(@classes), ' '),' meeting ')]"
     name="meeting_template"
     priority="1"
   >
-    <xsl:call-template name="generate_table"/>
-  
+    <xsl:call-template name="generate_table">
+      <!-- The results are a text: they take the full width of the table -->
+      <xsl:with-param name="wide_properties" select="',diagram,results,'"/>
+    </xsl:call-template>
   </xsl:template>
-  -->
+
 
 </xsl:stylesheet>

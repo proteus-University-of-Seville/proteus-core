@@ -217,6 +217,14 @@ table.proteus_table > tr > th:first-child {
   border-right: 1px solid var(--line);
 }
 
+/* wide properties (diagrams, meeting results): the name above the content, */
+/* in the same cell                                                          */
+table.proteus_table .wide_property_label {
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 0.4em;
+}
+
 /* step-by-step sequence (e.g. madeja's use-case "ordinary sequence"): the */
 /* step number column shrinks to fit its own header/content ("Step" or    */
 /* "Paso", or the number itself, whichever is narrower) via the standard  */
@@ -248,6 +256,30 @@ table.proteus_table > tr:hover > td {
 /* from its next sibling, since the cell padding already does that job */
 td.children_column > div.proteus_object:last-child > table.proteus_table {
   margin-bottom: 0;
+}
+
+/* Children as a compact list: "[code] name: description", nested if the */
+/* children have children (see renderChildrenList in generate_table.xsl) */
+ul.children_list {
+  margin: 0;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+
+ul.children_list ul.children_list {
+  margin-top: .2em;
+  list-style: circle;
+}
+
+ul.children_list > li {
+  margin: .25em 0;
+}
+
+ul.children_list span.child_code {
+  font-family: ui-monospace, "Cascadia Code", "Consolas", monospace;
+  font-size: .85em;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 /* ------------------------------------------------------- */

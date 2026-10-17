@@ -38,6 +38,17 @@ from PyQt6.QtWidgets import (
 # --------------------------------------------------------------------------
 
 from proteus.application.resources.icons import Icons, ProteusIconType
+
+
+# --------------------------------------------------------------------------
+# Helper widget classes (proper sizeHint overrides instead of instance
+# monkey-patching, as recommended by the Riverbank documentation)
+# --------------------------------------------------------------------------
+class _ItemListWidget(QListWidget):
+    """List widget with no preferred size (shrinks freely in layouts)."""
+
+    def sizeHint(self) -> QSize:
+        return QSize(0, 0)
 from proteus.application.resources.translator import translate as _
 
 # Module configuration
@@ -105,13 +116,10 @@ class ItemListEdit(QWidget):
     # ----------------------------------------------------------------------
     def create_component(self):
         # Item list
-        self.item_list = QListWidget()
+        self.item_list = _ItemListWidget()
         self.item_list.setSizePolicy(
             QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding
         )
-        # Reimplement sizeHint to set a minimun height of 80px
-        # NOTE: Recomended in https://www.riverbankcomputing.com/static/Docs/PyQt6/api/qtwidgets/qwidget.html
-        self.item_list.sizeHint = lambda: QSize(0, 0)
 
         # Allow items movement using InternalMove and not Movement.Free because
         # Free duplicates the item when dragging and dropping.

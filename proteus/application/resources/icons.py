@@ -143,7 +143,8 @@ class Icons(metaclass=SingletonMeta):
         resources_icons_root: ET._Element = resources_icons_tree.getroot()
 
         # Iterate over icons tag children (type tag) to create each type dictionary
-        for type_tag in resources_icons_root.iterchildren():
+        # NOTE: '*' selects only elements, XML comments are also children in lxml
+        for type_tag in resources_icons_root.iterchildren("*"):
             # Get name attribute to check if it is a valid icon type
             type_name: str = type_tag.attrib.get("name", None)
 
@@ -165,7 +166,7 @@ class Icons(metaclass=SingletonMeta):
                 )
 
             # Iterate over icons tag children icon
-            for icon in type_tag.iterchildren():
+            for icon in type_tag.iterchildren("*"):
                 # Get key and file attributes for the icon tag
                 key = icon.attrib.get("key", None)
                 file = icon.attrib.get("file", None)
@@ -197,6 +198,18 @@ class Icons(metaclass=SingletonMeta):
     # Public methods
     # ==========================================================================
 
+    def clear(self) -> None:
+        """
+        Clear all loaded icon paths and memoized QIcon instances. Used when
+        the application theme changes: icon layers (baseline theme, active
+        theme delta, profile) must be reloaded from scratch so keys resolve
+        to the new theme's assets.
+        """
+        self._icons_paths = {}
+        self._icons_memo = {}
+        for icon_type in ProteusIconType:
+            self._icons_memo[icon_type] = {}
+
     # --------------------------------------------------------------------------
     # Method: load_icons
     # Description: Load the system icons
@@ -204,7 +217,7 @@ class Icons(metaclass=SingletonMeta):
     # Version: 0.1
     # Author: José María Delgado Sánchez
     # --------------------------------------------------------------------------
-    def load_icons(self, icons_directory: Path) -> bool:
+    def load_icons(self, icons_directory: Path | None) -> bool:
         """
         Loads the icons from the given directory. Returns True if the icons
         were loaded successfully, False otherwise.

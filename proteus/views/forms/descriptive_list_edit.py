@@ -40,6 +40,24 @@ log = logging.getLogger(__name__)  # Logger
 
 
 # --------------------------------------------------------------------------
+# Helper widget classes (proper sizeHint overrides instead of instance
+# monkey-patching, as recommended by the Riverbank documentation)
+# --------------------------------------------------------------------------
+class _DescriptiveListWidget(QListWidget):
+    """List widget with a compact preferred height."""
+
+    def sizeHint(self) -> QSize:
+        return QSize(0, 100)
+
+
+class _InfoBox(QPlainTextEdit):
+    """Info box with no preferred size (shrinks freely in layouts)."""
+
+    def sizeHint(self) -> QSize:
+        return QSize(0, 0)
+
+
+# --------------------------------------------------------------------------
 # Class: DescriptiveListEdit
 # Description: Descriptive list form input widget.
 # Date: 05/12/2024
@@ -84,7 +102,7 @@ class DescriptiveListEdit(QWidget):
         """
 
         # Widgets creation --------------------------------------------------
-        self.list_widget = QListWidget()
+        self.list_widget = _DescriptiveListWidget()
         self.list_widget.setSelectionMode(
             QAbstractItemView.SelectionMode.SingleSelection
         )
@@ -92,19 +110,15 @@ class DescriptiveListEdit(QWidget):
         self.list_widget.setSizePolicy(
             QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum
         )
-        # NOTE: Recomended in https://www.riverbankcomputing.com/static/Docs/PyQt6/api/qtwidgets/qwidget.html
-        self.list_widget.sizeHint = lambda: QSize(0, 100)
 
         # Connect signals
         self.list_widget.currentItemChanged.connect(self._update_info_box)
 
-        self.info_box = QPlainTextEdit()
+        self.info_box = _InfoBox()
         self.info_box.setReadOnly(True)
         self.info_box.setSizePolicy(
             QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Minimum
         )
-        # NOTE: Recomended in https://www.riverbankcomputing.com/static/Docs/PyQt6/api/qtwidgets/qwidget.html
-        self.info_box.sizeHint = lambda: QSize(0, 0)
 
         # Layouts -----------------------------------------------------------
         layout = QHBoxLayout()

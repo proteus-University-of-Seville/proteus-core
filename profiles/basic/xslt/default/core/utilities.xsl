@@ -57,21 +57,31 @@
     <xsl:param name="included" select="false()"/>
     <xsl:param name="alternative"/>
     <xsl:param name="span" select="1"/>
-    <xsl:param name="diagram" select="@name='diagram'"/>
+    <xsl:param name="wide" select="false()"/>
 
     <xsl:variable name="hasContent" select="(string-length(current()//text()) > 0) and (normalize-space(current()) != 'tbd')"/>
     <xsl:variable name="hasChildren" select="boolean(current()/*)"/>
 
     <xsl:if test="$hasContent or $hasChildren or $included">
-      <tr>
-        <xsl:choose>
-          <xsl:when test="$diagram">
-            <th colspan="{$span + 1}">
-              <xsl:value-of select="$label"/>
+      <xsl:choose>
+        <!-- A wide property takes the whole row: its name above its content -->
+        <!-- Former layout, not used: the name in a row of its own, and the content
+             in the row below it, both spanning the table:
+             <tr><th colspan="{$span + 1}"><xsl:value-of select="$label"/></th></tr>
+             <tr><td colspan="{$span + 1}"><xsl:apply-templates select="current()"/></td></tr>
+        -->
+        <xsl:when test="$wide and not($alternative)">
+          <tr>
+            <td colspan="{$span + 1}" class="wide_property">
+              <div class="wide_property_label">
+                <xsl:value-of select="$label"/>
+              </div>
               <xsl:apply-templates select="current()"/>
-            </th>
-          </xsl:when>
-          <xsl:otherwise>
+            </td>
+          </tr>
+        </xsl:when>
+        <xsl:otherwise>
+          <tr>
             <th>
               <xsl:value-of select="$label"/>
             </th>
@@ -92,9 +102,9 @@
                 </xsl:otherwise>
               </xsl:choose>
             </td>
-          </xsl:otherwise>
-        </xsl:choose>
-      </tr>
+          </tr>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
   </xsl:template>
 

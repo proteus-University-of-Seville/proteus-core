@@ -241,4 +241,9 @@ class Config(metaclass=SingletonMeta):
         log_files.sort(key=os.path.getmtime, reverse=True)
 
         for old_log_file in log_files[PROTEUS_MAX_LOG_FILES:]:
-            os.remove(old_log_file)
+            # A log file may still be in use by another running instance of
+            # PROTEUS (or by a test or script): keep it, it will be removed later
+            try:
+                os.remove(old_log_file)
+            except OSError as error:
+                logger.debug(f"Old log file '{old_log_file}' not removed: {error}")

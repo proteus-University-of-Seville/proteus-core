@@ -894,3 +894,49 @@ class ArchetypeRepositoryChangedEvent(ProteusEvent):
         :param method: The method to connect to the event.
         """
         self.signal.connect(method)
+
+
+class ThemeChangedEvent(ProteusEvent):
+    """
+    Event to handle the change of the application visual theme. Emitted by
+    ThemeService after the new theme has been fully applied (stylesheet,
+    palette, search paths and icon cache), so subscribers can safely
+    re-query icons and theme tokens.
+    """
+
+    signal = pyqtSignal([str])
+
+    def notify(self, theme_key: str) -> None:
+        """
+        Notify the event that the application theme has changed. Receives
+        the key of the newly applied theme.
+
+        :param theme_key: The key of the theme that has been applied.
+        """
+        log.debug(f"Emitting THEME CHANGED EVENT signal... | theme_key: {theme_key}")
+
+        assert theme_key, "Theme key cannot be None or empty"
+
+        self.signal.emit(theme_key)
+
+    def connect(self, method: Callable[[str], None]) -> None:
+        """
+        Connect a method to the theme changed event. The method should take
+        one argument: the key of the newly applied theme.
+
+        :param method: The method to connect to the event.
+        """
+        self.signal.connect(method)
+
+
+class GitChangesEvent(ProteusEvent):
+    """Current project's saved Git changes; independent of document dirty state."""
+    signal = pyqtSignal(dict)
+    changes: dict[str, str] = {}
+
+    def notify(self, changes: dict[str, str]) -> None:
+        self.changes = dict(changes)
+        self.signal.emit(self.changes)
+
+    def connect(self, method: Callable) -> None:
+        self.signal.connect(method)

@@ -88,24 +88,54 @@ if exist "%venv_dir%" (
 echo PROTEUS: Activating the virtual environment...
 call "%venv_dir%\Scripts\activate.bat"
 
-echo PROTEUS: Checking the Python version in the virtual environment...
-for /f "tokens=2 delims= " %%i in ('%python_executable% %python_args% --version') do set "script_python_version=%%i"
+echo PROTEUS: Checking the virtual environment...
+
+@REM An existing virtual environment is used as it is, whichever Python it was
+@REM created with (e.g. a Python managed by uv), so the interpreter selected above
+@REM is only used to create it when it does not exist. Here we just check that the
+@REM environment was activated and that its Python version is supported.
+for /f "delims=" %%p in ('python -c "import sys; print(sys.prefix)"') do set "venv_prefix=%%p"
 for /f "tokens=2 delims= " %%i in ('python --version') do set "venv_python_version=%%i"
+for /f "delims=" %%m in ('python -c "import sys; print(*sys.version_info[:2], sep=chr(46))"') do set "venv_python_mm=%%m"
 
 echo PROTEUS: Virtual environment Python version: %venv_python_version%
 
-if not "%script_python_version%"=="%venv_python_version%" (
-    echo PROTEUS: Looks like the Python version in the virtual environment is different from the one chosen by the script.
-    echo PROTEUS: Virutal environment was not activated successfully.
-    echo PROTEUS: Script Python version: %script_python_version%
-    echo PROTEUS: Virtual environment Python version: %venv_python_version%
+@REM Check that the python being used belongs to the virtual environment
+if /i not "%venv_prefix%"=="%venv_dir%" (
+    echo PROTEUS: Virtual environment was not activated successfully.
     echo PROTEUS: Try using the PowerShell script "proteus.ps1" in order to run the application.
     pause
     exit /b 1
 )
 
+@REM Check that the Python version of the virtual environment is supported
+set "supported_python="
+for %%v in (3.11 3.12 3.13 3.14) do if "%venv_python_mm%"=="%%v" set "supported_python=1"
+if not defined supported_python (
+    echo PROTEUS: The Python version of the virtual environment ^(%venv_python_version%^) is not supported ^(3.11-3.14^).
+    echo PROTEUS: Delete the ".venv" directory and run this script again to create it again.
+    pause
+    exit /b 1
+)
+
+@REM Install the required packages. A virtual environment not created with 'venv'
+@REM (e.g. created with uv) might not have pip, in that case try with uv.
 echo PROTEUS: Installing the required packages...
-pip install -r "%script_dir%requirements.txt"
+python -m pip --version >nul 2>&1
+if not errorlevel 1 (
+    python -m pip install -r "%script_dir%requirements.txt"
+) else (
+    where uv >nul 2>&1
+    if not errorlevel 1 (
+        echo PROTEUS: pip is not available in the virtual environment, using uv.
+        uv pip install --python "%venv_dir%\Scripts\python.exe" -r "%script_dir%requirements.txt"
+    ) else (
+        echo PROTEUS: pip is not available in the virtual environment and uv was not found.
+        echo PROTEUS: Install the required packages manually and run this script again.
+        pause
+        exit /b 1
+    )
+)
 
 @REM Check for errors while installing the required packages
 if %errorlevel% NEQ 0 (
@@ -114,7 +144,7 @@ if %errorlevel% NEQ 0 (
     exit /b %errorlevel%
 )
 
-@REM Run the application in the background so the console can be closed
+@REM Run the application
 echo PROTEUS: Running the application...
 call python -m proteus
 

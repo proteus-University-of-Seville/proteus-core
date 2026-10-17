@@ -42,6 +42,24 @@ from proteus.views.forms.text_edit import TextEdit
 
 
 # --------------------------------------------------------------------------
+# Helper widget classes (proper sizeHint overrides instead of instance
+# monkey-patching, as recommended by the Riverbank documentation)
+# --------------------------------------------------------------------------
+class _MarkdownPreviewBox(QTextEdit):
+    """Read-only preview box with a compact preferred size."""
+
+    def sizeHint(self) -> QSize:
+        return QSize(250, 100)
+
+
+class _MarkdownInputBox(TextEdit):
+    """Markdown input box with a compact preferred size."""
+
+    def sizeHint(self) -> QSize:
+        return QSize(250, 100)
+
+
+# --------------------------------------------------------------------------
 # Class: MarkdownEdit
 # Description: Markdown edit input widget for forms.
 # Date: 14/12/2023
@@ -92,9 +110,8 @@ class MarkdownEdit(QWidget):
         """
 
         # Display box ------------------------------------------------------
-        self.display_box = QTextEdit()
+        self.display_box = _MarkdownPreviewBox()
         self.display_box.setReadOnly(True)
-        self.display_box.sizeHint = lambda: QSize(250, 100)
         self.display_box.wheelEvent = self.wheelEventDecorator(
             self.display_box.wheelEvent
         )
@@ -109,8 +126,7 @@ class MarkdownEdit(QWidget):
         self.display_box.setFont(font)
 
         # Input box --------------------------------------------------------
-        self.input_box = TextEdit()
-        self.input_box.sizeHint = lambda: QSize(250, 100)
+        self.input_box = _MarkdownInputBox()
         self.input_box.wheelEvent = self.wheelEventDecorator(self.input_box.wheelEvent)
         self.input_box.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.MinimumExpanding

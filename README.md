@@ -98,6 +98,17 @@ Developer mode can be enabled by setting the following variable to `True` in the
 developer_features = True
 ```
 
+### Git source control
+
+The **Git** tab provides source control for the current project's repository,
+including repositories in parent folders. Review document changes side by side,
+stage or unstage files, create commits, manage branches and remotes, and fetch,
+pull or push from the application.
+
+Git must be installed and available on PATH. Authentication uses your existing
+Git credential helper or SSH configuration. Creating a GitHub repository can use
+an authenticated GitHub CLI (`gh`) installation or open GitHub in the browser.
+
 ### MCP server (AI agent integration)
 
 PROTEUS embeds an [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server, ProteusMCP, that lets AI coding assistants and agents (Claude Code, Claude Desktop and other MCP-compatible clients) inspect and edit the project currently open in the running application: searching, reading and editing objects and documents, managing traceability, etc.

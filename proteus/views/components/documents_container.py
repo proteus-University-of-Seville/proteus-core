@@ -29,11 +29,13 @@ from proteus.model.object import Object
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.document_tree import DocumentTree
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.application.events import (
     AddDocumentEvent,
     ModifyObjectEvent,
     CurrentDocumentChangedEvent,
     DeleteDocumentEvent,
+    ThemeChangedEvent,
 )
 
 # logging configuration
@@ -103,7 +105,8 @@ class DocumentsContainer(QTabWidget, ProteusComponent):
         document.
         """
         self.setObjectName("documents_container")
-        self.setIconSize(QSize(28, 28))
+        icon_size: int = Themes().metric("icon_size_tab", 32)
+        self.setIconSize(QSize(icon_size, icon_size))
         self.tabBar().setExpanding(True)
 
         # Handle tab reordering
@@ -155,7 +158,8 @@ class DocumentsContainer(QTabWidget, ProteusComponent):
         # Set the tab icon
         icon = Icons().icon(ProteusIconType.Document, document_acronym)
         self.setTabIcon(tab_index, icon)
-        self.setIconSize(QSize(32, 32))
+        icon_size: int = Themes().metric("icon_size_tab", 32)
+        self.setIconSize(QSize(icon_size, icon_size))
 
         # Drop configuration to allow objects moves between tabs
         tabbar = self.tabBar()
@@ -178,11 +182,13 @@ class DocumentsContainer(QTabWidget, ProteusComponent):
             - MODIFY OBJECT -> update_on_modify_object
             - DELETE DOCUMENT -> update_on_delete_document
             - CURRENT DOCUMENT CHANGED -> update_on_current_document_changed
+            - THEME CHANGED -> update_on_theme_changed
         """
         AddDocumentEvent().connect(self.update_on_add_document)
         ModifyObjectEvent().connect(self.update_on_modify_object)
         DeleteDocumentEvent().connect(self.update_on_delete_document)
         CurrentDocumentChangedEvent().connect(self.update_on_current_document_changed)
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
 
     # ======================================================================
     # Component update methods (triggered by PROTEUS application events)
@@ -334,6 +340,28 @@ class DocumentsContainer(QTabWidget, ProteusComponent):
     # ======================================================================
     # Component slots methods (connected to the component signals)
     # ======================================================================
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply document tab icons and icon size when the application
+        theme changes.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        icon_size: int = Themes().metric("icon_size_tab", 32)
+        self.setIconSize(QSize(icon_size, icon_size))
+
+        for document_id, document_tab in self.tabs.items():
+            tab_index: int = self.indexOf(document_tab)
+            if tab_index < 0:
+                continue
+
+            document: Object = self._controller.get_element(document_id)
+            document_acronym: str = document.get_property(PROTEUS_ACRONYM).value
+            icon = Icons().icon(ProteusIconType.Document, document_acronym)
+            self.setTabIcon(tab_index, icon)
 
     # ----------------------------------------------------------------------
     # Method     : current_document_changed

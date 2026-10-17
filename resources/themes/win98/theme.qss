@@ -1,0 +1,333 @@
+/* Windows 98 classic: silver chrome, two-layer bevels and compact controls.
+   Native window decorations remain controlled by the operating system.
+   Application icons without overrides fall back to the bundled light theme. */
+
+QWidget {
+    background-color: @window;
+    color: @text;
+    font-family: "Tahoma", "Microsoft Sans Serif", "Arial", sans-serif;
+    font-size: 9pt;
+}
+QMainWindow, QDialog, QDockWidget, QScrollArea, QToolBar, QStatusBar,
+QMenuBar, QMenu { background-color: @chrome_surface; color: @text; }
+QLabel { background-color: transparent; }
+QLabel:disabled { color: @disabled_text; }
+QLabel#error_label, QLabel[descriptionState="empty"] { color: @error; font-weight: bold; }
+QLabel[descriptionState="filled"] { color: @text_muted; font-style: italic; }
+QLabel#setting_info_label, QLabel#message_traces_label,
+QLabel#message_label { font-weight: bold; }
+QLabel#app_name_label { font-size: 18pt; font-weight: bold; }
+QLabel#app_version_label { font-size: 11pt; }
+QToolTip {
+    background-color: @tooltip_surface;
+    color: @text;
+    border: 1px solid @border_strong;
+    padding: 2px 3px;
+}
+
+/* The SVG frames preserve both layers of a classic bevel. */
+QPushButton, QToolButton {
+    background-color: @button_surface;
+    color: @text;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+    border-radius: 0;
+    padding: 3px 7px;
+    margin: 1px;
+}
+QPushButton:hover, QToolButton:hover { background-color: @button_surface; }
+QPushButton:pressed, QToolButton:pressed,
+QPushButton:checked, QToolButton:checked {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+    padding: 4px 6px 2px 8px;
+}
+QPushButton:default {
+    border-image: url(theme:icons/retro/default-button.svg) 2 2 2 2 stretch stretch;
+}
+QPushButton:default:pressed, QPushButton:default:checked {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QPushButton:focus, QToolButton:focus { outline: 1px dotted @text; outline-offset: -5px; }
+QPushButton:disabled, QToolButton:disabled { color: @disabled_text; }
+QToolButton[autoRaise="true"] {
+    border-image: none;
+    border: 2px solid transparent;
+}
+QToolButton[autoRaise="true"]:hover {
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QToolButton[autoRaise="true"]:pressed, QToolButton[autoRaise="true"]:checked {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QToolButton::menu-indicator { image: url(theme:icons/retro/chevron-down.svg); width: 7px; height: 4px; }
+QDialogButtonBox QPushButton, QWizard QPushButton { min-width: 5em; }
+
+QLineEdit, QPlainTextEdit, QTextEdit, QSpinBox, QDoubleSpinBox,
+QDateEdit, QTimeEdit, QDateTimeEdit, QComboBox, QAbstractItemView {
+    background-color: @input_surface;
+    color: @text;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+    border-radius: 0;
+    padding: 2px;
+    selection-background-color: @selection_bg;
+    selection-color: @selection_text;
+}
+QLineEdit:disabled, QPlainTextEdit:disabled, QTextEdit:disabled,
+QSpinBox:disabled, QDoubleSpinBox:disabled, QDateEdit:disabled,
+QTimeEdit:disabled, QDateTimeEdit:disabled, QComboBox:disabled {
+    background-color: @disabled_bg;
+    color: @disabled_text;
+}
+QAbstractItemView { alternate-background-color: @input_surface; }
+QTreeView::item, QListView::item { padding: 1px 2px; }
+QTreeView::item:selected, QListView::item:selected {
+    background-color: @selection_bg;
+    color: @selection_text;
+}
+QAbstractItemView::item:disabled { color: @disabled_text; }
+QTreeView::branch { background-color: @input_surface; }
+QTreeView::branch:has-siblings:!adjoins-item {
+    border-image: url(theme:icons/treelines/vline.svg) 0;
+}
+QTreeView::branch:has-siblings:adjoins-item {
+    border-image: url(theme:icons/treelines/branch-more.svg) 0;
+}
+QTreeView::branch:!has-children:!has-siblings:adjoins-item {
+    border-image: url(theme:icons/treelines/branch-end.svg) 0;
+}
+QTreeView::branch:has-children:closed {
+    image: url(theme:icons/retro/tree-closed.svg);
+}
+QTreeView::branch:has-children:open {
+    image: url(theme:icons/retro/tree-open.svg);
+}
+QHeaderView::section, QTableCornerButton::section {
+    background-color: @header_surface;
+    color: @text;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+    padding: 2px 4px;
+    font-weight: normal;
+}
+QHeaderView::section:pressed {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QHeaderView::up-arrow { image: url(theme:icons/retro/chevron-up.svg); width: 7px; height: 4px; }
+QHeaderView::down-arrow { image: url(theme:icons/retro/chevron-down.svg); width: 7px; height: 4px; }
+
+QComboBox { min-width: 4em; padding-right: 20px; }
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 16px;
+    background-color: @button_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QComboBox::drop-down:on {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QComboBox::down-arrow { image: url(theme:icons/retro/chevron-down.svg); width: 7px; height: 4px; }
+QComboBox::down-arrow:disabled { image: url(theme:icons/retro/down-disabled.svg); }
+QComboBox QAbstractItemView { padding: 0; }
+QSpinBox, QDoubleSpinBox, QDateEdit, QTimeEdit, QDateTimeEdit { padding-right: 18px; }
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+    subcontrol-origin: padding;
+    width: 14px;
+    background-color: @button_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QAbstractSpinBox::up-button { subcontrol-position: top right; }
+QAbstractSpinBox::down-button { subcontrol-position: bottom right; }
+QAbstractSpinBox::up-button:pressed, QAbstractSpinBox::down-button:pressed {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QAbstractSpinBox::up-arrow { image: url(theme:icons/retro/chevron-up.svg); width: 7px; height: 4px; }
+QAbstractSpinBox::down-arrow { image: url(theme:icons/retro/chevron-down.svg); width: 7px; height: 4px; }
+QAbstractSpinBox::up-arrow:disabled, QAbstractSpinBox::up-arrow:off { image: url(theme:icons/retro/up-disabled.svg); }
+QAbstractSpinBox::down-arrow:disabled, QAbstractSpinBox::down-arrow:off { image: url(theme:icons/retro/down-disabled.svg); }
+
+QCheckBox, QRadioButton { spacing: 4px; padding: 2px; background-color: transparent; }
+QCheckBox:disabled, QRadioButton:disabled { color: @disabled_text; }
+QCheckBox::indicator, QRadioButton::indicator { width: 13px; height: 13px; }
+QCheckBox::indicator {
+    background-color: @input_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+    width: 9px;
+    height: 9px;
+}
+QCheckBox::indicator:checked { image: url(theme:icons/retro/check.svg); }
+QCheckBox::indicator:indeterminate { image: url(theme:icons/retro/check-mixed.svg); }
+QCheckBox::indicator:pressed, QCheckBox::indicator:disabled { background-color: @disabled_bg; }
+QCheckBox::indicator:checked:disabled { image: url(theme:icons/retro/check-disabled.svg); }
+QCheckBox::indicator:indeterminate:disabled { image: url(theme:icons/retro/check-mixed-disabled.svg); }
+QRadioButton::indicator:unchecked { image: url(theme:icons/retro/radio.svg); }
+QRadioButton::indicator:checked { image: url(theme:icons/retro/radio-checked.svg); }
+QRadioButton::indicator:unchecked:disabled, QRadioButton::indicator:unchecked:pressed { image: url(theme:icons/retro/radio-disabled.svg); }
+QRadioButton::indicator:checked:disabled, QRadioButton::indicator:checked:pressed { image: url(theme:icons/retro/radio-checked-disabled.svg); }
+
+QGroupBox {
+    background-color: @chrome_surface;
+    border: 2px groove @border_subtle;
+    border-radius: 0;
+    margin-top: 0.8em;
+    padding-top: 4px;
+}
+QGroupBox::title { subcontrol-origin: margin; left: 8px; padding: 0 3px; font-weight: normal; }
+QTabWidget::pane {
+    background-color: @tab_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+    top: -1px;
+}
+QTabBar::tab {
+    background-color: @tab_surface_inactive;
+    color: @text;
+    border: 1px solid @bevel_shadow;
+    border-top-color: @bevel_light;
+    border-left-color: @bevel_light;
+    border-bottom: 0;
+    border-radius: 0;
+    padding: 3px 8px;
+    margin-top: 2px;
+    min-width: 3em;
+}
+QTabBar::tab:selected {
+    background-color: @tab_surface;
+    margin-top: 0;
+    padding-top: 5px;
+    margin-bottom: -2px;
+}
+QTabBar::tab:disabled { color: @disabled_text; }
+QTabBar::tab:bottom { border-top: 0; border-bottom: 1px solid @bevel_shadow; margin-top: 0; }
+QTabBar::tab:left, QTabBar::tab:right { margin-top: 0; border-bottom: 1px solid @bevel_shadow; }
+
+QMenu {
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+    padding: 1px;
+}
+QMenu::item { padding: 3px 20px 3px 18px; background-color: transparent; }
+QMenu::item:selected, QMenuBar::item:selected { background-color: @selection_bg; color: @selection_text; }
+QMenu::item:disabled { color: @disabled_text; }
+QMenu::separator { height: 1px; background-color: @bevel_shadow; border-bottom: 1px solid @bevel_light; margin: 3px 2px; }
+QMenu::right-arrow { image: url(theme:icons/retro/right.svg); width: 4px; height: 7px; }
+QMenu::right-arrow:selected { image: url(theme:icons/retro/right-white.svg); }
+QMenu::indicator { width: 9px; height: 9px; }
+QMenu::indicator:non-exclusive:checked { image: url(theme:icons/retro/check.svg); }
+QMenu::indicator:exclusive:checked { image: url(theme:icons/retro/menu-dot.svg); }
+QMenu::indicator:non-exclusive:checked:selected { image: url(theme:icons/retro/check-white.svg); }
+QMenu::indicator:exclusive:checked:selected { image: url(theme:icons/retro/menu-dot-white.svg); }
+QMenu::indicator:non-exclusive:checked:disabled { image: url(theme:icons/retro/check-disabled.svg); }
+QMenuBar::item { padding: 3px 6px; background-color: transparent; }
+QMenuBar::item:disabled { color: @disabled_text; }
+QToolBar { border-top: 1px solid @bevel_light; border-bottom: 1px solid @bevel_shadow; spacing: 2px; padding: 2px; }
+QToolBar::separator { width: 1px; background-color: @bevel_shadow; border-right: 1px solid @bevel_light; margin: 2px; }
+
+/* Fully specify both scrollbar orientations, including the classic arrows. */
+QScrollBar:vertical {
+    background-image: url(theme:icons/retro/track.svg);
+    background-color: @chrome_surface;
+    border: 0;
+    width: 16px;
+    margin: 16px 0;
+}
+QScrollBar:horizontal {
+    background-image: url(theme:icons/retro/track.svg);
+    background-color: @chrome_surface;
+    border: 0;
+    height: 16px;
+    margin: 0 16px;
+}
+QScrollBar::handle, QScrollBar::add-line, QScrollBar::sub-line {
+    background-color: @scrollbar_handle;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QScrollBar::handle:vertical { min-height: 16px; }
+QScrollBar::handle:horizontal { min-width: 16px; }
+QScrollBar::add-line:vertical { height: 12px; subcontrol-origin: margin; subcontrol-position: bottom; }
+QScrollBar::sub-line:vertical { height: 12px; subcontrol-origin: margin; subcontrol-position: top; }
+QScrollBar::add-line:horizontal { width: 12px; subcontrol-origin: margin; subcontrol-position: right; }
+QScrollBar::sub-line:horizontal { width: 12px; subcontrol-origin: margin; subcontrol-position: left; }
+QScrollBar::add-line:pressed, QScrollBar::sub-line:pressed {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QScrollBar::up-arrow { image: url(theme:icons/retro/chevron-up.svg); width: 7px; height: 4px; }
+QScrollBar::down-arrow { image: url(theme:icons/retro/chevron-down.svg); width: 7px; height: 4px; }
+QScrollBar::left-arrow { image: url(theme:icons/retro/left.svg); width: 4px; height: 7px; }
+QScrollBar::right-arrow { image: url(theme:icons/retro/right.svg); width: 4px; height: 7px; }
+QScrollBar::up-arrow:disabled { image: url(theme:icons/retro/up-disabled.svg); }
+QScrollBar::down-arrow:disabled { image: url(theme:icons/retro/down-disabled.svg); }
+QScrollBar::left-arrow:disabled { image: url(theme:icons/retro/left-disabled.svg); }
+QScrollBar::right-arrow:disabled { image: url(theme:icons/retro/right-disabled.svg); }
+QScrollBar::add-page, QScrollBar::sub-page { background-color: transparent; }
+
+QProgressBar {
+    background-color: @chrome_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+    text-align: center;
+    color: @text;
+    min-height: 14px;
+}
+QProgressBar::chunk { background-color: @selection_bg; width: 8px; margin: 1px; }
+QSlider::groove:horizontal { height: 4px; border: 1px inset @bevel_shadow; background-color: @chrome_surface; }
+QSlider::groove:vertical { width: 4px; border: 1px inset @bevel_shadow; background-color: @chrome_surface; }
+QSlider::handle {
+    background-color: @button_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QSlider::handle:horizontal { width: 8px; margin: -7px 0; }
+QSlider::handle:vertical { height: 8px; margin: 0 -7px; }
+
+QCalendarWidget #qt_calendar_navigationbar { background-color: @calendar_accent; }
+QCalendarWidget QToolButton { color: @calendar_text; background-color: @calendar_accent; font-weight: bold; }
+/* QCalendarView's delegate cannot paint a transparent border-image center. */
+QCalendarWidget QAbstractItemView {
+    border-image: none;
+    border: 2px inset @bevel_shadow;
+    background-color: @input_surface;
+}
+QCalendarWidget QAbstractItemView::item:selected { background-color: @calendar_accent; color: @calendar_text; }
+QCalendarWidget QToolButton::menu-indicator { image: url(theme:icons/retro/down-white.svg); }
+QCalendarWidget #qt_calendar_prevmonth, QCalendarWidget #qt_calendar_nextmonth {
+    background-color: @button_surface;
+    border: 2px solid transparent;
+    border-image: url(theme:icons/retro/raised.svg) 2 2 2 2 stretch stretch;
+}
+QCalendarWidget #qt_calendar_prevmonth:pressed, QCalendarWidget #qt_calendar_nextmonth:pressed {
+    border-image: url(theme:icons/retro/sunken.svg) 2 2 2 2 stretch stretch;
+}
+QCalendarWidget #qt_calendar_prevmonth { qproperty-icon: url(theme:icons/retro/left.svg); }
+QCalendarWidget #qt_calendar_nextmonth { qproperty-icon: url(theme:icons/retro/right.svg); }
+
+QStatusBar { border-top: 1px solid @bevel_light; }
+QStatusBar::item { border: 1px inset @bevel_shadow; }
+#MetricsIndicator QWidget, #clipboard_indicator {
+    background-color: @statusbar_surface;
+    border: 1px inset @bevel_shadow;
+    padding: 1px;
+}
+#clipboard_indicator QLabel { border: 0; padding: 1px; }
+#ProjectContainer QSplitter::handle {
+    background-color: @splitter_surface;
+    border-left: 1px solid @bevel_light;
+    border-right: 1px solid @bevel_shadow;
+}
+#ProjectContainer QSplitter::handle:horizontal { width: 4px; }
+#MainMenu #profile_information { min-width: 140px; border-left: 1px solid @bevel_shadow; }
+#MainMenu #main_menu_container { border-bottom: 1px solid @bevel_shadow; }
+#MainMenu QWidget#main_tab, #MainMenu QWidget#archetype_tab { background-color: @chrome_surface; }
+#MainMenu QScrollArea, #MainMenu #archetype_button_group { border: 0; background-color: transparent; }
+#MainMenu QToolButton { padding: 3px; }
+#MainMenu QToolButton:pressed, #MainMenu QToolButton:checked { padding: 4px 2px 2px 4px; }
+#archetype_menu_button { margin-left: 4px; margin-right: 4px; }
+#ViewsContainer QTabBar::tab { min-height: 24px; }
+#dialog_content_widget { background-color: @chrome_surface; }
+#PropertyDialog #dialog_content_widget { background-color: transparent; }
+#PropertyDialog QTreeView::item { padding: 2px; }

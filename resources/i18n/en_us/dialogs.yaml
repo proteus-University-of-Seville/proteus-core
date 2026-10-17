@@ -59,6 +59,7 @@ app.open_last_project.text: "Do you want to open the last project?"
 # ---------------------------------------------------------------------------
 new_document_dialog.title: "Add new Document"
 new_document_dialog.combobox.label: "Select document Archetype:"
+new_document_dialog.archetype.from_project: "{} (from the «{}» project)"
 new_document_dialog.archetype.description: "Document Description:"
 new_document_dialog.archetype.description.empty: "No description available"
 new_document_dialog.error.no_archetype_selected: "Please select a valid document archetype"
@@ -111,6 +112,10 @@ settings_dialog.default_profile.checkbox: "Check to use a custom profile"
 settings_dialog.error.profile.empty_path: "Please select a valid profile path"
 settings_dialog.error.profile.invalid_path: "The selected path does not exist"
 settings_dialog.error.profile.invalid_profile: "The selected path is not a valid profile, see log file for more information about the error. Error: {}"
+settings_dialog.error.theme.title: "Theme could not be applied"
+settings_dialog.error.theme.text: "The selected theme could not be loaded. Settings were not saved. Check the application log for details."
+settings_dialog.error.save.title: "Settings could not be saved"
+settings_dialog.error.save.text: "The settings file could not be written. Your changes were not saved."
 
 settings_dialog.profile_settings.group: "Profile specific settings"
 settings_dialog.default_view.label: "Default view:"
@@ -128,7 +133,7 @@ settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project w
 settings_dialog.edit_on_clone.checkbox: "Edit on object archetype clone"
 settings_dialog.edit_on_clone.tooltip: "When creating a new object from an archetype, open the new object for editing. If edit dialog is canceled, the clone operation will be undone."
 
-settings_dialog.info.label: "The changes will be applied once the application is restarted"
+settings_dialog.info.label: "Theme changes apply immediately. Other settings may require a restart."
 
 settings_dialog.descriptions.empty: "No description available"
 
@@ -140,13 +145,28 @@ settings_dialog_warning.text: "The changes will be applied once the application 
 # ---------------------------------------------------------------------------
 export_dialog.title: "Export current view: {}"
 export_dialog.export_strategy.label: "Select export format:"
+export_dialog.log.label: "Export process:"
+export_dialog.elapsed: "Elapsed time: {}"
+export_dialog.progress.done: "PDF generated: {} KB in {} s."
+export_dialog.progress.pdf.generating_html: "Generating the HTML of the view..."
+export_dialog.progress.pdf.loading_page: "Loading the page..."
+export_dialog.progress.pdf.load_failed: "The page could not be loaded."
+export_dialog.progress.pdf.printing: "Generating the PDF..."
+export_dialog.progress.pdf.printing_elapsed: "Generating the PDF... ({} s)"
+export_dialog.progress.pdf.failed: "The PDF could not be generated."
+export_dialog.progress.latex.preparing: "Generating the LaTeX sources..."
+export_dialog.progress.latex.pass: "=== {} (pass {}) ==="
+export_dialog.progress.latex.prepare_error: "Error generating LaTeX with template '{}': {}"
+export_dialog.progress.latex.sources_error: "Error writing the LaTeX sources: {}"
+export_dialog.progress.latex.engine_start_error: "The LaTeX engine '{}' could not be started."
+export_dialog.progress.latex.failed: "=== LaTeX compilation failed (exit code {}) ==="
 export_dialog.finished.dialog.title: "Export finished"
 export_dialog.finished.dialog.text: "Current view has been exported successfully in path {}"
 export_dialog.finished.dialog.error.title: "Error exporting"
 export_dialog.finished.dialog.error.text: "Current view could not be exported. For more information, check the log file."
 
 # Export PDF
-export_dialog.export_strategy.pdf: "PDF file"
+export_dialog.export_strategy.pdf: "PDF (from HTML)"
 export_dialog.export_pdf.filename.label: "Enter file name and path:"
 export_dialog.export_pdf.filename.error.invalid_chars: 'The file name cannot contain the following characters: / \ : * ? \" < > |'
 export_dialog.export_pdf.filename.error.empty: "The file name cannot be empty"
@@ -156,11 +176,18 @@ export_dialog.export_pdf.filename.error.folder_not_found: "Selected path does no
 export_dialog.export_strategy.html: "HTML (with resources folder)"
 export_dialog.export_html.filepath.label: "Select destination directory:"
 export_dialog.export_html.folder_name.label: "Enter folder name:"
-export_dialog.export_html.error.empty: "The directory name cannot be empty"
+export_dialog.export_html.error.empty: "Select a destination directory"
 export_dialog.export_html.error.not_found: "The directory does not exist"
 export_dialog.export_html.error.not_directory: "The path is not a directory"
 export_dialog.export_html.error.invalid_folder_name: "The folder name is invalid"
 export_dialog.export_html.error.folder_exists: "The folder already exists, select another name"
+
+# Export LaTeX (sources and PDF)
+export_dialog.export_strategy.latex: "LaTeX (with resources folder)"
+export_dialog.export_strategy.pdf_latex: "PDF (from LaTeX)"
+export_dialog.export_latex.template.label: "LaTeX template:"
+export_dialog.export_pdf_latex.engine.label: "LaTeX engine:"
+export_dialog.export_pdf_latex.error.no_engine: "No LaTeX engine (xelatex, lualatex or pdflatex) was found. Install a LaTeX distribution such as MiKTeX or TeX Live and add it to the PATH."
 
 # ---------------------------------------------------------------------------
 # Information dialog

@@ -20,7 +20,7 @@ from pathlib import Path
 # --------------------------------------------------------------------------
 
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtWidgets import (
     QWidget,
     QLabel,
@@ -60,6 +60,7 @@ from proteus.application.state.restorer import read_state_from_file
 from proteus.application.state.exporter import write_state_to_file
 from proteus.application.resources.translator import translate as _
 from proteus.application.resources.icons import Icons, ProteusIconType
+from proteus.application.resources.themes import Themes
 from proteus.application.clipboard import Clipboard
 from proteus.application.events import (
     SelectObjectEvent,
@@ -70,6 +71,7 @@ from proteus.application.events import (
     StackChangedEvent,
     ClipboardChangedEvent,
     ArchetypeRepositoryChangedEvent,
+    ThemeChangedEvent,
 )
 
 # Module configuration
@@ -136,6 +138,8 @@ class MainMenu(QDockWidget, ProteusComponent):
         # Store archetype buttons by object class
         self.archetype_buttons: Dict[str, ArchetypeMenuButton] = {}
 
+        self._profile_icon_label: QLabel = None
+
         # Tab widget to display app menus in different tabs
         self.tab_widget: QTabWidget = QTabWidget()
 
@@ -201,10 +205,14 @@ class MainMenu(QDockWidget, ProteusComponent):
         profile_icon = QIcon(profile_metadata.image.as_posix())
         # The pixmap will keep the aspect ratio of the original image and will be
         # restricted to the minimum of the width and height values, in this case
-        # the maximun height will be 32 pixels like the menu bar buttons. 2000 is
-        # an arbitrary value to ensure the image is not stretched.
-        icon_label.setPixmap(profile_icon.pixmap(2000, 32))
+        # the maximum height is the theme's profile_icon_height metric.
+        # The wide requested size lets the icon keep its natural aspect ratio.
+        icon_label.setPixmap(
+            profile_icon.pixmap(2000, Themes().metric("profile_icon_height", 32))
+        )
         icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self._profile_icon_label = icon_label
 
         profile_name: QLabel = QLabel(profile_metadata.name)
         profile_name.setWordWrap(True)
@@ -635,6 +643,7 @@ class MainMenu(QDockWidget, ProteusComponent):
             - SELECT OBJECT -> update_on_clipboard_changed
             - STACK CHANGED -> update_on_clipboard_changed
             - ARCHETYPE REPOSITORY CHANGED -> update_on_archetype_repository_changed
+            - THEME CHANGED -> update_on_theme_changed
         """
         SaveProjectEvent().connect(self.update_on_save_project)
         OpenProjectEvent().connect(self.update_on_open_project)
@@ -650,6 +659,7 @@ class MainMenu(QDockWidget, ProteusComponent):
         ArchetypeRepositoryChangedEvent().connect(
             self.update_on_archetype_repository_changed
         )
+        ThemeChangedEvent().connect(self.update_on_theme_changed)
 
     # ======================================================================
     # Component update methods (triggered by PROTEUS application events)
@@ -852,6 +862,63 @@ class MainMenu(QDockWidget, ProteusComponent):
         if document_id == self._state_manager.get_current_document():
             current_object_id = self._state_manager.get_current_object()
             self.update_on_select_object(current_object_id)
+
+    def update_on_theme_changed(self, theme_key: str) -> None:
+        """
+        Re-apply icons and metric-driven geometry when the application
+        theme changes: main tab buttons (icon key stored as a dynamic
+        property by the button factory), archetype buttons and the profile
+        icon.
+
+        Triggered by: ThemeChangedEvent
+
+        :param theme_key: Key of the newly applied theme.
+        """
+        icon_size: int = Themes().metric("icon_size_button", 32)
+
+        # The button factory retains each icon key for live replacement.
+        main_buttons: List[QToolButton] = [
+            self.new_button,
+            self.open_button,
+            self.save_button,
+            self.project_properties_button,
+            self.add_document_button,
+            self.delete_document_button,
+            self.export_view_button,
+            self.cut_button,
+            self.copy_button,
+            self.paste_button,
+            self.undo_button,
+            self.redo_button,
+            self.impact_analysis_button,
+            self.settings_button,
+            self.information_button,
+        ]
+        for button in main_buttons:
+            if button is None:
+                continue
+            icon_key: str = button.property("icon_key")
+            if not icon_key:
+                continue
+            icon = Icons().icon(ProteusIconType.MainMenu, icon_key)
+            button.setIcon(icon)
+            button.setIconSize(icon.actualSize(QSize(icon_size, icon_size)))
+
+        for archetype_button in self.archetype_buttons.values():
+            archetype_icon = Icons().icon(
+                ProteusIconType.Archetype, archetype_button.object_class
+            )
+            archetype_button.setIcon(archetype_icon)
+            archetype_button.setIconSize(QSize(icon_size, icon_size))
+
+        if self._profile_icon_label is not None:
+            profile_metadata = Config().current_profile_metadata
+            profile_icon = QIcon(profile_metadata.image.as_posix())
+            self._profile_icon_label.setPixmap(
+                profile_icon.pixmap(
+                    2000, Themes().metric("profile_icon_height", 32)
+                )
+            )
 
     # ---------------------------------------------------------------------
     # Method     : update_on_archetype_repository_changed

@@ -16,7 +16,6 @@ from typing import List
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -31,6 +30,7 @@ from PyQt6.QtWidgets import (
 
 from proteus.model import ProteusID, PROTEUS_NAME
 from proteus.model.object import Object
+from proteus.model.archetype_repository import get_archetype_key
 from proteus.controller.command_stack import Controller
 from proteus.application.resources.translator import translate as _
 from proteus.views.components.dialogs.base_dialogs import ProteusDialog
@@ -86,7 +86,7 @@ class NewDocumentDialog(ProteusDialog):
 
         # Set the window title
         self.setWindowTitle(_("new_document_dialog.title"))
-        self.sizeHint = lambda: QSize(450, 0)
+        self.setMinimumWidth(450)
 
         # Get document archetypes
         document_archetypes: List[Object] = self._controller.get_document_archetypes()
@@ -99,7 +99,12 @@ class NewDocumentDialog(ProteusDialog):
 
         archetype: Object = None
         for archetype in document_archetypes:
-            self.archetype_combo.addItem(archetype.get_property(PROTEUS_NAME).value, archetype.id)
+            # Documents of project archetypes show the project they come from,
+            # since several project archetypes may have similar documents
+            name: str = archetype.get_property(PROTEUS_NAME).value
+            if archetype.archetype_origin:
+                name = _("new_document_dialog.archetype.from_project", name, archetype.archetype_origin)
+            self.archetype_combo.addItem(name, get_archetype_key(archetype))
 
         # Show the archetype description
         description_placeholder_label: QLabel = QLabel(
