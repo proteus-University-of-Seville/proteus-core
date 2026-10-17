@@ -36,6 +36,7 @@ from PyQt6.QtWidgets import (
 # Project specific imports
 # --------------------------------------------------------------------------
 
+from proteus.application.events import GitChangesEvent
 from proteus.model import ProteusID
 from proteus.model.abstract_object import ProteusState
 from proteus.application.metrics import Metrics
@@ -332,6 +333,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         SelectObjectEvent().connect(self.update_on_select_object)
         CurrentViewChangedEvent().connect(self.update_on_current_view_changed)
         ThemeChangedEvent().connect(self.update_on_theme_changed)
+        GitChangesEvent().connect(self.apply_git_highlights)
 
     # ----------------------------------------------------------------------
     # Method     : display_view
@@ -419,6 +421,13 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         script.setSourceCode(SCROLL_ON_LOAD_SCRIPT.replace("__ID__", json.dumps(str(target))))
         scripts.insert(script)
 
+    def apply_git_highlights(self, changes: dict) -> None:
+        from proteus.views.components.git_document_review import document_highlight_script
+        script = document_highlight_script(changes)
+        for browser in self.tabs.values():
+            if browser is not None:
+                browser.page().runJavaScript(script)
+
     def load_finished(self, sender: QWebEngineView.loadFinished, object_to_scroll: ProteusID):  # type: ignore
         # Disconnect the signal to avoid multiple calls when page is reloaded
         sender.disconnect()
@@ -438,6 +447,7 @@ class ViewsContainer(QTabWidget, ProteusComponent):
             script += f"document.getElementById({json.dumps(str(target))})?.scrollIntoView({{ behavior: 'instant' }});"
         browser.page().runJavaScript(script)
 
+        self.apply_git_highlights(GitChangesEvent().changes)
         Metrics.html_load_time_end()
 
     # ======================================================================
@@ -733,7 +743,12 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         :param index: Index of the tab to close.
         """
         # Get the key corresponding to the tab index
-        xslt_name: str = list(self.tabs.keys())[index]
+        widget = self.widget(index)
+        if widget not in self.tabs.values():
+            self.removeTab(index)
+            widget.deleteLater()
+            return
+        xslt_name = next(name for name, browser in self.tabs.items() if browser is widget)
 
         # Trigger REMOVE_VIEW event
         DeleteViewEvent().notify(xslt_name)
@@ -758,6 +773,8 @@ class ViewsContainer(QTabWidget, ProteusComponent):
         if index >= 0:
             view_tab: QWidget = self.widget(index)
             # Get the document id (key) from the tab (value)
+            if view_tab not in self.tabs.values():
+                return
             view_name = list(self.tabs.keys())[list(self.tabs.values()).index(view_tab)]
 
         # Update current document in the state manager

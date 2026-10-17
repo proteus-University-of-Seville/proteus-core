@@ -32,6 +32,7 @@ from proteus.application.resources.icons import Icons, ProteusIconType
 from proteus.application.resources.themes import Themes
 from proteus.views.components.abstract_component import ProteusComponent
 from proteus.views.components.main_menu import MainMenu
+from proteus.views.components.git_panel import GitPanel
 from proteus.views.components.project_container import ProjectContainer
 from proteus.application.events import (
     SelectObjectEvent,
@@ -125,6 +126,14 @@ class MainWindow(QMainWindow, ProteusComponent):
 
         self.statusBar().addPermanentWidget(self.clipboard_indicator)
         self.statusBar().addPermanentWidget(self.metrics_indicator)
+
+        self.git_panel = GitPanel(self)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.git_panel)
+        git_tab = self.git_panel.create_ribbon()
+        self.main_menu.tab_widget.addTab(git_tab, "Git")
+        self.main_menu.tab_widget.currentChanged.connect(
+            lambda _: self.git_panel.reveal() if self.main_menu.tab_widget.currentWidget() is git_tab else None
+        )
 
         log.info("Main window component created")
 
@@ -310,6 +319,19 @@ class MainWindow(QMainWindow, ProteusComponent):
 
         :param event: Close event
         """
+
+        if self.git_panel.busy and not self.git_panel._quiet:
+            event.ignore()
+            return
+
+        if self.git_panel.blocked:
+            if self._controller.check_unsaved_changes():
+                from proteus.views.components.git_panel import text
+                if not self.git_panel.confirm(text("discard_memory")):
+                    event.ignore()
+                    return
+            event.accept()
+            return
 
         def close_without_saving():
             # Clean the command stack
