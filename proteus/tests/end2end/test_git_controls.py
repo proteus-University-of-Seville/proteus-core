@@ -425,7 +425,7 @@ def test_rendered_review_is_temporary_tab_and_keeps_document_state(app, qtbot, t
     temporary_html = Path(review._html_directory.path())
     assert (temporary_html / '0.html').is_file()
     results = []
-    qtbot.wait(1200)
+    qtbot.waitUntil(lambda: len(review._rendered_text) == 2 and all(review._rendered_text.values()), timeout=15000)
     review.browsers[0].page().runJavaScript('document.body.innerText', results.append)
     qtbot.waitUntil(lambda: bool(results), timeout=10000)
     assert results[0].strip()

@@ -37,5 +37,10 @@ jobs:
 
       - name: Run pytest
         uses: aganders3/headless-gui@v2
+        env:
+          # Xvfb runners have no hardware GPU. Keep real WebEngine tests on
+          # Qt/Chromium's software rendering path instead of ANGLE/Vulkan.
+          QTWEBENGINE_CHROMIUM_FLAGS: --disable-gpu
+          QT_QUICK_BACKEND: software
         with:
           run: uv run pytest
