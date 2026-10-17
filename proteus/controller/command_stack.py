@@ -661,6 +661,30 @@ class Controller:
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
+    def reload_project_from_disk(self, project_path: str) -> None:
+        """Validate a disk snapshot before replacing the currently open model.
+
+        Git operations can replace every object. Undo and clipboard entries from
+        the previous snapshot must never be applied to the newly loaded model.
+        """
+        candidate = ProjectService()
+        candidate.load_project(project_path)
+        state = StateManager()
+        document_id = state.get_current_document()
+        object_id = state.get_current_object() if document_id else None
+        self._project_service = candidate
+        self.stack.clear()
+        from proteus.application.clipboard import Clipboard
+        Clipboard().clear()
+        state.clear()
+        state.current_project_path = Path(project_path)
+        OpenProjectEvent().notify()
+        if document_id in candidate.project_index:
+            state.set_current_document(document_id)
+            selected = candidate.project_index.get(object_id)
+            if isinstance(selected, Object) and selected.get_document().id == document_id:
+                state.set_current_object(object_id, document_id)
+
     @proteus_action
     def save_project(self) -> None:
         """
