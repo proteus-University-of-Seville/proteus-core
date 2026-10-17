@@ -1,5 +1,6 @@
 """Integration tests use real disposable Git repositories, never user remotes."""
 from pathlib import Path
+import os
 import subprocess
 
 import pytest
@@ -8,9 +9,14 @@ from proteus.services.git_service import GitError, GitService
 
 
 @pytest.fixture
-def repo(tmp_path):
+def repo(tmp_path, monkeypatch):
+    # The host may trust all repositories or configure hooks/signing globally.
+    # Exercise ownership checks and local mutations without inheriting that state.
+    monkeypatch.setenv('GIT_CONFIG_NOSYSTEM', '1')
+    monkeypatch.setenv('GIT_CONFIG_GLOBAL', os.devnull)
     service = GitService(tmp_path)
     service.run('init', '-b', 'develop')
+    service.run('config', 'core.autocrlf', 'input')
     service.run('config', 'user.name', 'PROTEUS Test')
     service.run('config', 'user.email', 'test@example.invalid')
     return service
