@@ -163,7 +163,11 @@ class PropertyInputFactory:
         # Create the label
         label = QLabel()
         name = _(f"archetype.prop_name.{property.name}", alternative_text=property.name)
-        label.setWordWrap(True)
+
+        # No word wrap: the label is one line high (see below), so a wrapped
+        # label would be cut. The label column of the form layout widens to
+        # fit the longest label instead.
+        label.setWordWrap(False)
 
         # Size policy expanding is required to center labels vertically in the form layout
         # https://stackoverflow.com/q/34644808

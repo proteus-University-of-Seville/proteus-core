@@ -16,7 +16,9 @@
 
 from PyQt6.QtCore import (
     Qt,
+    pyqtSignal,
 )
+from PyQt6.QtGui import QMouseEvent
 from PyQt6.QtWidgets import (
     QWidget,
     QCheckBox,
@@ -30,6 +32,26 @@ from PyQt6.QtWidgets import (
 
 from proteus.application.resources.translator import translate as _
 
+
+# --------------------------------------------------------------------------
+# Class: _ClickableLabel
+# Description: Label that emits a signal when it is clicked.
+# Date: 18/10/2026
+# Version: 0.1
+# Author: Amador Durán Toro
+# --------------------------------------------------------------------------
+class _ClickableLabel(QLabel):
+    """
+    Label that emits 'clicked' when it is clicked with the left button and it
+    is enabled. Used as the text of the checkbox of a BooleanEdit.
+    """
+
+    clicked = pyqtSignal()
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        if self.isEnabled() and event.button() == Qt.MouseButton.LeftButton:
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
 
 
 # --------------------------------------------------------------------------
@@ -83,20 +105,27 @@ class BooleanEdit(QWidget):
         Create the widgets and configure the layout.
         """
 
-        # Widgets creation --------------------------------------------------
-        self.checkbox = QCheckBox(
-            _(
-                f"archetype.tooltip.{self.tooltip_str}",
-                alternative_text=self.tooltip_str,
-            )
+        text: str = _(
+            f"archetype.tooltip.{self.tooltip_str}",
+            alternative_text=self.tooltip_str,
         )
+
+        # Widgets creation --------------------------------------------------
+        # The text is shown in a word-wrapped label instead of in the checkbox:
+        # the text of a checkbox does not wrap, so a long one forces a minimum
+        # width that makes the form layout move the property label above the
+        # field (and cut it). Clicking the label toggles the checkbox.
+        self.checkbox = QCheckBox()
+        self.checkbox.setAccessibleName(text)
+
+        self.label = _ClickableLabel(text)
+        self.label.setWordWrap(True)
+        self.label.clicked.connect(self.checkbox.toggle)
 
         # Layout setup -----------------------------------------------------
         layout = QHBoxLayout()
-        layout.addWidget(self.checkbox)
-
-        # Set alignment for the layout
-        layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.checkbox, 0, Qt.AlignmentFlag.AlignTop)
+        layout.addWidget(self.label, 1)
 
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
@@ -141,6 +170,7 @@ class BooleanEdit(QWidget):
         button.
         """
         self.checkbox.setEnabled(enabled)
+        self.label.setEnabled(enabled)
 
     # ======================================================================
     # Slots (connected to signals)
