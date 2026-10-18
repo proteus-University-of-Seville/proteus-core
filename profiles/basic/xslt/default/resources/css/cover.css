@@ -25,6 +25,12 @@ div#document_logo {
   margin-bottom: 20pt;
 }
 
+/* Logo of the organization the document is prepared for */
+div#document_logo img {
+  max-height: 150px;
+  max-width: 60%;
+}
+
 div#document_name {
   font-weight: bold;
   font-size: xx-large;

@@ -7,6 +7,10 @@
 <!-- Date    : 2026/09/22                                     -->
 <!-- Version : 2.0                                            -->
 <!-- ======================================================== -->
+<!-- Update  : 2026/10/18 (Amador Durán & Claude Code)        -->
+<!-- The logo is the one of the organization the document is  -->
+<!-- prepared for, or the default one if it has none.         -->
+<!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -26,8 +30,21 @@
           <xsl:value-of select="parent::*/parent::*/properties/stringProperty[@name=':Proteus-name']"/>
         </div>
 
+        <!-- Logo of the organization the document is prepared for or, if -->
+        <!-- there is none or it has no logo, the default logo            -->
+        <xsl:variable name="client"
+          select="//object[@id = current()/properties/traceProperty[@name='prepared-for']/trace[1]/@target]"/>
+        <xsl:variable name="client_logo" select="normalize-space($client/properties/fileProperty[@name='logo'])"/>
+
         <div id="document_logo">
-          <img alt="Universidad de Sevilla" src="templates:///default/resources/images/logo_us.gif"/>
+          <xsl:choose>
+            <xsl:when test="$client_logo != ''">
+              <img alt="{$client/properties/*[@name=':Proteus-name']}" src="{concat('assets:///', $client_logo)}"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <img alt="Universidad de Sevilla" src="templates:///default/resources/images/logo_us.gif"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </div>
 
         <div id="document_name">
