@@ -17,8 +17,8 @@ from typing import Union, List, Dict, Any
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtGui import QIcon, QGuiApplication, QShowEvent
 from PyQt6.QtWidgets import (
     QWidget,
     QLabel,
@@ -56,6 +56,10 @@ from proteus.controller.command_stack import Controller
 
 # Module configuration
 log = logging.getLogger(__name__)  # Logger
+
+# Maximum width of the dialog when it is widened to show all its tabs,
+# as a fraction of the available screen width
+MAX_SCREEN_WIDTH_FRACTION: float = 0.8
 
 
 # --------------------------------------------------------------------------
@@ -228,9 +232,64 @@ class PropertyDialog(ProteusDialog):
 
         self.set_content_layout(tabbed_layout)
 
+        # The dialog is widened to show all the tabs when it is first shown
+        # (see showEvent), once the size of every widget is known
+        self.tab_widget: QTabWidget = tab_widget
+        self.width_fitted_to_tabs: bool = False
+
+    # ----------------------------------------------------------------------
+    # Method     : showEvent
+    # Description: Widen the dialog to show all its tabs when it is first
+    #              shown.
+    # Date       : 18/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def showEvent(self, event: QShowEvent) -> None:
+        """
+        Widen the dialog to show all its tabs the first time it is shown.
+        """
+        super().showEvent(event)
+
+        if not self.width_fitted_to_tabs:
+            self.width_fitted_to_tabs = True
+            self.fit_width_to_tabs(self.tab_widget)
+
     # ======================================================================
     # Helper private methods
     # ======================================================================
+
+    def fit_width_to_tabs(self, tab_widget: QTabWidget) -> None:
+        """
+        Widen the dialog so that all the category tabs are visible, without
+        the scroll buttons of the tab bar, which users often overlook. The
+        width is limited to a fraction of the available screen width
+        (MAX_SCREEN_WIDTH_FRACTION): beyond it, the tab bar keeps its scroll
+        buttons. The dialog is never narrowed, and it is moved to keep it
+        centred where it was and inside the screen.
+        """
+        # Space that is not available for the tabs (buttons column, margins,
+        # frames), measured with the dialog laid out
+        self.layout().activate()
+        other_width: int = self.width() - tab_widget.width()
+
+        # A small margin avoids the scroll buttons due to rounding
+        needed_width: int = tab_widget.tabBar().sizeHint().width() + other_width + 8
+
+        screen = self.screen() or QGuiApplication.primaryScreen()
+        available: QRect = screen.availableGeometry()
+        max_width: int = int(available.width() * MAX_SCREEN_WIDTH_FRACTION)
+
+        width: int = min(needed_width, max_width)
+        if width <= self.width():
+            return
+
+        # Keep the dialog centred where it was, but inside the screen
+        x: int = self.x() - (width - self.width()) // 2
+        x = max(available.left(), min(x, available.right() + 1 - width))
+
+        self.resize(width, self.height())
+        self.move(x, self.y())
 
     def create_category_widgets(
         self, properties_dict: Dict[str, Property]
