@@ -68,7 +68,12 @@ def test_dialog_widened_to_show_all_tabs(app, mocker, qtbot):
     """
     The dialog is widened so that the tab bar shows all its tabs without
     scroll buttons.
+
+    The limit of the dialog width is disabled, since it depends on the size
+    of the screen (small in the virtual displays of the continuous
+    integration): it is tested in test_dialog_width_is_limited.
     """
+    mocker.patch.object(property_dialog, "MAX_SCREEN_WIDTH_FRACTION", 100.0)
     dialog = open_dialog_with_long_tab_names(app, mocker, qtbot)
     tab_bar = dialog.findChild(QTabWidget).tabBar()
 
