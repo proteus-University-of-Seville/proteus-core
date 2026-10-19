@@ -7,6 +7,10 @@
 <!-- Date    : 2026/10/07                                     -->
 <!-- Version : 1.0                                            -->
 <!-- ======================================================== -->
+<!-- Update  : 2026/10/18 (Amador Durán & Claude Code)        -->
+<!-- The logo is the one of the organization the document is  -->
+<!-- prepared for, or the default one if it has none.         -->
+<!-- ======================================================== -->
 
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -29,8 +33,22 @@
     </xsl:call-template>
     <xsl:text>\par}&#10;\vspace{3cm}&#10;</xsl:text>
 
-    <!-- Logo -->
-    <xsl:text>\includegraphics[width=0.35\linewidth]{resources/images/logo_us.png}\par&#10;\vspace{2cm}&#10;</xsl:text>
+    <!-- Logo of the organization the document is prepared for or, if there -->
+    <!-- is none or it has no logo, the default logo. Assets are referenced -->
+    <!-- as {assets/<file>} so that the export strategies copy them.        -->
+    <xsl:variable name="client"
+      select="//object[@id = current()/properties/traceProperty[@name='prepared-for']/trace[1]/@target]"/>
+    <xsl:variable name="client_logo" select="normalize-space($client/properties/fileProperty[@name='logo'])"/>
+    <xsl:choose>
+      <xsl:when test="$client_logo != ''">
+        <xsl:text>\includegraphics[width=0.35\linewidth,height=3cm,keepaspectratio]{assets/</xsl:text>
+        <xsl:value-of select="$client_logo"/>
+        <xsl:text>}\par&#10;\vspace{2cm}&#10;</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>\includegraphics[width=0.35\linewidth]{resources/images/logo_us.png}\par&#10;\vspace{2cm}&#10;</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
 
     <!-- Document name, version and date -->
     <xsl:text>{\Huge\bfseries </xsl:text>
