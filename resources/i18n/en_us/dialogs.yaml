@@ -193,15 +193,30 @@ export_dialog.export_pdf_latex.error.no_engine: "No LaTeX engine (xelatex, luala
 # Information dialog
 # ---------------------------------------------------------------------------
 information_dialog.title: "Proteus information"
-information_dialog.description.text: "Proteus is an archetype-based editor for structured documents.
-An archetype is an off-the-shelf object, document or project that can be cloned to create new ones.
-Archetypes are organized into domain-specific profiles.
-This application has been developed at the University of Seville (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez).
-This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez."
-information_dialog.license.text: "This application is distributed under the BSD 3-Clause 'New' or 'Revised' License."
-information_dialog.terms_of_use.text: "This application do not collect any personal information. The software is provided 'as is',
-without warranty of any kind, use it at your own risk. The authors are not responsible for any damage caused by the use of this software.
-Seville, September 2026."
+# The description, license and terms of use are Markdown (GitHub dialect).
+# Literal block scalars (|-) keep the line breaks: a blank line separates paragraphs.
+information_dialog.description.text: |-
+  **Proteus** is an archetype-based editor for structured documents.
+
+  An *archetype* is an off-the-shelf object, document or project that can be cloned to create new ones. Archetypes are organized into domain-specific *profiles*.
+
+  This application has been developed at the [University of Seville](https://www.us.es) (Andalusia, Spain) under the supervision of Professor Amador Durán Toro and with the effort of several students:
+
+  - José Renato Ramos González
+  - José Gamaza Díaz
+  - Pablo Rivera Jiménez
+  - José María Delgado Sánchez
+
+  This version is mainly the evolution of the results of the End-Of-Degree project of José María Delgado Sánchez.
+
+  Source code: [proteus-core](https://github.com/proteus-University-of-Seville/proteus-core)
+information_dialog.license.text: "This application is distributed under the [BSD 3-Clause 'New' or 'Revised' License](https://opensource.org/license/bsd-3-clause)."
+information_dialog.terms_of_use.text: |-
+  This application **does not collect any personal information**.
+
+  The software is provided 'as is', without warranty of any kind; use it at your own risk. The authors are not responsible for any damage caused by the use of this software.
+
+  Seville, September 2026.
 
 # ---------------------------------------------------------------------------
 # Items dialog

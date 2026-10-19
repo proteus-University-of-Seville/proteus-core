@@ -15,6 +15,7 @@
 # Third-party library imports
 # --------------------------------------------------------------------------
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -84,20 +85,10 @@ class InformationDialog(ProteusDialog):
         app_version.setObjectName("app_version_label")
         app_version.setContentsMargins(0, 0, 0, 20)
 
-        # App description
-        app_description = QLabel(_("information_dialog.description.text"))
-        app_description.setWordWrap(True)
-        app_description.setContentsMargins(0, 0, 0, 20)
-
-        # License
-        license = QLabel(_("information_dialog.license.text"))
-        license.setWordWrap(True)
-        license.setContentsMargins(0, 0, 0, 20)
-
-        # Terms of use and privacy policy
-        terms_of_use = QLabel(_("information_dialog.terms_of_use.text"))
-        terms_of_use.setWordWrap(True)
-        terms_of_use.setContentsMargins(0, 0, 0, 20)
+        # App description, license, terms of use and privacy policy (Markdown)
+        app_description = self.markdown_label("information_dialog.description.text")
+        license = self.markdown_label("information_dialog.license.text")
+        terms_of_use = self.markdown_label("information_dialog.terms_of_use.text")
 
         # Icons8 attribution
         icons8_attribution = QLabel("Icons by <a href='https://icons8.com'>Icons8</a>")
@@ -127,6 +118,30 @@ class InformationDialog(ProteusDialog):
     # ======================================================================
     # Dialog slots methods (connected to the component signals and helpers)
     # ======================================================================
+
+    # ----------------------------------------------------------------------
+    # Method     : markdown_label
+    # Description: Create a label that shows a translated Markdown text.
+    # Date       : 19/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    @staticmethod
+    def markdown_label(key: str) -> QLabel:
+        """
+        Create a word-wrapped label that shows the translation of the given
+        key as Markdown (GitHub dialect): paragraphs are separated by blank
+        lines, so the line breaks of the translation are kept, and its links
+        are opened in the web browser.
+
+        :param key: Translation key of the Markdown text.
+        """
+        label = QLabel(_(key, allow_new_line_characters=True))
+        label.setTextFormat(Qt.TextFormat.MarkdownText)
+        label.setOpenExternalLinks(True)
+        label.setWordWrap(True)
+        label.setContentsMargins(0, 0, 0, 20)
+        return label
 
     # ======================================================================
     # Dialog static methods (create and show the form window)

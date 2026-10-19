@@ -193,16 +193,30 @@ export_dialog.export_pdf_latex.error.no_engine: "No se ha encontrado ningún mot
 # Information dialog
 # ---------------------------------------------------------------------------
 information_dialog.title: "Información sobre Proteus"
-information_dialog.description.text: "Proteus es un editor basado en arquetipos para documentos estructurados.
-Un arquetipo es un objeto, documento o proyecto listo para ser clonado cuando sea necesario crear otros nuevos.
-Los arquetipos se organizan en perfiles, que pueden desarrollarse para diferentes dominios.
-Esta aplicación ha sido desarrollada en la Universidad de Sevilla (Andalucía, España) bajo la supervisión del profesor Amador Durán Toro y con el esfuerzo de varios estudiantes (José Renato Ramos González, José Gamaza Díaz, Pablo Rivera Jiménez and José María Delgado Sánchez).
-Esta versión es principalmente la evolución de los resultados del Trabajo Fin de Grado de José María Delgado Sánchez."
-information_dialog.license.text: "Esta aplicacion se distribuyen bajo la licencia BSD 3-Clause 'New' or 'Revised'."
-information_dialog.terms_of_use.text: "Esta aplicación no recopila ninguna información personal.
-El software se proporciona 'tal cual', sin garantía de ningún tipo, utilícelo bajo su propio riesgo.
-Los autores no son responsables de ningún daño causado por el uso de este software.
-Sevilla, Septiembre de 2026."
+# The description, license and terms of use are Markdown (GitHub dialect).
+# Literal block scalars (|-) keep the line breaks: a blank line separates paragraphs.
+information_dialog.description.text: |-
+  **Proteus** es un editor basado en arquetipos para documentos estructurados.
+
+  Un *arquetipo* es un objeto, documento o proyecto listo para ser clonado cuando sea necesario crear otros nuevos. Los arquetipos se organizan en *perfiles*, que pueden desarrollarse para diferentes dominios.
+
+  Esta aplicación ha sido desarrollada en la [Universidad de Sevilla](https://www.us.es) (Andalucía, España) bajo la supervisión del profesor Amador Durán Toro y con el esfuerzo de varios estudiantes:
+
+  - José Renato Ramos González
+  - José Gamaza Díaz
+  - Pablo Rivera Jiménez
+  - José María Delgado Sánchez
+
+  Esta versión es principalmente la evolución de los resultados del Trabajo Fin de Grado de José María Delgado Sánchez.
+
+  Código fuente: [proteus-core](https://github.com/proteus-University-of-Seville/proteus-core)
+information_dialog.license.text: "Esta aplicación se distribuye bajo la licencia [BSD 3-Clause 'New' or 'Revised'](https://opensource.org/license/bsd-3-clause)."
+information_dialog.terms_of_use.text: |-
+  Esta aplicación **no recopila ninguna información personal**.
+
+  El software se proporciona 'tal cual', sin garantía de ningún tipo; utilícelo bajo su propio riesgo. Los autores no son responsables de ningún daño causado por el uso de este software.
+
+  Sevilla, septiembre de 2026.
 
 # ---------------------------------------------------------------------------
 # Items edit dialog
