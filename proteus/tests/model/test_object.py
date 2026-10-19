@@ -15,6 +15,7 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import shutil
 from typing import Union
 
 # --------------------------------------------------------------------------
@@ -63,11 +64,15 @@ SAMPLE_DOCUMENT_ID = SampleData.get("document_1")
 
 
 @pytest.fixture
-def sample_project() -> Project:
+def sample_project(tmp_path) -> Project:
     """
-    Fixture that returns a PROTEUS sample project.
+    Fixture that returns a PROTEUS sample project. It is a temporary copy
+    of the sample project: cloning objects copies their assets into the
+    assets folder of the project, which must not change the sample data.
     """
-    return Project.load(SAMPLE_PROJECT_PATH)
+    project_path = tmp_path / SAMPLE_PROJECT_PATH.name
+    shutil.copytree(SAMPLE_PROJECT_PATH, project_path)
+    return Project.load(project_path)
 
 
 # TODO: For rich tests we need sample archetype objects. This is a temporary
