@@ -231,6 +231,10 @@ class PropertyDialog(ProteusDialog):
         self.accept_button.clicked.connect(self.save_button_clicked)
 
         self.set_content_layout(tabbed_layout)
+        # Additional width belongs to the form, not the action-button column.
+        # Native styles can otherwise give both layouts an expanding policy.
+        self._dialog_layout.setStretch(0, 1)
+        self._dialog_layout.setStretch(1, 0)
 
         # The dialog is widened to show all the tabs when it is first shown
         # (see showEvent), once the size of every widget is known

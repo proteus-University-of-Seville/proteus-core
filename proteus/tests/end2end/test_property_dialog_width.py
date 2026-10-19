@@ -96,3 +96,14 @@ def test_dialog_width_is_limited(app, mocker, qtbot, fraction):
         dialog.width() <= expected
     ), f"Dialog width {dialog.width()} exceeds the limit {expected}"
     assert dialog.width() >= INITIAL_WIDTH, "The dialog was narrowed"
+
+
+
+def test_extra_width_goes_to_form_instead_of_action_buttons(app, mocker, qtbot):
+    dialog = open_dialog_with_long_tab_names(app, mocker, qtbot)
+    tab_widget = dialog.findChild(QTabWidget)
+    original_form_width = tab_widget.width()
+    original_buttons_width = dialog.accept_button.width()
+    dialog.resize(dialog.width() + 120, dialog.height())
+    qtbot.waitUntil(lambda: tab_widget.width() >= original_form_width + 120)
+    assert dialog.accept_button.width() == original_buttons_width
