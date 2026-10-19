@@ -38,7 +38,7 @@
 
     <xsl:variable name="target_code" select="$target_object/properties/*[@name=':Proteus-code']" />
     <xsl:variable name="in_document"
-      select="$target_object/ancestor::object[@classes=':Proteus-document']/@id = proteus-utils:current_document()"/>
+      select="$target_object/ancestor::object[contains(concat(' ', normalize-space(@classes), ' '), ' :Proteus-document ')]/@id = proteus-utils:current_document()"/>
     <xsl:variable name="citable">
       <xsl:call-template name="is_citable">
         <xsl:with-param name="object" select="$target_object"/>
@@ -92,7 +92,7 @@
         <xsl:call-template name="trace_target_link">
           <xsl:with-param name="target_object" select="$organization"/>
           <xsl:with-param name="in_document"
-            select="$organization/ancestor::object[@classes=':Proteus-document']/@id = proteus-utils:current_document()"/>
+            select="$organization/ancestor::object[contains(concat(' ', normalize-space(@classes), ' '), ' :Proteus-document ')]/@id = proteus-utils:current_document()"/>
         </xsl:call-template>
         <xsl:text>)</xsl:text>
       </xsl:if>

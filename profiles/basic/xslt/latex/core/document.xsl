@@ -15,7 +15,7 @@
     exclude-result-prefixes="proteus proteus-utils"
 >
   <!-- Match the root object of the document -->
-  <xsl:template match="object[@classes=':Proteus-document']">
+  <xsl:template match="object[contains(concat(' ', normalize-space(@classes), ' '), ' :Proteus-document ')]" priority="10">
 
     <!-- Preamble: the language comes from the profile i18n files.    -->
     <!-- twoside: chapters of the document (cover, table of contents, -->

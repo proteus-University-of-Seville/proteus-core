@@ -15,7 +15,7 @@
     exclude-result-prefixes="proteus"
 >
   <!-- Match the root object of the document -->
-  <xsl:template match="object[@classes=':Proteus-document']">
+  <xsl:template match="object[contains(concat(' ', normalize-space(@classes), ' '), ' :Proteus-document ')]" priority="10">
 
     <!-- <!doctype html> -->
     <html>

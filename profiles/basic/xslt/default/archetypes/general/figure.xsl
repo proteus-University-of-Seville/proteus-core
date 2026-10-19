@@ -81,7 +81,7 @@
           <xsl:text> </xsl:text>
           <!-- from is needed to restart numbering in each document          -->
           <!-- level is needed to avoid restarting numbering in each section -->
-          <xsl:number from="object[@classes=':Proteus-document']"
+          <xsl:number from="object[contains(concat(' ', normalize-space(@classes), ' '), ' :Proteus-document ')]"
                       count="object[contains(concat(' ', normalize-space(@classes), ' '),' figure ')]"
                       level="any"/>:
           <xsl:text> </xsl:text>
