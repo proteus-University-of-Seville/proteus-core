@@ -82,7 +82,10 @@ def sample_archetype_document() -> Object:
     archetype_list: list[Object] = ArchetypeRepository.load_document_archetypes(
         Config().profile_settings.archetypes_directory
     )
-    return archetype_list[0]  # Known archetype document with multiple children
+    # Known archetype document with multiple children and traces to some of
+    # them (its 'prepared-for' and 'prepared-by' organizations). It is
+    # selected by id: the order of the list must not be relied on.
+    return next(archetype for archetype in archetype_list if archetype.id == "sample-doc")
 
 
 @pytest.fixture
@@ -323,11 +326,26 @@ def test_clone_object(
     ), f"Properties were not cloned. Expected: {test_object_to_clone.properties.keys()} \
         Actual: {new_object.properties.keys()}"
 
-    # Check traces are cloned
+    # Check traces are cloned: a target inside the cloned subtree is replaced
+    # by its clone, any other target is kept
+    def _flatten(object: Object) -> list[Object]:
+        objects = [object]
+        for child in object.children:
+            objects.extend(_flatten(child))
+        return objects
+
+    ids_map = {
+        original.id: clone.id
+        for original, clone in zip(_flatten(test_object_to_clone), _flatten(new_object))
+    }
+    expected_traces = [
+        (trace.name, [ids_map.get(target, target) for target in trace.value])
+        for trace in test_object_to_clone.get_traces()
+    ]
+    actual_traces = [(trace.name, trace.value) for trace in new_object.get_traces()]
     assert (
-        test_object_to_clone.get_traces() == new_object.get_traces()
-    ), f"Traces were not cloned. Expected: {test_object_to_clone.get_traces()} \
-        Actual: {new_object.get_traces()}"
+        expected_traces == actual_traces
+    ), f"Traces were not cloned. Expected: {expected_traces} Actual: {actual_traces}"
 
     # Check the children are in the new object
     # NOTE: This will not work if we clone an object into itself

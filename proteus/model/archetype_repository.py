@@ -278,9 +278,10 @@ class ArchetypeRepository:
         # its project archetypes (see _load_project_document_archetypes)
         subdirs: list[str] = []
         if isdir(archetypes_dir):
-            subdirs = [
+            # Sorted, so that the order does not depend on the file system
+            subdirs = sorted(
                 f for f in listdir(archetypes_dir) if isdir(join(archetypes_dir, f))
-            ]
+            )
 
             # Check there is no files in the root directory
             assert all(
@@ -368,7 +369,8 @@ class ArchetypeRepository:
             return []
 
         document_archetype_list: list[Object] = []
-        for subdir in listdir(projects_dir):
+        # Sorted, so that the order does not depend on the file system
+        for subdir in sorted(listdir(projects_dir)):
             # The structure of the project archetypes is checked when they are
             # loaded (see load_project_archetypes)
             project_file: str = join(projects_dir, subdir, PROJECT_FILE)
@@ -439,9 +441,10 @@ class ArchetypeRepository:
         # TODO: this means that ALL archetypes must be in one subdirectory, i.e., that
         #       no archetypes are supposed to be in the root directory, AND that only one
         #       level of subdirectories is allowed.
-        subdirs: list[str] = [
+        # Sorted, so that the order does not depend on the file system
+        subdirs: list[str] = sorted(
             f for f in listdir(archetypes_dir) if isdir(join(archetypes_dir, f))
-        ]
+        )
 
         # Check there is no files in the root directory
         assert all(
