@@ -87,6 +87,11 @@ documents/<archetype-name>/
   assets/
 ```
 
+`project.xml` must have the `<properties>` element of `proteus.xml`, with the name as the
+`:Proteus-name` property (not as an attribute), or the profile is rejected. A document
+archetype must have its `objects/` directory, containing the object that `document.xml`
+points to. See `profile_creation.md` for the whole profile.
+
 When a project is created from a project archetype, Proteus copies the whole directory and
 renames `project.xml` to `proteus.xml`. When a document is created from a document
 archetype, its objects are cloned into the project (with new IDs, see below) and the
@@ -115,7 +120,7 @@ documents of that project archetype are lost (traces) or left pointing to a miss
 
 ## How Documents Are Stored
 
-In storage terms, a document is just a Proteus object whose `classes` attribute contains `:Proteus-document`.
+In storage terms, a document is just a Proteus object whose `classes` attribute contains `:Proteus-document`. It may have other classes after it (e.g. `":Proteus-document project-charter"`); XSLT templates must test `:Proteus-document` as a class token, not compare the whole `classes` attribute.
 
 That means documents are saved exactly like other objects: one XML file per document in `objects/`.
 

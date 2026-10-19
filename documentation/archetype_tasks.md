@@ -5,7 +5,9 @@ An object archetype is the template Proteus clones when the user creates an obje
 (a section, a requirement, a use case step...). Archetypes belong to a **profile**
 (e.g. `profiles/basic`, or an external profile such as madeja). This document lists the
 files to create and the files to modify to add one. See `PROJECT_STORAGE_MANUAL.md` for
-the XML format of objects and properties, and `i18n_design.md` for the translations.
+the XML format of objects and properties, and `i18n_design.md` for the translations. To
+create a whole profile (`profile.ini`, project archetypes, XSLT templates), see
+`profile_creation.md`.
 
 Profiles ship **one complete archetype set per language** (see
 `archetypes/languages.xml`). Every step below that touches `archetypes/` or `i18n/` must be
@@ -61,6 +63,11 @@ last class of the archetype; `<id_>` is its ID with underscores):
   tabs, and the rest of the name after `NN_` is the category key, translated as
   `archetype.category.<category>` (e.g. `02_requirements` → `requirements`). A category
   folder can only contain `objects.xml`, `objects/` and `assets/`.
+* Object archetypes are the objects created inside documents. Documents themselves are
+  not object archetypes: do not put them in a category folder nor in `objects.xml` (see
+  `profile_creation.md`).
+* `:Proteus-any` and `:Proteus-none` are wildcards of `acceptedChildren`,
+  `acceptedParents` and `acceptedTargets`, never classes: do not write them in `classes`.
 * **Declare the archetype in `objects.xml`**: `<object id="<archetype id>" />`.
   This file is **mandatory**: Proteus loads *only* the archetypes listed in it, in that
   order, which is the order of the buttons in the tab. An archetype file that is not
@@ -81,7 +88,9 @@ last class of the archetype; `<id_>` is its ID with underscores):
   built from the loaded archetypes, so an archetype missing from `objects.xml` cannot be
   created at all. (Precisely, an archetype is second-level when its `acceptedParents`
   contains neither `:Proteus-any` nor `:Proteus-document`; e.g. an archetype accepting only
-  `section` as parent would be second-level too.)
+  `section` as parent would be second-level too, and, as sections accept `:Proteus-any`
+  instead of listing it, it could not be created anywhere: use
+  `acceptedParents=":Proteus-document section"` for ordinary document content.)
 
 **Alternative**: with the developer features enabled, an existing object can be stored as
 an archetype from its context menu. Proteus then writes the object (and its descendants)
@@ -144,6 +153,8 @@ Rules:
 * The order of the properties is the order of the fields in the edit form and in the
   generic rendering. `category` (default `general`) selects the form tab; a new category
   needs the label `archetype.prop_category.<category>`.
+* Every `enumProperty` needs `choices` (space-separated values): without it the only
+  choice is the default value. Every `traceProperty` should declare `acceptedTargets`.
 * Default values are the starting point of every new object. Linguistic patterns can be
   given as default text with placeholders in italics (e.g. `when _[triggering event]_`),
   with a `tooltip` explaining what to replace. When two variants of an object differ in the
@@ -185,7 +196,9 @@ file can be added too).
 
 **NOTE**: all YAML files in a language folder are merged into a single dictionary. A key
 must be defined in **one** file only: a key defined in two files silently overrides
-itself. Keys are lowercase (lookups are case-insensitive); write values between quotes;
+itself. **Write keys in lowercase**, also for property names in camelCase
+(`archetype.prop_name.documentauthor`): lookups lowercase the key, but loading does not, so
+a key with capitals is never found. Write values between quotes;
 `\n` in a class label breaks the toolbar button text.
 
 Labels shared by the GUI and the templates:

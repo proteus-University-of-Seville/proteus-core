@@ -68,7 +68,7 @@ git pull
 PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:
 - [profile-madeja](https://github.com/proteus-University-of-Seville/profile-madeja)
 
-We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu.
+We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu. See [documentation/profile_creation.md](documentation/profile_creation.md) to create a profile and [documentation/archetype_tasks.md](documentation/archetype_tasks.md) to add archetypes to it.
 
 ### LaTeX rendering (not available yet)
 
