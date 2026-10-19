@@ -196,8 +196,10 @@ class PropertyFactory:
                 element.find(UNIT_TAG).text,
             )
         else:
-            # Value could be empty
-            value = str(element.text)
+            # Value could be empty: an element with no text (e.g. written
+            # without an empty CDATA section, or self-closed) has None as
+            # text, which must be read as an empty string, not as "None"
+            value = str(element.text) if element.text is not None else str()
 
         # Create and return the property object -------------------------------
 

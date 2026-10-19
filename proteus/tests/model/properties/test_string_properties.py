@@ -25,7 +25,8 @@ import lxml.etree as ET
 # Project specific imports
 # --------------------------------------------------------------------------
 
-from proteus.model.properties import STRING_PROPERTY_TAG, MARKDOWN_PROPERTY_TAG         
+from proteus.model.properties import STRING_PROPERTY_TAG, MARKDOWN_PROPERTY_TAG, \
+    URL_PROPERTY_TAG, FILE_PROPERTY_TAG, PropertyFactory
 
 # --------------------------------------------------------------------------
 # Test specific imports
@@ -78,4 +79,30 @@ def test_string_and_markdown_properties(property_tag, name, category, value, new
     assert(
         ET.tostring(evolved_property.generate_xml()).decode() ==
         f'<{property_tag} name="{name}" category="{category}"><![CDATA[{new_value}]]></{property_tag}>'
+    )
+
+# --------------------------------------------------------------------------
+# Text properties without text
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize('property_tag', [STRING_PROPERTY_TAG, MARKDOWN_PROPERTY_TAG, URL_PROPERTY_TAG, FILE_PROPERTY_TAG])
+@pytest.mark.parametrize('xml', [
+    '<{tag} name="comments" category="general"></{tag}>',
+    '<{tag} name="comments" category="general"/>',
+])
+
+def test_text_properties_without_text(property_tag, xml):
+    """
+    A text property written without an empty CDATA section (as lxml writes
+    it when it rewrites a file) or self-closed has no text: its value must
+    be an empty string, not "None", and it must be written back with an
+    empty CDATA section.
+    """
+    element = ET.fromstring(xml.format(tag=property_tag))
+    property = PropertyFactory.create(element)
+
+    assert(property.value == str())
+    assert(
+        ET.tostring(property.generate_xml()).decode() ==
+        f'<{property_tag} name="comments" category="general"><![CDATA[]]></{property_tag}>'
     )
