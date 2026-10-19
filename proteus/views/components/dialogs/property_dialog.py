@@ -17,7 +17,7 @@ from typing import Union, List, Dict, Any
 # Third-party library imports
 # --------------------------------------------------------------------------
 
-from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtCore import Qt, QRect, QTimer
 from PyQt6.QtGui import QIcon, QGuiApplication, QShowEvent
 from PyQt6.QtWidgets import (
     QWidget,
@@ -252,8 +252,15 @@ class PropertyDialog(ProteusDialog):
         super().showEvent(event)
 
         if not self.width_fitted_to_tabs:
-            self.width_fitted_to_tabs = True
-            self.fit_width_to_tabs(self.tab_widget)
+            # Child layouts and native window geometry may still be pending
+            # during showEvent, particularly on X11.
+            QTimer.singleShot(0, self._fit_width_after_show)
+
+    def _fit_width_after_show(self) -> None:
+        if self.width_fitted_to_tabs or not self.isVisible():
+            return
+        self.fit_width_to_tabs(self.tab_widget)
+        self.width_fitted_to_tabs = True
 
     # ======================================================================
     # Helper private methods
@@ -270,7 +277,10 @@ class PropertyDialog(ProteusDialog):
         """
         # Space that is not available for the tabs (buttons column, margins,
         # frames), measured with the dialog laid out
+        self.ensurePolished()
         self.layout().activate()
+        self._content_widget.layout().activate()
+        tab_widget.ensurePolished()
         other_width: int = self.width() - tab_widget.width()
 
         # A small margin avoids the scroll buttons due to rounding

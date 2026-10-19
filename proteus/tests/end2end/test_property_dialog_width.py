@@ -56,6 +56,7 @@ def open_dialog_with_long_tab_names(main_window: MainWindow, mocker, qtbot) -> P
     qtbot.addWidget(dialog)
     dialog.show()
     qtbot.waitExposed(dialog)
+    qtbot.waitUntil(lambda: dialog.width_fitted_to_tabs)
     return dialog
 
 
@@ -72,6 +73,7 @@ def test_dialog_widened_to_show_all_tabs(app, mocker, qtbot):
     dialog = open_dialog_with_long_tab_names(app, mocker, qtbot)
     tab_bar = dialog.findChild(QTabWidget).tabBar()
 
+    qtbot.waitUntil(lambda: tab_bar.width() >= tab_bar.sizeHint().width())
     assert dialog.width() > INITIAL_WIDTH, "The dialog was not widened"
     assert (
         tab_bar.width() >= tab_bar.sizeHint().width()
