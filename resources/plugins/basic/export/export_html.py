@@ -11,6 +11,7 @@
 # --------------------------------------------------------------------------
 
 from pathlib import Path
+from typing import List
 import shutil
 import logging
 import re
@@ -50,6 +51,20 @@ log = logging.getLogger(__name__) # Logger
 # Constants
 # --------------------------------------------------------------------------
 FILE_EXTENSION_HTML: str = "html"
+
+# Folder of the export where the other templates referenced by the view are
+# copied (e.g. a view that reuses the CSS of the default template)
+REFERENCED_TEMPLATES_FOLDER: str = "templates"
+
+
+def referenced_templates(html: str, current_view: str) -> List[str]:
+    """
+    Returns the names of the templates, other than the current view, whose
+    resources are referenced in the HTML with 'templates:///<name>/' URLs,
+    sorted alphabetically.
+    """
+    pattern = re.compile(rf"{TEMPLATE_DUMMY_SEARCH_PATH}:///([^/\"'\s]+)/")
+    return sorted(set(pattern.findall(html)) - {current_view})
 
 
 # --------------------------------------------------------------------------
@@ -114,6 +129,10 @@ class ExportHTML(ExportStrategy):
           the string './assets/'.
         - Replace all the 'templates:///<current_tempalte_name>' dummy URLs
           from 'src' attributes with the string './resources/'.
+        - Copy the other templates whose resources the HTML references
+          ('templates:///<other_template_name>/' URLs) to
+          'templates/<other_template_name>' and replace those URLs with
+          './templates/<other_template_name>/'.
         - Write the processed HTML to the export folder.
 
         If any error occurs, the export is aborted and the exportFinishedSignal
@@ -162,6 +181,27 @@ class ExportHTML(ExportStrategy):
                         ignore=shutil.ignore_patterns("*.xsl", "*.xml"),
                     )
 
+            # ------------------------------------------------------------------
+            # Copy the other templates whose resources the view references
+            # (e.g. a view that reuses the CSS of the default template) to
+            # 'templates/<name>', also excluding XSL and XML files
+            other_templates: List[str] = referenced_templates(html, current_view)
+            for template_name in other_templates:
+                try:
+                    other_template = self._controller.get_template_by_name(template_name)
+                except AssertionError:
+                    log.warning(
+                        f"View '{current_view}' references template '{template_name}', "
+                        "which does not exist: its resources are not exported."
+                    )
+                    continue
+
+                shutil.copytree(
+                    other_template.path,
+                    export_folder / REFERENCED_TEMPLATES_FOLDER / template_name,
+                    ignore=shutil.ignore_patterns("*.xsl", "*.xml"),
+                )
+
             self.exportProgressSignal.emit(50)
 
             # ------------------------------------------------------------------
@@ -195,6 +235,13 @@ class ExportHTML(ExportStrategy):
                 f"{TEMPLATE_DUMMY_SEARCH_PATH}:///{current_view}/",
                 "./",
             )
+
+            # The same for the other referenced templates, copied above
+            for template_name in other_templates:
+                html = html.replace(
+                    f"{TEMPLATE_DUMMY_SEARCH_PATH}:///{template_name}/",
+                    f"./{REFERENCED_TEMPLATES_FOLDER}/{template_name}/",
+                )
 
             self.exportProgressSignal.emit(85)
 
