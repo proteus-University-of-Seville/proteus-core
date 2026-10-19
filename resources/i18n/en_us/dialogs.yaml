@@ -1,9 +1,9 @@
 # ==========================================================================
 # File: dialogs.yaml
 # Description: Proteus application dialogs related translations
-# Date: 02/02/2024
-# Version: 0.1
-# Author: José María Delgado Sánchez
+# Date: 19/10/2026
+# Version: 1.0
+# Author: Amador Durán Toro
 # ==========================================================================
 
 # ---------------------------------------------------------------------------
@@ -216,7 +216,7 @@ information_dialog.terms_of_use.text: |-
 
   The software is provided 'as is', without warranty of any kind; use it at your own risk. The authors are not responsible for any damage caused by the use of this software.
 
-  Seville, September 2026.
+  Seville, October 2026.
 
 # ---------------------------------------------------------------------------
 # Items dialog

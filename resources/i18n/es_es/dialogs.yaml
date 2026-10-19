@@ -1,9 +1,9 @@
 # ==========================================================================
-# File: dialogos.yaml
+# File: dialogs.yaml
 # Description: Traducciones de los diálogos de la aplicación Proteus
-# Date: 02/02/2024
-# Version: 0.1
-# Author: José María Delgado Sánchez
+# Date: 19/10/2026
+# Version: 1.0
+# Author: Amador Durán Toro
 # ==========================================================================
 
 # ---------------------------------------------------------------------------
@@ -174,7 +174,6 @@ export_dialog.export_pdf.filename.error.folder_not_found: "La ruta seleccionada 
 
 # Export HTML
 export_dialog.export_strategy.html: "HTML (con carpeta de recursos)"
-export_dialog.export_html.filename.label: "Seleccione una carpeta de destino:"
 export_dialog.export_html.folder_name.label: "Introduzca un nombre de carpeta:"
 export_dialog.export_html.error.empty: "Seleccione una carpeta de destino"
 export_dialog.export_html.error.not_found: "La ruta seleccionada no existe"
@@ -216,7 +215,7 @@ information_dialog.terms_of_use.text: |-
 
   El software se proporciona 'tal cual', sin garantía de ningún tipo; utilícelo bajo su propio riesgo. Los autores no son responsables de ningún daño causado por el uso de este software.
 
-  Sevilla, septiembre de 2026.
+  Sevilla, octubre de 2026.
 
 # ---------------------------------------------------------------------------
 # Items edit dialog
