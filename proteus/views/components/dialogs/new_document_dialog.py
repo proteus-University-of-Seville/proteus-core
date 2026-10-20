@@ -16,6 +16,7 @@ from typing import List
 # Third-party library imports
 # --------------------------------------------------------------------------
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -110,8 +111,11 @@ class NewDocumentDialog(ProteusDialog):
         description_placeholder_label: QLabel = QLabel(
             _("new_document_dialog.archetype.description")
         )
+        # The description of the archetype is Markdown
         self.description_content_label: QLabel = QLabel()
         self.description_content_label.setWordWrap(True)
+        self.description_content_label.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.description_content_label.setOpenExternalLinks(True)
 
         self.accept_button.clicked.connect(self.save_button_clicked)
         self.archetype_combo.currentIndexChanged.connect(self.update_description)

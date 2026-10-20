@@ -18,6 +18,7 @@ import os
 # Third-party library imports
 # --------------------------------------------------------------------------
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
@@ -148,8 +149,11 @@ class ArchetypePage(QWizardPage):
         self.description_label = QLabel(_("new_project_dialog.archetype.description"))
         self.description_label.setWordWrap(True)
 
+        # The description of the archetype is Markdown
         self.description_container_label = QLabel()
         self.description_container_label.setWordWrap(True)
+        self.description_container_label.setTextFormat(Qt.TextFormat.MarkdownText)
+        self.description_container_label.setOpenExternalLinks(True)
 
         # Layout
         layout = QVBoxLayout()
