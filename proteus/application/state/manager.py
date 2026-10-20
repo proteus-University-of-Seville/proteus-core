@@ -151,10 +151,9 @@ class StateManager(metaclass=SingletonMeta):
         """
         log.debug(f"Selecting object '{object_id}' in document '{document_id}'")
 
-        assert (
-            document_id in self.current_object
-        ), f"Document id '{document_id}' not found in current application state dictionary."
-
+        # The document may not have been shown yet since the project was opened
+        # (e.g. when navigating to the target of a trace or a symbolic link in
+        # another document): its entry is created here, as set_current_document does.
         self.current_object[document_id] = object_id
         SelectObjectEvent().notify(object_id, document_id, navigate, scroll_behavior)
 
