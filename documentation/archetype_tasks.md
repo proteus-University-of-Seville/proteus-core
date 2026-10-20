@@ -23,6 +23,7 @@ last class of the archetype; `<id_>` is its ID with underscores):
 | `archetypes/<lang>/objects/NN_<category>/objects.xml` | modify | 1 |
 | `archetypes/<lang>/objects/NN_<category>/assets/<file>` | create, if needed | 3 |
 | `icons/<main-class>.png` | create | 4 |
+| `xslt/<template>/resources/images/<main-class>.png` | create (copy of the icon) | 4 |
 | `i18n/<lang>/*.yaml` | modify | 5 |
 | `xslt/<template>/archetypes/<category>/<id_>.xsl` | create, if needed | 6 |
 | `xslt/<template>/default.xsl` | modify, if a module was created | 6 |
@@ -184,6 +185,11 @@ when an object is created.
 Create `icons/<main-class>.png` in the profile, 48x48 pixels, in the flat style of the
 profile icons. Proteus finds it by name; `icons/icons.xml` is only needed to override
 other icons (application, menus, documents). Without an icon, a default one is used.
+
+Copy the same file to `xslt/<template>/resources/images/<main-class>.png` (e.g.
+`xslt/default/resources/images/`): the class pill of the cards in the HTML view loads
+`templates:///default/resources/images/<class>.png`, not the icons folder, and shows a broken
+image if it is missing. The LaTeX export copies the icons from `icons/` itself.
 
 
 5. i18n labels for the UI and the XSLT templates

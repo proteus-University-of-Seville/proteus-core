@@ -117,6 +117,7 @@ same ids, classes and properties; only texts change.
 |---|---|
 | `archetypes/<lang>/objects/NN_<category>/objects/<id>.xml` | the archetype (see rules below) |
 | `icons/<main-class>.png` | 48x48, flat style of the profile; `<main-class>` = last class in `classes` |
+| `xslt/default/resources/images/<main-class>.png` | **a copy of the same icon**: the class pill of the HTML view loads `templates:///default/resources/images/<class>.png`, not `icons/` (the LaTeX export does use `icons/`). Without it the pill shows a broken image |
 | `xslt/default/archetypes/<category>/<id_with_underscores>.xsl` | only if the generic rendering (`any_archetype.xsl`, a property table) is not enough |
 | `xslt/default/resources/css/<id_with_underscores>.css` | optional accent colour: `.proteus_table.<main-class> { --accent: #1d4ed8; }` |
 | `archetypes/<lang>/objects/NN_<category>/assets/<file>` | only if a `fileProperty` default points to a file |
