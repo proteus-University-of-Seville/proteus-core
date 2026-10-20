@@ -64,6 +64,10 @@ from proteus.application.events import (
 # logging configuration
 log = logging.getLogger(__name__)
 
+# Class of the comments of the profiles (basic and the profiles derived from
+# it), which the user may leave out of exported documents
+COMMENT_CLASS: str = "comment"
+
 
 # --------------------------------------------------------------------------
 # Class: CommandStack
@@ -812,7 +816,7 @@ class Controller:
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
-    def get_html_view(self, xslt_name: str = "default") -> str:
+    def get_html_view(self, xslt_name: str = "default", include_comments: bool = True) -> str:
         """
         Get the HTML string view of the project XML processed with the given
         XSLT template.
@@ -821,12 +825,13 @@ class Controller:
 
         :param document_id: The id of the document to get the view.
         :param xslt_name: The name of the xslt file to use.
+        :param include_comments: False to leave the comments out (exports).
         :return: The HTML string of the view.
         """
         log.info(f"Getting {xslt_name} render of project.")
 
         # Get the document xml
-        xml: ET.Element = self._project_service.generate_project_xml()
+        xml: ET.Element = self._project_xml(include_comments)
 
         html_string: str = self._render_service.render(xml, xslt_name)
 
@@ -841,7 +846,7 @@ class Controller:
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
     @Metrics.html_generation_time_decorator
-    def get_html_view_path(self, xslt_name: str = "default") -> str:
+    def get_html_view_path(self, xslt_name: str = "default", include_comments: bool = True) -> str:
         """
         Generate a temporary HTML file that contains the view of the project
         XML processed with the given XSLT template.
@@ -850,9 +855,10 @@ class Controller:
 
         :param document_id: The id of the document to get the view.
         :param xslt_name: The name of the xslt file to use.
+        :param include_comments: False to leave the comments out (exports).
         :return: The path of the generated HTML file.
         """
-        html_string = self.get_html_view(xslt_name)
+        html_string = self.get_html_view(xslt_name, include_comments)
 
         # Replace the dummy search paths with the real paths
         assets_dir = (
@@ -911,15 +917,33 @@ class Controller:
     # Version    : 0.1
     # Author     : Amador Durán Toro
     # ----------------------------------------------------------------------
-    def render_template(self, template_name: str) -> str:
+    def render_template(self, template_name: str, include_comments: bool = True) -> str:
         """
         Render the project XML with the given template and return the result
         as a string, whatever its output format is (HTML, LaTeX...). Search
         paths (assets:///, templates:///) are not replaced.
+
+        :param include_comments: False to leave the comments out (exports).
         """
         log.info(f"Rendering project with template '{template_name}'.")
-        xml: ET.Element = self._project_service.generate_project_xml()
+        xml: ET.Element = self._project_xml(include_comments)
         return self._render_service.render(xml, template_name)
+
+    # ----------------------------------------------------------------------
+    # Method     : _project_xml
+    # Description: Project XML to render, with or without comments.
+    # Date       : 20/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _project_xml(self, include_comments: bool = True) -> ET.Element:
+        """
+        Project XML to render. Comments (objects of class 'comment', with
+        their descendants) are left out if include_comments is False: the
+        export dialog lets the user leave them out of the exported document.
+        """
+        excluded = () if include_comments else (COMMENT_CLASS,)
+        return self._project_service.generate_project_xml(excluded_classes=excluded)
 
     # ----------------------------------------------------------------------
     # Method     : get_template_by_name

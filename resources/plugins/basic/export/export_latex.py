@@ -305,7 +305,9 @@ def _replace_remote_images(
     return REMOTE_IMAGE_PATTERN.sub(replace, tex)
 
 
-def prepare_latex_sources(controller: Controller, template: Template, folder: Path) -> str:
+def prepare_latex_sources(
+    controller: Controller, template: Template, folder: Path, include_comments: bool = True
+) -> str:
     """
     First step of writing the LaTeX sources, run in the application thread
     because rendering uses the project and plugin components: renders the
@@ -315,10 +317,12 @@ def prepare_latex_sources(controller: Controller, template: Template, folder: Pa
     - the profile icons (icons/<class>.png)
     - the project assets referenced in the LaTeX source (assets/...)
 
+    Comments are left out if include_comments is False.
+
     :return: the LaTeX source, with remote figures still to be downloaded
              (see finish_latex_sources)
     """
-    tex: str = controller.render_template(template.name)
+    tex: str = controller.render_template(template.name, include_comments)
 
     # RenderService returns an <errors> HTML element if the XSLT failed
     if tex.lstrip().startswith("<errors>"):
@@ -379,14 +383,16 @@ def finish_latex_sources(
     return main_file
 
 
-def write_latex_sources(controller: Controller, template: Template, folder: Path) -> Path:
+def write_latex_sources(
+    controller: Controller, template: Template, folder: Path, include_comments: bool = True
+) -> Path:
     """
     Writes all the LaTeX sources in the given folder in the calling thread
     (prepare_latex_sources and finish_latex_sources).
 
     :return: path to main.tex
     """
-    tex: str = prepare_latex_sources(controller, template, folder)
+    tex: str = prepare_latex_sources(controller, template, folder, include_comments)
     return finish_latex_sources(tex, folder)
 
 
@@ -549,7 +555,9 @@ class ExportLaTeX(ExportHTML):
         try:
             self.exportProgressSignal.emit(10)
             self._export_folder.mkdir(parents=True)
-            tex: str = prepare_latex_sources(self._controller, template, self._export_folder)
+            tex: str = prepare_latex_sources(
+                self._controller, template, self._export_folder, self.include_comments
+            )
         except Exception as e:
             log.error(f"Error exporting with LaTeX template '{template.name}': {e}")
             self._sources_written(str(e), False)
@@ -673,7 +681,9 @@ class ExportPDFLaTeX(ExportPDF):
         template: Template = self._template_selector.currentData()
 
         try:
-            tex: str = prepare_latex_sources(self._controller, template, self._build_folder)
+            tex: str = prepare_latex_sources(
+                self._controller, template, self._build_folder, self.include_comments
+            )
         except Exception as e:
             log.error(f"Error generating LaTeX with template '{template.name}': {e}")
             self.report(_("export_dialog.progress.latex.prepare_error", template.name, e))

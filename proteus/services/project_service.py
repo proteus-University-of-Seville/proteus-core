@@ -11,7 +11,7 @@
 # --------------------------------------------------------------------------
 
 import logging
-from typing import Union, List, Dict, Set, Tuple
+from typing import Collection, Union, List, Dict, Set, Tuple
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -28,6 +28,8 @@ from proteus.model import (
     ID_ATTRIBUTE,
     CHILD_TAG,
     DOCUMENT_TAG,
+    OBJECT_TAG,
+    CLASSES_ATTRIBUTE,
     ProteusClassTag,
     PROTEUS_ANY,
     PROTEUS_NONE,
@@ -927,12 +929,15 @@ class ProjectService:
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ----------------------------------------------------------------------
-    def generate_project_xml(self) -> ET._Element:
+    def generate_project_xml(self, excluded_classes: Collection[str] = ()) -> ET._Element:
         """
         Generates the xml file for the actual project. Iterates until no
         child tags are found. Replaces child tags with the xml of the child
         object or document.
 
+        :param excluded_classes: Objects with any of these classes are left
+            out of the xml, with their descendants (e.g. comments, which the
+            user may choose not to export).
         :return: Root element of the xml file.
         :rtype: ET._Element
         """
@@ -970,6 +975,14 @@ class ProjectService:
                     # Replace child element with xml
                     parent_element: ET._Element = child_element.getparent()
                     parent_element.replace(child_element, child_xml)
+
+        # Leave out the objects of the excluded classes
+        if excluded_classes:
+            excluded = set(excluded_classes)
+            for object_element in list(root.iter(OBJECT_TAG)):
+                classes = set(object_element.attrib.get(CLASSES_ATTRIBUTE, "").split())
+                if classes & excluded and object_element.getparent() is not None:
+                    object_element.getparent().remove(object_element)
 
         return root
 

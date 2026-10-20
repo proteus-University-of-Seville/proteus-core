@@ -28,6 +28,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QProgressBar,
     QPlainTextEdit,
+    QCheckBox,
 )
 
 
@@ -39,6 +40,7 @@ from proteus.controller.command_stack import Controller
 from proteus.application.resources.translator import translate as _
 from proteus.application.export_strategy import ExportStrategy
 from proteus.application.resources.plugins import Plugins
+from proteus.application.configuration.config import Config
 from proteus.views.components.dialogs.base_dialogs import ProteusDialog, MessageBox
 
 
@@ -97,6 +99,7 @@ class ExportDialog(ProteusDialog):
         self.log_view: QPlainTextEdit = None
         self.export_format_selector: QComboBox = None
         self.export_widget_holder: QVBoxLayout = None
+        self.include_comments_checkbox: QCheckBox = None
 
         # Create the component
         self.create_component()
@@ -168,6 +171,13 @@ class ExportDialog(ProteusDialog):
         self.export_widget_holder = QVBoxLayout()
         self.export_widget_holder.setContentsMargins(0, 0, 0, 0)
 
+        # Comments, common to every export format: the last choice is kept
+        self.include_comments_checkbox = QCheckBox(_("export_dialog.include_comments"))
+        self.include_comments_checkbox.setToolTip(_("export_dialog.include_comments.tooltip"))
+        self.include_comments_checkbox.setChecked(
+            Config().app_settings.get_export_include_comments()
+        )
+
         # Accept button
         self.accept_button.setText(_("dialog.export_button"))
         self.accept_button.setEnabled(False)
@@ -182,6 +192,7 @@ class ExportDialog(ProteusDialog):
         main_layout.addWidget(export_format_label)
         main_layout.addWidget(self.export_format_selector)
         main_layout.addLayout(self.export_widget_holder)
+        main_layout.addWidget(self.include_comments_checkbox)
         main_layout.addWidget(self.log_label)
         main_layout.addWidget(self.log_view, 1)
         main_layout.addStretch()
@@ -267,6 +278,12 @@ class ExportDialog(ProteusDialog):
         self._exporting = True
         # The strategy cannot be replaced while it is exporting
         self.export_format_selector.setEnabled(False)
+        self.include_comments_checkbox.setEnabled(False)
+
+        # Whether the comments are exported, remembered for the next export
+        include_comments: bool = self.include_comments_checkbox.isChecked()
+        self._export_strategy.include_comments = include_comments
+        Config().app_settings.set_export_include_comments(include_comments)
         self.accept_button.setEnabled(False)
 
         # The dialog grows when the progress bar and the elapsed time are
@@ -331,6 +348,7 @@ class ExportDialog(ProteusDialog):
             self.progress_bar.setRange(0, 100)
             self.progress_bar.setValue(0)
             self.export_format_selector.setEnabled(True)
+            self.include_comments_checkbox.setEnabled(True)
             self.accept_button.setEnabled(True)
 
     # ----------------------------------------------------------------------

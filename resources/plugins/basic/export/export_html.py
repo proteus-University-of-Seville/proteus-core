@@ -142,7 +142,7 @@ class ExportHTML(ExportStrategy):
         """
         # Current view and HTML
         current_view: str = StateManager().get_current_view()
-        html: str = self._controller.get_html_view(current_view)
+        html: str = self._controller.get_html_view(current_view, self.include_comments)
         folder_name: str = self._folder_name_input.text()
 
         try:

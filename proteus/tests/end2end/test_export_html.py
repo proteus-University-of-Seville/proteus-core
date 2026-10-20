@@ -65,7 +65,7 @@ def test_export_copies_referenced_templates(app, tmp_path, monkeypatch):
         '<link rel="stylesheet" href="templates:///missing/resources/css/missing.css"/>'
         "</head><body></body></html>"
     )
-    monkeypatch.setattr(controller, "get_html_view", lambda view: html)
+    monkeypatch.setattr(controller, "get_html_view", lambda view, include_comments=True: html)
 
     strategy = Plugins().get_export_strategies()["html"](controller)
     strategy.exportFormWidget()

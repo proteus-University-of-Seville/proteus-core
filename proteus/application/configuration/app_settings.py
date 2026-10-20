@@ -73,6 +73,7 @@ DEFAULT_MCP_PORT: int = 8731
 # User session data
 SESSION: str = "session"
 SESSION_LAST_PROJECT_OPENED: str = "last_project_opened"
+SESSION_EXPORT_INCLUDE_COMMENTS: str = "export_include_comments"
 
 
 # logging configuration
@@ -515,3 +516,50 @@ class AppSettings:
             f"Session data '{SESSION_LAST_PROJECT_OPENED}' saved to '{self.settings_file_path}'."
         )
         log.info(f"{last_project_opened = }")
+
+    # --------------------------------------------------------------------------
+    # Method: get_export_include_comments
+    # Description: Whether the last export included the comments
+    # Date: 20/10/2026
+    # Version: 0.1
+    # Author: Amador Durán Toro
+    # --------------------------------------------------------------------------
+    def get_export_include_comments(self) -> bool:
+        """
+        Whether the comments were included in the last export (the export
+        dialog remembers the choice). True if it was never chosen.
+        """
+        try:
+            return self.config_parser.getboolean(
+                SESSION, SESSION_EXPORT_INCLUDE_COMMENTS, fallback=True
+            )
+        except ValueError:
+            return True
+
+    # --------------------------------------------------------------------------
+    # Method: set_export_include_comments
+    # Description: Remember whether the export included the comments
+    # Date: 20/10/2026
+    # Version: 0.1
+    # Author: Amador Durán Toro
+    # --------------------------------------------------------------------------
+    def set_export_include_comments(self, include_comments: bool) -> None:
+        """
+        Remember whether the comments were included in the export, so that
+        the export dialog proposes the same choice next time.
+        """
+        # The settings file is only written when the choice changes
+        if (
+            self.config_parser.has_option(SESSION, SESSION_EXPORT_INCLUDE_COMMENTS)
+            and self.get_export_include_comments() == include_comments
+        ):
+            return
+
+        if not self.config_parser.has_section(SESSION):
+            self.config_parser.add_section(SESSION)
+        self.config_parser[SESSION][SESSION_EXPORT_INCLUDE_COMMENTS] = str(include_comments)
+
+        with open(self.settings_file_path, "w") as config_file:
+            self.config_parser.write(config_file)
+
+        log.info(f"Session data '{SESSION_EXPORT_INCLUDE_COMMENTS}' = {include_comments} saved.")

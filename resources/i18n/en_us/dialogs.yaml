@@ -145,6 +145,8 @@ settings_dialog_warning.text: "The changes will be applied once the application 
 # ---------------------------------------------------------------------------
 export_dialog.title: "Export current view: {}"
 export_dialog.export_strategy.label: "Select export format:"
+export_dialog.include_comments: "Include the comments"
+export_dialog.include_comments.tooltip: "Uncheck it to leave the comment objects (e.g. the guidance of the sections) out of the exported document. The view in PROTEUS always shows them."
 export_dialog.log.label: "Export process:"
 export_dialog.elapsed: "Elapsed time: {}"
 export_dialog.progress.done: "PDF generated: {} KB in {} s."

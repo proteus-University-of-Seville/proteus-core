@@ -144,6 +144,8 @@ settings_dialog_warning.text: "Los cambios se aplicarán al reiniciar la aplicac
 # ---------------------------------------------------------------------------
 export_dialog.title: "Exportar vista: {}"
 export_dialog.export_strategy.label: "Formato de exportación:"
+export_dialog.include_comments: "Incluir los comentarios"
+export_dialog.include_comments.tooltip: "Desmárquela para dejar fuera del documento exportado los objetos comentario (p. ej., las orientaciones de las secciones). La vista de PROTEUS siempre los muestra."
 export_dialog.log.label: "Proceso de la exportación:"
 export_dialog.elapsed: "Tiempo transcurrido: {}"
 export_dialog.progress.done: "PDF generado: {} KB en {} s."

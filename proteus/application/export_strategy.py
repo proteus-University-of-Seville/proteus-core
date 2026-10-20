@@ -72,6 +72,9 @@ class ExportStrategy(QObject, ABC, metaclass=AbstractObjectMeta):
 
         self._controller = controller
 
+        # Whether the comments are exported (set by the export dialog)
+        self.include_comments: bool = True
+
     def report(self, message: str = "", progress: int = None) -> None:
         """
         Tells the user what the export is doing: the message is added to the

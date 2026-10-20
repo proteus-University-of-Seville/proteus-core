@@ -141,7 +141,9 @@ class ExportPDF(ExportStrategy):
         current_view = StateManager().get_current_view()
 
         # Generate html view
-        html_view_path: str = self._controller.get_html_view_path(xslt_name=current_view)
+        html_view_path: str = self._controller.get_html_view_path(
+            xslt_name=current_view, include_comments=self.include_comments
+        )
 
         self.report(_("export_dialog.progress.pdf.loading_page"), 10)
         self.page.loadProgress.connect(self._load_progress)
