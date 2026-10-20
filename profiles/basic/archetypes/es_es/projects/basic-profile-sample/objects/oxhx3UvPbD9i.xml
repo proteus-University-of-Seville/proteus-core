@@ -2,7 +2,7 @@
 <object id="oxhx3UvPbD9i" classes="traceability-matrix" acceptedChildren=":Proteus-none" acceptedParents=":Proteus-any">
   <properties>
     <codeProperty name=":Proteus-code" category="general" inmutable="true">
-      <prefix><![CDATA[TRM-]]></prefix>
+      <prefix><![CDATA[MTZ-]]></prefix>
       <number>001</number>
       <suffix><![CDATA[]]></suffix>
     </codeProperty>
