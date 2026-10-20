@@ -548,11 +548,9 @@ class AppSettings:
         Remember whether the comments were included in the export, so that
         the export dialog proposes the same choice next time.
         """
-        # The settings file is only written when the choice changes
-        if (
-            self.config_parser.has_option(SESSION, SESSION_EXPORT_INCLUDE_COMMENTS)
-            and self.get_export_include_comments() == include_comments
-        ):
+        # The settings file is only written when the choice changes (the
+        # default, including the comments, is not written)
+        if self.get_export_include_comments() == include_comments:
             return
 
         if not self.config_parser.has_section(SESSION):
