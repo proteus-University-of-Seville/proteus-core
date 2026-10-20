@@ -94,7 +94,7 @@
 % by \arraystretch, \ProteusTableFraction of the text width, centred.
 % --------------------------------------------------------------------------
 \renewcommand{\arraystretch}{1.5}
-\newcommand{\ProteusTableFraction}{0.95}
+\newcommand{\ProteusTableFraction}{0.98}
 \newcommand{\ProteusTableWidth}{\ProteusTableFraction\linewidth}
 
 % --------------------------------------------------------------------------
@@ -117,7 +117,7 @@
 \AddToHook{env/xltabular/begin}{\xdef\proteus@tablecounter{\the\c@table}}
 \newcommand{\ProteusCardEnd}{\setcounter{table}{\proteus@tablecounter}}
 \arrayrulecolor{proteusline}
-\newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode\small\bfseries\color{proteusink!75}}p{0.20\linewidth}}
+\newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode\small\bfseries\color{proteusink!75}}p{0.23\linewidth}}
 % Value column. Cells of X columns start in horizontal mode, so a list at
 % the beginning of a cell would end that empty paragraph and leave an
 % empty line above it. The content is set in a top-aligned minipage, which
@@ -196,13 +196,12 @@
   before upper={\setlength{\parskip}{0.4em}}}
 
 % --------------------------------------------------------------------------
-% Symbolic links: indented block with a title (not a box, because cards
-% are long tables, which cannot be placed inside boxes)
+% Symbolic links: the linked object is rendered as one more object of the
+% document (the explanatory text of the view is not exported); inside it,
+% labels and anchors are not defined again
 % --------------------------------------------------------------------------
-\newenvironment{proteuslink}[1]
-  {\par\proteus@inlinktrue
-   \begin{adjustwidth}{1em}{0pt}%
-   {\small\itshape\color{proteuslink}#1\par}}
-  {\end{adjustwidth}\par}
+\newenvironment{proteuslink}
+  {\par\proteus@inlinktrue}
+  {\par}
 
 \endinput

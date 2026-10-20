@@ -33,11 +33,9 @@
       <xsl:variable name="target_object" select="//object[@id = current()/@target]" />
 
       <xsl:if test="$target_object">
-        <xsl:text>&#10;\begin{proteuslink}{</xsl:text>
-        <xsl:call-template name="label">
-          <xsl:with-param name="key" select="'xslt.symlink_tooltip'"/>
-        </xsl:call-template>
-        <xsl:text>}&#10;</xsl:text>
+        <!-- The explanatory text of the view (xslt.symlink_tooltip) is not -->
+        <!-- exported: the linked object reads as one more object          -->
+        <xsl:text>&#10;\begin{proteuslink}&#10;</xsl:text>
         <!-- standalone: the target is rendered alone, out of its siblings -->
         <!-- (used by bibliography items, ignored by other templates)     -->
         <xsl:apply-templates select="$target_object">

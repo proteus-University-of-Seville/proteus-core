@@ -64,8 +64,10 @@ Document layout
   `\raggedbottom` avoids the stretched vertical space of `\flushbottom`.
 * Fonts: Latin Modern with every engine, and the sans serif family for the whole document
   (`\familydefault` is `\sfdefault`); code uses the typewriter family.
-* Tables (property cards, Markdown tables and traceability matrices) are centred, 95% of the
-  text width (`\ProteusTableFraction` in `proteus.sty`), with rows separated by
+* Tables (property cards, Markdown tables and traceability matrices) are centred, 98% of the
+  text width (`\ProteusTableFraction` in `proteus.sty`); the label column of cards (`L`) is
+  23% of the line width, wide enough for the class pills (e.g. *FUNCIONALIDAD*), and the value
+  column keeps 75%. Rows are separated by
   `\arraystretch` 1.5. Columns of Markdown tables are left-aligned. The content of the value
   column of cards (`Q`) and of the columns of Markdown tables (`Y`) is set in a top-aligned
   `minipage` (`\proteus@cellbegin`, `\proteus@cellend`): cells of X columns start in
@@ -212,8 +214,9 @@ module is mostly replacing HTML by LaTeX. Rules:
   them active in some languages (e.g. Spanish) and they break inside long tables.
 * **Property cards** (`generate_table`) are `xltabular` long tables that break across
   pages and repeat their header row. Long tables cannot be nested in table cells or placed in
-  boxes, so children are rendered below the card, indented (`adjustwidth`), and symbolic
-  links are an indented block, not a box. `extra_rows_before` and `extra_rows` are LaTeX rows
+  boxes, so children are rendered below the card, indented (`adjustwidth`). Symbolic links
+  render the linked object as one more object of the document, without the explanatory text
+  of the view (`xslt.symlink_tooltip`), which would make exported documents harder to read. `extra_rows_before` and `extra_rows` are LaTeX rows
   (`label & value \\ \hline`). A long table steps the `table` counter: `\end{xltabular}` must
   be followed by `\ProteusCardEnd`, which restores it, so that only real tables (e.g.
   traceability matrices) are numbered.
