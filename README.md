@@ -68,6 +68,7 @@ git pull
 PROTEUS is shipped with a basic profile that includes archetypes like `paragraph`, `section`, `figures`, etc. More complex profiles can be found within the organization with the prefix `profile-`. Current available profiles are:
 - [profile-madeja](https://github.com/proteus-University-of-Seville/profile-madeja): requirements engineering with the MADEJA method (English and Spanish).
 - [profile-rgpd](https://github.com/proteus-University-of-Seville/profile-rgpd): record of processing activities of the GDPR (RGPD), with its public inventory and information clauses (Spanish).
+- [profile-pm2](https://github.com/proteus-University-of-Seville/profile-pm2): PM² project management methodology, with the artefacts of the initiating phase so far (English and Spanish; work in progress).
 
 We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu. See [documentation/profile_creation.md](documentation/profile_creation.md) to create a profile and [documentation/archetype_tasks.md](documentation/archetype_tasks.md) to add archetypes to it.
 
