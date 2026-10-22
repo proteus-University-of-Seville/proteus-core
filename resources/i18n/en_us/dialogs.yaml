@@ -117,8 +117,7 @@ settings_dialog.error.theme.text: "The selected theme could not be loaded. Setti
 settings_dialog.error.save.title: "Settings could not be saved"
 settings_dialog.error.save.text: "The settings file could not be written. Your changes were not saved."
 
-settings_dialog.profile_settings.group: "Profile specific settings"
-settings_dialog.default_view.label: "Default view:"
+settings_dialog.default_view.group: "Default view"
 settings_dialog.default_repository.label: "Archetype repository:"
 
 settings_dialog.appearance.group: "Appearance"
@@ -127,11 +126,36 @@ settings_dialog.theme.light: "Light"
 settings_dialog.theme.dark: "Dark"
 settings_dialog.theme.none_available: "(no themes available)"
 
-settings_dialog.app.group: "App"
+settings_dialog.app.group: "Application"
 settings_dialog.open_project_on_startup.checkbox: "Open last project on startup"
 settings_dialog.open_project_on_startup.tooltip: "Ask to open the last project when the application starts"
 settings_dialog.edit_on_clone.checkbox: "Edit on object archetype clone"
 settings_dialog.edit_on_clone.tooltip: "When creating a new object from an archetype, open the new object for editing. If edit dialog is canceled, the clone operation will be undone."
+
+settings_dialog.tab.general: "General"
+settings_dialog.tab.profile: "Profile"
+settings_dialog.tab.advanced: "Advanced"
+
+settings_dialog.developer.group: "Developer"
+settings_dialog.developer_features.checkbox: "Enable developer features"
+settings_dialog.developer_features.tooltip: "Add the model editor and the options to store objects and documents as archetypes to the context menu."
+settings_dialog.xslt_debug_mode.checkbox: "XSLT debug mode"
+settings_dialog.xslt_debug_mode.tooltip: "Reload the XSLT templates every time a view is rendered, so that changes to the templates are shown without restarting the application."
+
+settings_dialog.mcp.group: "MCP server"
+settings_dialog.mcp.enabled.checkbox: "Enable the embedded MCP server"
+settings_dialog.mcp.enabled.tooltip: "Start an MCP server with the application so that AI assistants can read and edit the open project."
+settings_dialog.mcp.host.label: "Host:"
+settings_dialog.mcp.port.label: "Port:"
+settings_dialog.mcp.host.warning: "This host accepts connections from other machines. Anyone in the network will be able to read and edit the open project."
+settings_dialog.error.mcp.empty_host: "Please enter the host of the MCP server"
+settings_dialog.mcp.client_config.button: "Generate .mcp.json…"
+settings_dialog.mcp.client_config.tooltip: "Create or update the .mcp.json file of a folder so that Claude Code connects to this MCP server when it is opened in that folder. Other servers in the file are kept."
+settings_dialog.mcp.client_config.dialog: "Select the folder where .mcp.json will be generated"
+settings_dialog.mcp.client_config.success.title: ".mcp.json generated"
+settings_dialog.mcp.client_config.success.text: "The PROTEUS MCP server has been added to '{}'. The server starts once the settings are saved and the application is restarted."
+settings_dialog.mcp.client_config.error.title: ".mcp.json could not be generated"
+settings_dialog.mcp.client_config.error.text: "The .mcp.json file could not be written. If it already existed, it has not been modified."
 
 settings_dialog.info.label: "Theme changes apply immediately. Other settings may require a restart."
 

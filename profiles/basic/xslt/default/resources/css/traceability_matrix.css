@@ -76,13 +76,16 @@ table.traceability_matrix > thead > tr > th.value_column {
   color: var(--surface);
 }
 
+/* column items and every cell below them (mark or dash) are centred; */
+/* the extra class outweighs proteus_table.css's left alignment       */
+table.proteus_table.traceability_matrix > thead > tr > th.matrix_column,
+table.proteus_table.traceability_matrix > tbody > tr > td {
+  text-align: center;
+}
+
 /* ------------------------------------------------------- */
 /* Dependency mark                                          */
 /* ------------------------------------------------------- */
-
-table.traceability_matrix td.trace {
-  text-align: center;
-}
 
 span.trace_mark {
   display: inline-flex;
