@@ -1,0 +1,205 @@
+git.title: Control de versiones
+git.open_project: Abre un proyecto PROTEUS para detectar su repositorio.
+git.branches: Ramas
+git.refresh: Actualizar
+git.init: Inicializar repositorio
+git.clone: Clonar repositorio
+git.create_branch: Crear rama…
+git.rename_branch: Renombrar rama actual
+git.delete_branch: Eliminar rama local integrada
+git.fetch: Fetch
+git.pull: Pull
+git.push: Push
+git.publish_branch: Publicar rama
+git.remotes: Remotos
+git.identity: Identidad de commits (este repositorio)
+git.history: Historial
+git.merge: Integrar rama (merge)
+git.rebase: Reorganizar sobre rama (rebase)
+git.continue: Continuar operación
+git.abort: Abortar operación
+git.stash: Guardar cambios en stash
+git.apply_stash: Aplicar stash
+git.revert: Revertir commit
+git.cherry_pick: Aplicar commit (cherry-pick)
+git.tag: Crear etiqueta
+git.publish_github: Crear repositorio en GitHub…
+git.git_path: Elegir ejecutable de Git
+git.message: Mensaje del commit · Ctrl+Intro para confirmar
+git.commit: Commit
+git.stage: Preparar
+git.unstage: Retirar
+git.diff: Comparar
+git.discard: Descartar
+git.working: Operación Git en curso…
+git.no_repository: Sin repositorio Git
+git.conflicts: Conflictos
+git.staged: Cambios preparados
+git.changes: Cambios
+git.empty: No hay elementos disponibles.
+git.save_first: ¿Guardar los cambios pendientes del documento antes de continuar?
+git.clean_first: Confirma o guarda en stash todos los cambios del repositorio antes
+  de esta operación.
+git.resolve_first: Resuelve los conflictos en Control de versiones antes de editar
+  documentos.
+git.reload_failed: La edición está pausada. Restaura un proyecto válido o resuelve
+  los conflictos y vuelve a cargar.
+git.discard_tracked: Descartar se aplica a archivos seguidos sin conflictos. Se conservan
+  los archivos sin seguimiento.
+git.discard_confirm: '¿Descartar los cambios de trabajo de estos archivos? Se restaurarán
+  sus versiones del índice:'
+git.init_confirm: ¿Inicializar Git en la carpeta de este proyecto?
+git.url: URL del repositorio
+git.clone_destination: Nueva carpeta de destino
+git.destination_exists: Elige un destino que no exista.
+git.pull_strategy: Estrategia de pull
+git.add_remote: Añadir remoto
+git.edit_remote: Editar URL del remoto
+git.remove_remote: Eliminar remoto
+git.remote_name: Nombre del remoto
+git.user_name: Nombre del autor
+git.user_email: Correo del autor
+git.abort_confirm: ¿Abortar la operación Git actual?
+git.commit_reference: Referencia del commit (hash)
+git.confirm_operation: ¿Aplicar esta operación a la rama actual?
+git.gh_required: Instala GitHub CLI (gh) y ejecuta gh auth login. gh gestiona las
+  credenciales de GitHub.
+git.github_name: Repositorio de GitHub (propietario/nombre)
+git.visibility: Visibilidad del repositorio
+git.publish_confirm: ¿Crear este repositorio en GitHub y subir la rama actual?
+git.resolve: Resolver
+git.reload: Recargar proyecto desde disco
+git.resolve_save: Guardar resolución y preparar archivo
+git.resolve_delete: Resolver eliminando el archivo
+git.base: Base
+git.ours: Actual
+git.theirs: Entrante
+git.resolution: Resolución (editable)
+git.external_changes: Los archivos han cambiado fuera de PROTEUS. Recarga el proyecto
+  antes de editar o guardar.
+git.scope: Este proyecto está dentro de un repositorio mayor. Las operaciones Git
+  afectan al repositorio completo.
+git.stage_all: Preparar todos los cambios
+git.unstage_all: Retirar todos los cambios
+git.stage_hunk: Preparar un bloque de cambios
+git.ignore: Ignorar archivos sin seguimiento
+git.worktrees: Listar worktrees
+git.add_worktree: Crear worktree
+git.discard_memory: ¿Descartar las ediciones sin guardar en memoria y usar los archivos
+  del disco?
+git.repository: Repositorio
+git.synchronize: Sincronizar
+git.origin_exists: Este repositorio ya tiene origin. Usa Push / Publicar rama o configura
+  otro remoto antes de crear un repositorio en GitHub.
+git.trust: Confiar en el repositorio durante esta sesión
+git.trust_confirm: ¿Permitir a Git usar este repositorio aunque pertenezca a otra
+  cuenta? Git puede ejecutar sus hooks configurados al hacer commit o push.
+git.choose_root: Elige la raíz del repositorio que contiene .git.
+git.copy_path: Copiar ruta del repositorio
+git.more_actions: Más acciones de Git
+git.no_project: Sin proyecto abierto
+git.no_remote: Repositorio local · sin remoto configurado
+git.branch_unpublished: Rama sin seguimiento remoto
+git.clean_worktree: Sin cambios pendientes
+git.files_changed: '{} archivos con cambios'
+git.detecting: Detectando repositorio…
+git.no_repository_help: Este proyecto no está bajo Git. Inicializa un repositorio
+  o clona uno desde el menú Repositorio.
+git.panel: Panel Git
+git.panel_tip: Mostrar u ocultar el panel de control de versiones
+git.github_browser: GitHub CLI es opcional. Se abrirá el navegador para crear un repositorio.
+  Después, añade su URL en Remotos y publica tu rama.
+git.tip_fetch: Descargar referencias remotas sin modificar los documentos
+git.tip_pull: Incorporar los cambios remotos a la rama actual
+git.tip_push: Enviar los commits locales al remoto de seguimiento
+git.tip_publish_branch: Subir la rama actual y configurar su seguimiento; no crea
+  un repositorio
+git.tip_publish_github: Crear un repositorio nuevo en GitHub (opcional)
+git.tip_commit: Crear un commit local con los cambios preparados
+git.history_search: Filtrar por mensaje, autor, rama o hash…
+git.graph: Grafo
+git.commit_subject: Mensaje
+git.commit_author: Autor
+git.commit_date: Fecha
+git.commit_hash: Commit
+git.commit_refs: Ramas / etiquetas
+git.select_commit: Selecciona un commit para revisar sus cambios.
+git.load_more_commits: Cargar más commits
+git.commits_loaded: '{} commits cargados'
+git.loading_commit: Cargando los detalles del commit…
+git.project_location: 'Proyecto: {}'
+git.branch_search: Selecciona una rama o etiqueta…
+git.branch_source: Selecciona la rama o etiqueta de origen…
+git.detach_reference: Selecciona una referencia o escribe un hash de commit…
+git.picker_create: Crear una rama nueva…
+git.picker_create_from: Crear una rama nueva desde…
+git.picker_detach: Cambiar a un commit (HEAD separado)…
+git.reference_local: ramas locales
+git.reference_remote: ramas remotas
+git.reference_tag: etiquetas
+git.current_branch: actual
+git.picker_keys: ↑ ↓ Navegar   ·   Intro Seleccionar   ·   Esc Cancelar
+git.days_ago: hace {} días
+git.today: hoy
+git.highlight_document: Resaltar cambios en el documento
+git.highlight_help: Resalta los objetos guardados que han cambiado desde el último
+  commit. Pulsa un cambio para ir al objeto.
+git.document_object: Objeto del documento
+git.review_document: Revisar cambios del documento
+git.structure: Contenido y orden
+git.no_content_change: No hay cambios en el contenido; solo difiere el formato de
+  almacenamiento.
+git.comparison: El texto eliminado se marca a la izquierda y el añadido a la derecha.
+git.last_commit: Último commit
+git.prepared_version: Versión preparada
+git.saved_document: Documento guardado
+git.document_content: Contenido del documento
+git.technical_xml: Diferencias XML (técnico)
+git.show_in_document: Ver en el documento
+git.stage_object: Preparar objeto completo
+git.unstage_object: Retirar objeto
+git.property_settings: Configuración de la propiedad
+git.review_changed: El objeto ha cambiado después de revisarlo. Vuelve a revisarlo
+  antes de prepararlo.
+git.one_file_changed: 1 archivo con cambios
+
+git.version_absent: "No existe en esta versión"
+git.comparison_tab: "Cambios"
+
+git.save_remote: Guardar remoto
+
+git.pull_pending: Hay cambios locales pendientes. Puedes guardarlos temporalmente en stash y restaurarlos después del pull, o crear un commit antes de continuar.
+git.stash_pull: Guardar en stash y hacer pull
+git.commit_pull: Crear commit y hacer pull
+git.stash_retained: Tus cambios siguen guardados en un stash de PROTEUS. Revisa el estado del repositorio antes de restaurarlos desde Aplicar stash.
+git.stage_all_commit: ¿Quieres preparar todos los cambios del repositorio y crear el commit?
+git.push_first_commit: Todavía no hay commits. Crea el primer commit antes de publicar la rama.
+git.push_nothing: No hay commits pendientes de enviar.
+git.push_uncommitted: Hay cambios locales sin commit. Crea un commit para poder enviarlos.
+
+git.remote_branch_collision: Ya existe una rama local con ese nombre que no sigue a la rama remota seleccionada. Puedes crear una rama de seguimiento con otro nombre o abrir la local existente.
+git.remote_create_named: Crear local con otro nombre…
+git.remote_use_local: Abrir la rama local existente
+
+git.no_stashes: No hay cambios guardados en stash.
+
+git.configure_remote_first: Configura primero un remoto con el botón Remotes para publicar esta rama.
+
+git.tracking_required: Publica la rama o configura su seguimiento remoto antes de hacer pull.
+git.no_other_branches: No hay otras ramas disponibles para esta operación.
+
+git.worktree_path: Carpeta
+git.worktree_state: Estado
+git.worktree_current: Actual
+git.worktree_bare: Sin copia de trabajo
+git.worktree_locked: Bloqueado
+git.worktree_prunable: Carpeta no disponible
+
+git.operation_completed: "{}: operación completada."
+git.cancel: "Cancelar"
+git.remote_invalid: "Introduce un nombre de remoto válido que no exista ya."
+git.remote_unchanged: "La URL no ha cambiado."
+
+git.worktree_branch: Rama
+
+git.invalid_remote_url: URL de remoto no válida
