@@ -23,10 +23,17 @@ import logging
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QVBoxLayout,
+    QFormLayout,
     QLabel,
     QComboBox,
     QCheckBox,
     QGroupBox,
+    QLineEdit,
+    QSpinBox,
+    QTabWidget,
+    QWidget,
+    QPushButton,
+    QFileDialog,
 )
 
 
@@ -36,6 +43,11 @@ from PyQt6.QtWidgets import (
 
 from proteus.application.spellcheck import SpellCheckerWrapper
 from proteus.application.configuration.config import Config
+from proteus.application.configuration.app_settings import DEFAULT_MCP_HOST
+from proteus.application.configuration.mcp_client_config import (
+    write_mcp_client_config,
+)
+from proteus.application.state.manager import StateManager
 from proteus.application.configuration.profile_settings import (
     ProfileSettings,
     ProfileBasicMetadata,
@@ -53,6 +65,14 @@ from proteus.views.components.dialogs.base_dialogs import ProteusDialog, Message
 
 # Module configuration
 log = logging.getLogger(__name__)
+
+# Hosts that only accept connections from this machine. Any other host
+# exposes the MCP server to the network, so the dialog warns about it.
+LOCAL_MCP_HOSTS: List[str] = ["127.0.0.1", "localhost", "::1"]
+
+# Valid range for the MCP server port (non privileged ports)
+MIN_MCP_PORT: int = 1024
+MAX_MCP_PORT: int = 65535
 
 
 # --------------------------------------------------------------------------
@@ -97,12 +117,30 @@ class SettingsDialog(ProteusDialog):
 
         self.theme_combo: QComboBox = None
 
+        self.developer_features_checkbox: QCheckBox = None
+        self.xslt_debug_mode_checkbox: QCheckBox = None
+
+        self.mcp_enabled_checkbox: QCheckBox = None
+        self.mcp_host_edit: QLineEdit = None
+        self.mcp_port_spinbox: QSpinBox = None
+        self.mcp_client_config_button: QPushButton = None
+
+        # Tabs
+        self.tab_widget: QTabWidget = None
+        self.general_tab: QWidget = None
+        self.profile_tab: QWidget = None
+        self.advanced_tab: QWidget = None
+
         # Description labels
         self.profile_description_label: QLabel = None
         self.view_description_label: QLabel = None
 
+        # Warning message labels
+        self.mcp_host_warning_label: QLabel = None
+
         # Error message labels
         self.error_profile_label: QLabel = None
+        self.error_mcp_label: QLabel = None
 
         # Create the component
         self.create_component()
@@ -142,19 +180,24 @@ class SettingsDialog(ProteusDialog):
         language_box: QGroupBox = self.create_language_box()
         appearance_box: QGroupBox = self.create_appearance_box()
         profile_box: QGroupBox = self.create_profile_box()
-        profile_specific_settings: QGroupBox = (
-            self.create_profile_specific_settings_box()
-        )
+        default_view_box: QGroupBox = self.create_default_view_box()
         app_box: QGroupBox = self.create_app_box()
+        developer_box: QGroupBox = self.create_developer_box()
+        mcp_box: QGroupBox = self.create_mcp_box()
+
+        # Tabs ---------------------------------------------------
+        self.general_tab = self._create_tab([language_box, appearance_box, app_box])
+        self.profile_tab = self._create_tab([profile_box, default_view_box])
+        self.advanced_tab = self._create_tab([developer_box, mcp_box])
+
+        self.tab_widget = QTabWidget()
+        self.tab_widget.addTab(self.general_tab, _("settings_dialog.tab.general"))
+        self.tab_widget.addTab(self.profile_tab, _("settings_dialog.tab.profile"))
+        self.tab_widget.addTab(self.advanced_tab, _("settings_dialog.tab.advanced"))
 
         # Add the widgets to the layout
         layout.addWidget(setting_info_label)
-        layout.addWidget(language_box)
-        layout.addWidget(appearance_box)
-        layout.addWidget(app_box)
-        layout.addWidget(profile_specific_settings)
-        layout.addWidget(profile_box)
-        layout.addStretch()
+        layout.addWidget(self.tab_widget)
 
         self.set_content_layout(layout)
 
@@ -341,22 +384,21 @@ class SettingsDialog(ProteusDialog):
         return profile_group
 
     # ---------------------------------------------------------------------
-    # Method     : create_profile_specific_settings_box
-    # Description: Create the profile specific settings group box
+    # Method     : create_default_view_box
+    # Description: Create the default view group box
     # Date       : 25/01/2024
     # Version    : 0.1
     # Author     : José María Delgado Sánchez
     # ---------------------------------------------------------------------
-    def create_profile_specific_settings_box(self) -> QGroupBox:
+    def create_default_view_box(self) -> QGroupBox:
         """
-        Create the profile specific settings group box that contains the
-        the selected default view.
+        Create the default view group box that contains the selected default
+        view among the views of the profile.
         """
         # View layout
         layout: QVBoxLayout = QVBoxLayout()
 
         # Default view -------------------------------------
-        default_view_label: QLabel = QLabel(_("settings_dialog.default_view.label"))
         self.default_view_combo: QComboBox = QComboBox()
         for view_name in self._controller.get_available_xslt():
             self.default_view_combo.addItem(
@@ -382,12 +424,11 @@ class SettingsDialog(ProteusDialog):
         )
 
         # Add the widgets to the layout
-        layout.addWidget(default_view_label)
         layout.addWidget(self.default_view_combo)
         layout.addWidget(self.view_description_label)
 
         # Group box
-        group: QGroupBox = QGroupBox(_("settings_dialog.profile_settings.group"))
+        group: QGroupBox = QGroupBox(_("settings_dialog.default_view.group"))
         group.setLayout(layout)
 
         return group
@@ -500,6 +541,136 @@ class SettingsDialog(ProteusDialog):
 
         return startup_group
 
+    # ---------------------------------------------------------------------
+    # Method     : create_developer_box
+    # Description: Create the developer settings group box
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ---------------------------------------------------------------------
+    def create_developer_box(self) -> QGroupBox:
+        """
+        Create the developer group box that contains the developer features
+        checkbox and the XSLT debug mode checkbox.
+        """
+        developer_layout: QVBoxLayout = QVBoxLayout()
+
+        # Developer features -------------------------------------
+        self.developer_features_checkbox: QCheckBox = QCheckBox(
+            _("settings_dialog.developer_features.checkbox")
+        )
+        self.developer_features_checkbox.setToolTip(
+            _("settings_dialog.developer_features.tooltip")
+        )
+        self.developer_features_checkbox.setChecked(
+            Config().app_settings_copy.developer_features
+        )
+
+        # XSLT debug mode ----------------------------------------
+        self.xslt_debug_mode_checkbox: QCheckBox = QCheckBox(
+            _("settings_dialog.xslt_debug_mode.checkbox")
+        )
+        self.xslt_debug_mode_checkbox.setToolTip(
+            _("settings_dialog.xslt_debug_mode.tooltip")
+        )
+        self.xslt_debug_mode_checkbox.setChecked(
+            Config().app_settings_copy.xslt_debug_mode
+        )
+
+        # Add the widgets to the layout
+        developer_layout.addWidget(self.developer_features_checkbox)
+        developer_layout.addWidget(self.xslt_debug_mode_checkbox)
+
+        # Group box -----------------------------------------------
+        developer_group: QGroupBox = QGroupBox(_("settings_dialog.developer.group"))
+        developer_group.setLayout(developer_layout)
+
+        return developer_group
+
+    # ---------------------------------------------------------------------
+    # Method     : create_mcp_box
+    # Description: Create the embedded MCP server group box
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ---------------------------------------------------------------------
+    def create_mcp_box(self) -> QGroupBox:
+        """
+        Create the MCP group box that contains the embedded MCP server
+        settings (enabled, host and port). Host and port are only enabled
+        when the server is enabled.
+        """
+        mcp_layout: QVBoxLayout = QVBoxLayout()
+
+        app_settings = Config().app_settings_copy
+
+        # Enabled checkbox ---------------------------------------
+        self.mcp_enabled_checkbox: QCheckBox = QCheckBox(
+            _("settings_dialog.mcp.enabled.checkbox")
+        )
+        self.mcp_enabled_checkbox.setToolTip(_("settings_dialog.mcp.enabled.tooltip"))
+        self.mcp_enabled_checkbox.setChecked(app_settings.mcp_server_enabled)
+
+        # Host edit ----------------------------------------------
+        self.mcp_host_edit: QLineEdit = QLineEdit()
+        self.mcp_host_edit.setText(app_settings.mcp_server_host)
+        self.mcp_host_edit.setPlaceholderText(DEFAULT_MCP_HOST)
+
+        # Port spin box ------------------------------------------
+        self.mcp_port_spinbox: QSpinBox = QSpinBox()
+        self.mcp_port_spinbox.setRange(MIN_MCP_PORT, MAX_MCP_PORT)
+        self.mcp_port_spinbox.setValue(app_settings.mcp_server_port)
+
+        host_port_layout: QFormLayout = QFormLayout()
+        host_port_layout.addRow(_("settings_dialog.mcp.host.label"), self.mcp_host_edit)
+        host_port_layout.addRow(
+            _("settings_dialog.mcp.port.label"), self.mcp_port_spinbox
+        )
+
+        # Client configuration button ----------------------------
+        self.mcp_client_config_button: QPushButton = QPushButton(
+            _("settings_dialog.mcp.client_config.button")
+        )
+        self.mcp_client_config_button.setToolTip(
+            _("settings_dialog.mcp.client_config.tooltip")
+        )
+        self.mcp_client_config_button.clicked.connect(
+            self.mcp_client_config_button_clicked
+        )
+
+        # Warning message label (non local host) -----------------
+        self.mcp_host_warning_label: QLabel = QLabel(
+            _("settings_dialog.mcp.host.warning")
+        )
+        self.mcp_host_warning_label.setObjectName("error_label")
+        self.mcp_host_warning_label.setWordWrap(True)
+
+        # Error message label ------------------------------------
+        self.error_mcp_label: QLabel = QLabel()
+        self.error_mcp_label.setObjectName("error_label")
+        self.error_mcp_label.setWordWrap(True)
+        self.error_mcp_label.setHidden(True)
+
+        # Connect signals to keep enabled state and warning updated
+        self.mcp_enabled_checkbox.stateChanged.connect(
+            lambda: self._update_mcp_widgets()
+        )
+        self.mcp_host_edit.textChanged.connect(lambda: self._update_mcp_widgets())
+        self._update_mcp_widgets()
+
+        # Add the widgets to the layout ---------------------------
+        mcp_layout.addWidget(self.mcp_enabled_checkbox)
+        mcp_layout.addLayout(host_port_layout)
+        mcp_layout.addWidget(self.mcp_client_config_button)
+        mcp_layout.addWidget(self.mcp_host_warning_label)
+        mcp_layout.addWidget(self.error_mcp_label)
+
+        # Group box -----------------------------------------------
+        mcp_group: QGroupBox = QGroupBox(_("settings_dialog.mcp.group"))
+        mcp_group.setLayout(mcp_layout)
+
+        return mcp_group
+
     # ======================================================================
     # Validators
     # ======================================================================
@@ -556,6 +727,28 @@ class SettingsDialog(ProteusDialog):
         self.error_profile_label.setHidden(True)
         return True
 
+    # ---------------------------------------------------------------------
+    # Method     : validate_mcp
+    # Description: Validate the embedded MCP server settings
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ---------------------------------------------------------------------
+    def validate_mcp(self) -> bool:
+        """
+        Validate that the MCP server host is not empty when the server is
+        enabled. The port is always valid because the spin box limits it.
+
+        :return: True if the MCP settings are valid, False otherwise
+        """
+        if self.mcp_enabled_checkbox.isChecked() and not self._mcp_host():
+            self.error_mcp_label.setText(_("settings_dialog.error.mcp.empty_host"))
+            self.error_mcp_label.setHidden(False)
+            return False
+
+        self.error_mcp_label.setHidden(True)
+        return True
+
     # ======================================================================
     # Dialog slots methods (connected to the component signals)
     # ======================================================================
@@ -574,11 +767,17 @@ class SettingsDialog(ProteusDialog):
         # ---------------------
         # Validate settings
         # ---------------------
-        valid_settings: bool = True
-        valid_settings = self.validate_profile() and valid_settings
+        valid_mcp: bool = self.validate_mcp()
+        valid_profile: bool = self.validate_profile()
 
-        # If there are errors, do not save the settings
-        if not valid_settings:
+        # If there are errors, show the tab of the first one and do not
+        # save the settings
+        if not valid_profile:
+            self.tab_widget.setCurrentWidget(self.profile_tab)
+            return
+
+        if not valid_mcp:
+            self.tab_widget.setCurrentWidget(self.advanced_tab)
             return
 
         # ---------------------
@@ -615,6 +814,11 @@ class SettingsDialog(ProteusDialog):
             open_project_on_startup=self.open_project_on_startup_checkbox.isChecked(),
             edit_on_clone=self.edit_on_clone_checkbox.isChecked(),
             theme=chosen_theme,
+            xslt_debug_mode=self.xslt_debug_mode_checkbox.isChecked(),
+            developer_features=self.developer_features_checkbox.isChecked(),
+            mcp_server_enabled=self.mcp_enabled_checkbox.isChecked(),
+            mcp_server_host=self._mcp_host() or DEFAULT_MCP_HOST,
+            mcp_server_port=self.mcp_port_spinbox.value(),
         )
 
         # Config.app_settings is a boot-time snapshot. Compare with the
@@ -672,10 +876,113 @@ class SettingsDialog(ProteusDialog):
         self.close()
         self.deleteLater()
 
+    # ----------------------------------------------------------------------
+    # Method     : mcp_client_config_button_clicked
+    # Description: Generate .mcp.json button clicked event handler
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def mcp_client_config_button_clicked(self) -> None:
+        """
+        Ask for a directory and create or update its .mcp.json file with the
+        PROTEUS MCP server entry, using the host and port in the dialog. The
+        directory of the open project is suggested.
+        """
+        if not self.validate_mcp():
+            return
+
+        project_path: Path = StateManager().current_project_path
+        start_directory: str = project_path.as_posix() if project_path else ""
+
+        directory: str = QFileDialog.getExistingDirectory(
+            self, _("settings_dialog.mcp.client_config.dialog"), start_directory
+        )
+
+        # Dialog cancelled
+        if not directory:
+            return
+
+        try:
+            config_path: Path = write_mcp_client_config(
+                Path(directory), self._mcp_host(), self.mcp_port_spinbox.value()
+            )
+        except (ValueError, OSError) as e:
+            log.error(f"Could not write the MCP client configuration: {e}")
+            MessageBox.warning(
+                _("settings_dialog.mcp.client_config.error.title"),
+                _("settings_dialog.mcp.client_config.error.text"),
+                str(e),
+            )
+            return
+
+        MessageBox.information(
+            _("settings_dialog.mcp.client_config.success.title"),
+            _("settings_dialog.mcp.client_config.success.text", config_path.as_posix()),
+        )
+
 
     # ======================================================================
     # Helper methods
     # ======================================================================
+
+    # ----------------------------------------------------------------------
+    # Method     : _create_tab
+    # Description: Create a tab page with the given group boxes.
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _create_tab(self, group_boxes: List[QGroupBox]) -> QWidget:
+        """
+        Create a tab page that stacks the given group boxes vertically,
+        aligned to the top.
+        """
+        tab_layout: QVBoxLayout = QVBoxLayout()
+        for group_box in group_boxes:
+            tab_layout.addWidget(group_box)
+        tab_layout.addStretch()
+
+        tab: QWidget = QWidget()
+        tab.setLayout(tab_layout)
+
+        return tab
+
+    # ----------------------------------------------------------------------
+    # Method     : _mcp_host
+    # Description: Return the MCP host typed by the user.
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _mcp_host(self) -> str:
+        """
+        Return the MCP host typed by the user without surrounding spaces.
+        """
+        return self.mcp_host_edit.text().strip()
+
+    # ----------------------------------------------------------------------
+    # Method     : _update_mcp_widgets
+    # Description: Update the enabled state of the MCP widgets.
+    # Date       : 21/10/2026
+    # Version    : 0.1
+    # Author     : Amador Durán Toro
+    # ----------------------------------------------------------------------
+    def _update_mcp_widgets(self) -> None:
+        """
+        Enable host and port only when the MCP server is enabled, and show
+        the warning when the server would accept connections from other
+        machines.
+        """
+        enabled: bool = self.mcp_enabled_checkbox.isChecked()
+        self.mcp_host_edit.setEnabled(enabled)
+        self.mcp_port_spinbox.setEnabled(enabled)
+        self.mcp_client_config_button.setEnabled(enabled)
+
+        host: str = self._mcp_host()
+        self.mcp_host_warning_label.setHidden(
+            not enabled or host == "" or host.lower() in LOCAL_MCP_HOSTS
+        )
 
     # ----------------------------------------------------------------------
     # Method     : _update_xslt_templtate_description_label

@@ -50,7 +50,7 @@ SETTING_CUSTOM_PROFILE_PATH: str = "custom_profile_path"
 SETTING_OPEN_PROJECT_ON_STARTUP: str = "open_project_on_startup"
 SETTING_EDIT_ON_CLONE: str = "edit_on_clone"
 SETTING_THEME: str = "theme"
-# Special advanced settings
+# Advanced settings (Advanced tab of the Settings dialog)
 SETTING_XSLT_DEBUG_MODE: str = "xslt_debug_mode"
 SETTING_DEVELOPER_FEATURES: str = "developer_features"
 
@@ -58,9 +58,8 @@ SETTING_DEVELOPER_FEATURES: str = "developer_features"
 # fallback chain when this key does not match an installed theme.
 DEFAULT_THEME: str = "light"
 
-# Embedded MCP server settings (own section, not exposed in the Settings
-# dialog; edited by hand in the configuration file like the advanced
-# settings above).
+# Embedded MCP server settings (own section, Advanced tab of the Settings
+# dialog).
 SETTINGS_MCP: str = "mcp"
 SETTING_MCP_ENABLED: str = "enabled"
 SETTING_MCP_HOST: str = "host"
@@ -107,12 +106,11 @@ class AppSettings:
     open_project_on_startup: bool = None
     edit_on_clone: bool = False
     theme: str = DEFAULT_THEME
-    # Special advanced settings (not editable by the user)
-    # These settings must be set manually in the configuration file
+    # Advanced settings
     xslt_debug_mode: bool = False
     developer_features: bool = False
 
-    # Embedded MCP server settings (not editable by the user, [mcp] section)
+    # Embedded MCP server settings ([mcp] section)
     mcp_server_enabled: bool = DEFAULT_MCP_ENABLED
     mcp_server_host: str = DEFAULT_MCP_HOST
     mcp_server_port: int = DEFAULT_MCP_PORT
@@ -377,6 +375,11 @@ class AppSettings:
         open_project_on_startup: bool = None,
         edit_on_clone: bool = None,
         theme: str = None,
+        xslt_debug_mode: bool = None,
+        developer_features: bool = None,
+        mcp_server_enabled: bool = None,
+        mcp_server_host: str = None,
+        mcp_server_port: int = None,
     ) -> "AppSettings":
         """
         Clone the current object with the new user settings (if any).
@@ -408,6 +411,21 @@ class AppSettings:
         if theme is None:
             theme = self.theme
 
+        if xslt_debug_mode is None:
+            xslt_debug_mode = self.xslt_debug_mode
+
+        if developer_features is None:
+            developer_features = self.developer_features
+
+        if mcp_server_enabled is None:
+            mcp_server_enabled = self.mcp_server_enabled
+
+        if mcp_server_host is None:
+            mcp_server_host = self.mcp_server_host
+
+        if mcp_server_port is None:
+            mcp_server_port = self.mcp_server_port
+
         new_settings = replace(
             self,
             language=language,
@@ -419,6 +437,11 @@ class AppSettings:
             open_project_on_startup=open_project_on_startup,
             edit_on_clone=edit_on_clone,
             theme=theme,
+            xslt_debug_mode=xslt_debug_mode,
+            developer_features=developer_features,
+            mcp_server_enabled=mcp_server_enabled,
+            mcp_server_host=mcp_server_host,
+            mcp_server_port=mcp_server_port,
         )
 
         new_settings._validate_profile_path()
@@ -437,9 +460,10 @@ class AppSettings:
         """
         # Settings section
         self.config_parser[SETTINGS][SETTING_LANGUAGE] = self.language
-        self.config_parser[SETTINGS][
-            SETTING_SPELLCHECKER_LANGUAGE
-        ] = self.spellchecker_language
+        # None when the spellchecker is deactivated or not available
+        self.config_parser[SETTINGS][SETTING_SPELLCHECKER_LANGUAGE] = (
+            self.spellchecker_language or ""
+        )
         self.config_parser[SETTINGS][SETTING_DEFAULT_VIEW] = self.default_view
         self.config_parser[SETTINGS][SETTING_SELECTED_PROFILE] = self.selected_profile
         self.config_parser[SETTINGS][SETTING_USING_DEFAULT_PROFILE] = str(
@@ -454,6 +478,21 @@ class AppSettings:
 
         self.config_parser[SETTINGS][SETTING_EDIT_ON_CLONE] = str(self.edit_on_clone)
         self.config_parser[SETTINGS][SETTING_THEME] = self.theme or DEFAULT_THEME
+        self.config_parser[SETTINGS][SETTING_XSLT_DEBUG_MODE] = str(
+            self.xslt_debug_mode
+        )
+        self.config_parser[SETTINGS][SETTING_DEVELOPER_FEATURES] = str(
+            self.developer_features
+        )
+
+        # MCP section, absent in older configuration files
+        if not self.config_parser.has_section(SETTINGS_MCP):
+            self.config_parser.add_section(SETTINGS_MCP)
+        self.config_parser[SETTINGS_MCP][SETTING_MCP_ENABLED] = str(
+            self.mcp_server_enabled
+        )
+        self.config_parser[SETTINGS_MCP][SETTING_MCP_HOST] = self.mcp_server_host
+        self.config_parser[SETTINGS_MCP][SETTING_MCP_PORT] = str(self.mcp_server_port)
 
         with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
             self.config_parser.write(config_file)
@@ -468,6 +507,11 @@ class AppSettings:
         log.info(f"{self.open_project_on_startup = }")
         log.info(f"{self.edit_on_clone = }")
         log.info(f"{self.theme = }")
+        log.info(f"{self.xslt_debug_mode = }")
+        log.info(f"{self.developer_features = }")
+        log.info(f"{self.mcp_server_enabled = }")
+        log.info(f"{self.mcp_server_host = }")
+        log.info(f"{self.mcp_server_port = }")
 
     # ==========================================================================
     # Session data

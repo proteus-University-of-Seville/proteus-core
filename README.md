@@ -128,6 +128,8 @@ The server only serves the project currently open in that running PROTEUS instan
   }
 }
 ```
+The *Generate .mcp.json…* button in the *MCP server* group of the *Advanced* tab of the Settings dialog creates this file in the selected folder, or adds the `proteus` entry to it if it already exists, keeping the other servers.
+
 With PROTEUS running and `[mcp] enabled = True`, opening Claude Code inside this repository will offer to connect to the `proteus` MCP server, exposing its tools in the coding session.
 
 #### Connecting other MCP-compatible applications

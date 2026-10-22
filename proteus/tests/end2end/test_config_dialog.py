@@ -10,6 +10,7 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import json
 
 # --------------------------------------------------------------------------
 # Third party imports
@@ -43,12 +44,14 @@ def app_settings():
     """
     # Config singleton
     config = Config()
+    app_settings_copy = config.app_settings_copy
 
     # Return settings
     yield config.app_settings
 
     # Restore settings
     config.app_settings.save()
+    config.app_settings_copy = app_settings_copy
 
 
 # # --------------------------------------------------------------------------
@@ -441,3 +444,237 @@ def test_config_dialog_change_custom_profile(app, app_settings: AppSettings):
         is False
         == app_settings_copy.using_default_profile
     ), f"Using default profile settings was not correctly saved. It is '{new_app_settings.using_default_profile}' but should be 'False' | app: {app_settings_copy.using_default_profile}"
+
+
+def test_config_dialog_tabs(app, app_settings: AppSettings):
+    """
+    Opens the config dialog and checks that the settings are grouped in
+    tabs and that the advanced settings are correctly loaded.
+    """
+    # --------------------------------------------
+    # Arrange
+    # --------------------------------------------
+    main_window: MainWindow = app
+
+    # Get config button
+    settings_button = main_window.main_menu.settings_button
+
+    # --------------------------------------------
+    # Act
+    # --------------------------------------------
+
+    # Open config dialog
+    dialog: SettingsDialog = get_dialog(settings_button.click)
+
+    # --------------------------------------------
+    # Assert
+    # --------------------------------------------
+
+    assert (
+        dialog.tab_widget.count() == 3
+    ), f"Settings dialog has {dialog.tab_widget.count()} tabs but should have 3"
+
+    assert (
+        dialog.developer_features_checkbox.isChecked()
+        == app_settings.developer_features
+    ), "Developer features checkbox does not match the settings"
+
+    assert (
+        dialog.xslt_debug_mode_checkbox.isChecked() == app_settings.xslt_debug_mode
+    ), "XSLT debug mode checkbox does not match the settings"
+
+    assert (
+        dialog.mcp_enabled_checkbox.isChecked() == app_settings.mcp_server_enabled
+    ), "MCP enabled checkbox does not match the settings"
+
+    assert (
+        dialog.mcp_host_edit.text() == app_settings.mcp_server_host
+    ), f"MCP host is '{dialog.mcp_host_edit.text()}' but should be '{app_settings.mcp_server_host}'"
+
+    assert (
+        dialog.mcp_port_spinbox.value() == app_settings.mcp_server_port
+    ), f"MCP port is '{dialog.mcp_port_spinbox.value()}' but should be '{app_settings.mcp_server_port}'"
+
+    dialog.deleteLater()
+
+
+def test_config_dialog_mcp_widgets(app, app_settings: AppSettings):
+    """
+    Opens the config dialog and checks that host and port are only enabled
+    when the MCP server is enabled, that the warning is shown for non local
+    hosts and that an empty host is not saved.
+    """
+    # --------------------------------------------
+    # Arrange
+    # --------------------------------------------
+    main_window: MainWindow = app
+
+    # Get config button
+    settings_button = main_window.main_menu.settings_button
+
+    # Open config dialog
+    dialog: SettingsDialog = get_dialog(settings_button.click)
+
+    # --------------------------------------------
+    # Act & Assert
+    # --------------------------------------------
+
+    # Disabled server
+    dialog.mcp_enabled_checkbox.setChecked(False)
+
+    assert dialog.mcp_host_edit.isEnabled() is False, "Host should be disabled"
+    assert dialog.mcp_port_spinbox.isEnabled() is False, "Port should be disabled"
+    assert dialog.mcp_host_warning_label.isHidden(), "Warning should be hidden"
+
+    # Enabled server with local host
+    dialog.mcp_enabled_checkbox.setChecked(True)
+    dialog.mcp_host_edit.setText("localhost")
+
+    assert dialog.mcp_host_edit.isEnabled() is True, "Host should be enabled"
+    assert dialog.mcp_port_spinbox.isEnabled() is True, "Port should be enabled"
+    assert dialog.mcp_host_warning_label.isHidden(), "Warning should be hidden"
+
+    # Enabled server with a host reachable from the network
+    dialog.mcp_host_edit.setText("0.0.0.0")
+
+    assert (
+        not dialog.mcp_host_warning_label.isHidden()
+    ), "Warning should be shown for a non local host"
+
+    # Empty host is not saved and the advanced tab is shown
+    dialog.tab_widget.setCurrentWidget(dialog.general_tab)
+    dialog.mcp_host_edit.setText("")
+    dialog.accept_button.click()
+
+    assert (
+        not dialog.error_mcp_label.isHidden()
+    ), "Empty host error should be shown"
+
+    assert (
+        dialog.tab_widget.currentWidget() is dialog.advanced_tab
+    ), "Advanced tab should be shown when the MCP settings are not valid"
+
+    assert (
+        Config().app_settings_copy.mcp_server_host == app_settings.mcp_server_host
+    ), "MCP settings should not be saved when the host is empty"
+
+    dialog.close()
+    dialog.deleteLater()
+
+
+def test_config_dialog_change_advanced_settings(app, app_settings: AppSettings):
+    """
+    Opens the config dialog and changes the advanced settings. Then checks
+    if the settings were correctly saved to the file.
+
+    app_settings fixture is used to restore the settings file to its
+    original state. It also works when the test fails.
+    """
+    # --------------------------------------------
+    # Arrange
+    # --------------------------------------------
+    main_window: MainWindow = app
+
+    # Get config button
+    settings_button = main_window.main_menu.settings_button
+
+    new_developer_features = not app_settings.developer_features
+    new_xslt_debug_mode = not app_settings.xslt_debug_mode
+    new_mcp_enabled = not app_settings.mcp_server_enabled
+    new_mcp_host = "localhost"
+    new_mcp_port = 9000
+
+    # --------------------------------------------
+    # Act
+    # --------------------------------------------
+
+    # Open config dialog
+    dialog: SettingsDialog = get_dialog(settings_button.click)
+
+    # Change the advanced settings
+    dialog.developer_features_checkbox.setChecked(new_developer_features)
+    dialog.xslt_debug_mode_checkbox.setChecked(new_xslt_debug_mode)
+    dialog.mcp_enabled_checkbox.setChecked(new_mcp_enabled)
+    dialog.mcp_host_edit.setText(new_mcp_host)
+    dialog.mcp_port_spinbox.setValue(new_mcp_port)
+
+    # Save settings
+    warning_dialog: MessageBox = get_dialog(dialog.accept_button.click)
+    warning_dialog.button(QMessageBox.StandardButton.Ok).click()
+    dialog.deleteLater()
+    warning_dialog.deleteLater()
+
+    # --------------------------------------------
+    # Assert
+    # --------------------------------------------
+
+    # Read settings file and check if the setting were correctly changed
+    new_app_settings = AppSettings.load(proteus.PROTEUS_APP_PATH)
+
+    assert new_app_settings.developer_features == new_developer_features
+    assert new_app_settings.xslt_debug_mode == new_xslt_debug_mode
+    assert new_app_settings.mcp_server_enabled == new_mcp_enabled
+    assert new_app_settings.mcp_server_host == new_mcp_host
+    assert new_app_settings.mcp_server_port == new_mcp_port
+
+
+def test_config_dialog_generate_mcp_client_config(
+    app, app_settings: AppSettings, mocker, tmp_path
+):
+    """
+    Opens the config dialog and generates the .mcp.json file in the selected
+    folder using the host and port of the dialog.
+    """
+    # --------------------------------------------
+    # Arrange
+    # --------------------------------------------
+    main_window: MainWindow = app
+
+    # Get config button
+    settings_button = main_window.main_menu.settings_button
+
+    mocker.patch(
+        "proteus.views.components.dialogs.settings_dialog.QFileDialog.getExistingDirectory",
+        return_value=tmp_path.as_posix(),
+    )
+    information = mocker.patch(
+        "proteus.views.components.dialogs.settings_dialog.MessageBox.information"
+    )
+
+    # Open config dialog
+    dialog: SettingsDialog = get_dialog(settings_button.click)
+
+    # --------------------------------------------
+    # Act
+    # --------------------------------------------
+
+    dialog.mcp_enabled_checkbox.setChecked(False)
+    button_enabled_when_disabled = dialog.mcp_client_config_button.isEnabled()
+
+    dialog.mcp_enabled_checkbox.setChecked(True)
+    dialog.mcp_host_edit.setText("0.0.0.0")
+    dialog.mcp_port_spinbox.setValue(9000)
+    dialog.mcp_client_config_button.click()
+
+    dialog.close()
+    dialog.deleteLater()
+
+    # --------------------------------------------
+    # Assert
+    # --------------------------------------------
+
+    assert (
+        button_enabled_when_disabled is False
+    ), "Generate .mcp.json button should be disabled when the server is disabled"
+
+    config_path = tmp_path / ".mcp.json"
+    assert config_path.exists(), f"Expected file '{config_path}' to exist"
+
+    url = json.loads(config_path.read_text(encoding="utf-8"))["mcpServers"][
+        "proteus"
+    ]["url"]
+    assert (
+        url == "http://127.0.0.1:9000/mcp/"
+    ), f"Expected URL 'http://127.0.0.1:9000/mcp/', but got '{url}'"
+
+    information.assert_called_once()

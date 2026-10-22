@@ -51,13 +51,13 @@ def _fresh_register():
 # --------------------------------------------------------------------------
 
 
-def test_mcp_plugin_not_registered_when_disabled(app_settings_test_config):
+def test_mcp_plugin_not_registered_when_disabled(app_settings_test_config, monkeypatch):
     """
     Check that the MCP server component is not registered (and therefore
     never instantiated/started) when mcp_server_enabled is False, which is
     the default.
     """
-    Config().app_settings.mcp_server_enabled = False
+    monkeypatch.setattr(Config().app_settings, "mcp_server_enabled", False)
     register = _fresh_register()
 
     registered = {}
@@ -71,12 +71,12 @@ def test_mcp_plugin_not_registered_when_disabled(app_settings_test_config):
     assert registered == {}, f"Expected no component registered, got {registered}"
 
 
-def test_mcp_plugin_registered_when_enabled(app_settings_test_config):
+def test_mcp_plugin_registered_when_enabled(app_settings_test_config, monkeypatch):
     """
     Check that the MCP server component is registered when mcp_server_enabled
     is explicitly set to True.
     """
-    Config().app_settings.mcp_server_enabled = True
+    monkeypatch.setattr(Config().app_settings, "mcp_server_enabled", True)
     register = _fresh_register()
 
     registered = {}

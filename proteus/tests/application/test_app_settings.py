@@ -11,6 +11,7 @@
 # --------------------------------------------------------------------------
 
 from pathlib import Path
+import shutil
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -384,3 +385,93 @@ def test_app_settings_clone(
         assert (
             cloned_settings.theme == theme
         ), f"Expected theme '{theme}' (override), but got '{cloned_settings.theme}'"
+
+
+def test_app_settings_clone_advanced_settings():
+    """
+    Check that clone preserves the advanced and MCP settings when they are
+    not passed and adopts them when they are.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    app_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Act
+    # --------------------
+
+    preserved_settings = app_settings.clone()
+    changed_settings = app_settings.clone(
+        xslt_debug_mode=not app_settings.xslt_debug_mode,
+        developer_features=not app_settings.developer_features,
+        mcp_server_enabled=not app_settings.mcp_server_enabled,
+        mcp_server_host="localhost",
+        mcp_server_port=9000,
+    )
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    for name in [
+        "xslt_debug_mode",
+        "developer_features",
+        "mcp_server_enabled",
+        "mcp_server_host",
+        "mcp_server_port",
+    ]:
+        assert getattr(preserved_settings, name) == getattr(
+            app_settings, name
+        ), f"Expected '{name}' to be preserved, but got '{getattr(preserved_settings, name)}'"
+
+    assert changed_settings.xslt_debug_mode == (not app_settings.xslt_debug_mode)
+    assert changed_settings.developer_features == (not app_settings.developer_features)
+    assert changed_settings.mcp_server_enabled == (not app_settings.mcp_server_enabled)
+    assert changed_settings.mcp_server_host == "localhost"
+    assert changed_settings.mcp_server_port == 9000
+
+
+def test_save_advanced_settings_without_mcp_section(mocker, tmp_path: Path):
+    """
+    Check that the advanced and MCP settings are saved, creating the [mcp]
+    section when the configuration file does not have it.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    # init_min/proteus.ini has no [mcp] section. Work on a copy so that the
+    # sample file is not modified.
+    shutil.copy(
+        PROTEUS_SAMPLE_INIT_FILES_PATH / "init_min" / CONFIG_FILE,
+        tmp_path / CONFIG_FILE,
+    )
+    mocker.patch("pathlib.Path.cwd", return_value=tmp_path)
+
+    app_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Act
+    # --------------------
+
+    app_settings.clone(
+        xslt_debug_mode=True,
+        developer_features=True,
+        mcp_server_enabled=True,
+        mcp_server_host="localhost",
+        mcp_server_port=9000,
+    ).save()
+
+    saved_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert saved_settings.xslt_debug_mode is True
+    assert saved_settings.developer_features is True
+    assert saved_settings.mcp_server_enabled is True
+    assert saved_settings.mcp_server_host == "localhost"
+    assert saved_settings.mcp_server_port == 9000
