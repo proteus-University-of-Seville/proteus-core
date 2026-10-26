@@ -10,11 +10,12 @@
 # Standard library imports
 # --------------------------------------------------------------------------
 
+import locale
 import logging
 import shutil
 from pathlib import Path
 from dataclasses import dataclass, replace
-from configparser import ConfigParser
+from configparser import ConfigParser, Error as ConfigParserError
 
 # --------------------------------------------------------------------------
 # Third-party library imports
@@ -149,10 +150,18 @@ class AppSettings:
 
         try:
             config_parser: ConfigParser = ConfigParser()
-            config_parser.read(config_file_exec_path, encoding="utf-8")
-        except Exception as e:
+            try:
+                config_parser.read(config_file_exec_path, encoding="utf-8")
+            except UnicodeDecodeError:
+                # Older versions wrote some changes with the locale encoding
+                # (issue #7): convert the file to UTF-8 and read it again, so
+                # that the user does not lose the settings
+                AppSettings._convert_settings_file_to_utf8(config_file_exec_path)
+                config_parser = ConfigParser()
+                config_parser.read(config_file_exec_path, encoding="utf-8")
+        except (UnicodeError, ConfigParserError) as e:
             log.error(
-                f"Error loading configuration file '{config_file_exec_path}': {e}"
+                f"Error loading configuration file '{config_file_exec_path}': {e}. "
                 "Configuration file will be deleted and copied again from the default configuration file."
             )
 
@@ -494,8 +503,7 @@ class AppSettings:
         self.config_parser[SETTINGS_MCP][SETTING_MCP_HOST] = self.mcp_server_host
         self.config_parser[SETTINGS_MCP][SETTING_MCP_PORT] = str(self.mcp_server_port)
 
-        with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
-            self.config_parser.write(config_file)
+        self._write_settings_file()
 
         log.info(f"Settings saved to '{self.settings_file_path}'.")
         log.info(f"{self.language = }")
@@ -512,6 +520,49 @@ class AppSettings:
         log.info(f"{self.mcp_server_enabled = }")
         log.info(f"{self.mcp_server_host = }")
         log.info(f"{self.mcp_server_port = }")
+
+    # --------------------------------------------------------------------------
+    # Method: _convert_settings_file_to_utf8
+    # Description: Convert a configuration file in the locale encoding to UTF-8
+    # Date: 27/10/2026
+    # Version: 0.1
+    # Author: Amador Durán Toro
+    # --------------------------------------------------------------------------
+    @staticmethod
+    def _convert_settings_file_to_utf8(settings_file_path: Path) -> None:
+        """
+        Rewrite in UTF-8 a configuration file written with the locale
+        encoding (see _write_settings_file). The bytes are converted as they
+        are, keeping comments and line endings, which ConfigParser.write
+        would lose. Raises UnicodeDecodeError if the file is not valid in
+        the locale encoding either.
+        """
+        locale_encoding: str = locale.getpreferredencoding(False)
+        content: str = settings_file_path.read_bytes().decode(locale_encoding)
+        settings_file_path.write_bytes(content.encode("utf-8"))
+
+        log.warning(
+            f"Configuration file '{settings_file_path}' was not in UTF-8: "
+            f"converted from '{locale_encoding}'."
+        )
+
+    # --------------------------------------------------------------------------
+    # Method: _write_settings_file
+    # Description: Write the configuration file in UTF-8
+    # Date: 27/10/2026
+    # Version: 0.1
+    # Author: Amador Durán Toro
+    # --------------------------------------------------------------------------
+    def _write_settings_file(self) -> None:
+        """
+        Write the configuration parser to the configuration file. Every
+        method that changes the file must use this one: the file is read in
+        UTF-8, and without an explicit encoding Python writes it with the
+        locale encoding (cp1252 on Windows), so a path with non-ASCII
+        characters (e.g. 'º' or 'ñ') makes it unreadable (issue #7).
+        """
+        with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
+            self.config_parser.write(config_file)
 
     # ==========================================================================
     # Session data
@@ -553,8 +604,7 @@ class AppSettings:
 
         self.config_parser[SESSION][SESSION_LAST_PROJECT_OPENED] = last_project_opened
 
-        with open(self.settings_file_path, "w") as config_file:
-            self.config_parser.write(config_file)
+        self._write_settings_file()
 
         log.info(
             f"Session data '{SESSION_LAST_PROJECT_OPENED}' saved to '{self.settings_file_path}'."
@@ -601,7 +651,6 @@ class AppSettings:
             self.config_parser.add_section(SESSION)
         self.config_parser[SESSION][SESSION_EXPORT_INCLUDE_COMMENTS] = str(include_comments)
 
-        with open(self.settings_file_path, "w") as config_file:
-            self.config_parser.write(config_file)
+        self._write_settings_file()
 
         log.info(f"Session data '{SESSION_EXPORT_INCLUDE_COMMENTS}' = {include_comments} saved.")

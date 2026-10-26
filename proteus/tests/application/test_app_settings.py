@@ -11,6 +11,7 @@
 # --------------------------------------------------------------------------
 
 from pathlib import Path
+import locale
 import shutil
 
 # --------------------------------------------------------------------------
@@ -475,3 +476,95 @@ def test_save_advanced_settings_without_mcp_section(mocker, tmp_path: Path):
     assert saved_settings.mcp_server_enabled is True
     assert saved_settings.mcp_server_host == "localhost"
     assert saved_settings.mcp_server_port == 9000
+
+
+def test_settings_kept_with_non_ascii_path(mocker, tmp_path: Path):
+    """
+    Check that the settings survive a restart when the configuration file
+    stores a path with non-ASCII characters (issue #7). Every method that
+    writes the configuration file must write it in UTF-8, the encoding it
+    is read with: on Windows, the locale encoding (cp1252) wrote 'º' as a
+    byte that UTF-8 cannot decode, so the file was replaced by the default
+    one on the next start-up.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    settings_dir: Path = tmp_path / "3º curso"
+    settings_dir.mkdir()
+    shutil.copy(
+        PROTEUS_SAMPLE_INIT_FILES_PATH / "init_min" / CONFIG_FILE,
+        settings_dir / CONFIG_FILE,
+    )
+    mocker.patch("pathlib.Path.cwd", return_value=settings_dir)
+
+    app_settings = AppSettings.load(PROTEUS_APP_PATH)
+    app_settings = app_settings.clone(
+        language="es_ES", open_project_on_startup=True
+    )
+    app_settings.save()
+
+    last_project: str = (settings_dir / "proyecto de diseño").as_posix()
+
+    # --------------------
+    # Act
+    # --------------------
+
+    app_settings.set_last_project_opened(last_project)
+    app_settings.set_export_include_comments(False)
+
+    saved_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    # The file is valid UTF-8 (raises UnicodeDecodeError otherwise)
+    (settings_dir / CONFIG_FILE).read_bytes().decode("utf-8")
+
+    assert saved_settings.language == "es_ES"
+    assert saved_settings.get_last_project_opened() == last_project
+    assert saved_settings.get_export_include_comments() is False
+
+
+@pytest.mark.skipif(
+    locale.getpreferredencoding(False).lower().replace("-", "") == "utf8",
+    reason="the locale encoding is UTF-8, so files written with it are UTF-8",
+)
+def test_load_recovers_settings_file_in_locale_encoding(mocker, tmp_path: Path):
+    """
+    Check that a configuration file written with the locale encoding by
+    older versions (issue #7) is loaded keeping its settings, and rewritten
+    in UTF-8, instead of being replaced by the default configuration file.
+    """
+    # --------------------
+    # Arrange
+    # --------------------
+
+    last_project: str = (tmp_path / "3º curso" / "proyecto").as_posix()
+    content: str = (
+        PROTEUS_SAMPLE_INIT_FILES_PATH / "init_min" / CONFIG_FILE
+    ).read_text(encoding="utf-8")
+    content = content.replace("language = en_US", "language = es_ES")
+    content = content.replace(
+        "last_project_opened =", f"last_project_opened = {last_project}"
+    )
+    (tmp_path / CONFIG_FILE).write_text(
+        content, encoding=locale.getpreferredencoding(False)
+    )
+    mocker.patch("pathlib.Path.cwd", return_value=tmp_path)
+
+    # --------------------
+    # Act
+    # --------------------
+
+    app_settings = AppSettings.load(PROTEUS_APP_PATH)
+
+    # --------------------
+    # Assert
+    # --------------------
+
+    assert app_settings.language == "es_ES"
+    assert app_settings.get_last_project_opened() == last_project
+    assert (tmp_path / CONFIG_FILE).read_text(encoding="utf-8") == content
