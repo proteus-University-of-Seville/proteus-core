@@ -508,7 +508,7 @@ class AppSettings:
 
         self.config_parser[SESSION][SESSION_LAST_PROJECT_OPENED] = last_project_opened
 
-        with open(self.settings_file_path, "w") as config_file:
+        with open(self.settings_file_path, "w", encoding="utf-8") as config_file:
             self.config_parser.write(config_file)
 
         log.info(
