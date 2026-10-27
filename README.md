@@ -72,9 +72,14 @@ PROTEUS is shipped with a basic profile that includes archetypes like `paragraph
 
 We encourage you to create your own profiles or modify the existing ones to suit your needs. Profiles can be shipped with the application or loaded from an external directory in the configuration menu. See [documentation/profile_creation.md](documentation/profile_creation.md) to create a profile and [documentation/archetype_tasks.md](documentation/archetype_tasks.md) to add archetypes to it.
 
-### LaTeX rendering (not available yet)
+### LaTeX and PDF export
 
-We are currently working on a LaTeX XSLT template and export strategy. This will allow the generation of LaTeX documents and PDF files from the basic profile (extendable to any other profile/archetypes). There is a feature branch for this purpose, contact us if you need more information about its status.
+Besides the HTML views, a profile may include LaTeX templates, which generate a LaTeX document instead of HTML. The basic profile and profile-madeja include one. When the current profile has a LaTeX template, the export dialog offers two more formats:
+
+- **LaTeX (with resources folder)**: writes `main.tex` and its resources in a folder, ready to be edited or compiled.
+- **PDF (from LaTeX)**: compiles the LaTeX sources and saves the PDF. It needs `xelatex` (default), `lualatex` or `pdflatex` in the `PATH`, e.g. from [MiKTeX](https://miktex.org/) or [TeX Live](https://tug.org/texlive/). Without them, you can still use **PDF (from HTML)**.
+
+See [documentation/latex_export.md](documentation/latex_export.md) for the details and for adding a LaTeX template to a profile.
 
 ## Developer features
 
