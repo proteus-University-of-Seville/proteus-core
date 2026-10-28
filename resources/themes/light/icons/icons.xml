@@ -44,6 +44,12 @@
         <icon key="es_ES" file="flags/es_ES.png"/>
     </type>
     <type name="main_menu" default="default-archetype.png">
+        <icon key="git-refresh" file="git/refresh.png" />
+        <icon key="git-fetch" file="git/fetch.png" />
+        <icon key="git-remotes" file="git/remotes.png" />
+        <icon key="git-history" file="git/history.png" />
+        <icon key="git-copy" file="git/copy.png" />
+        <icon key="git-branches" file="git/branches.png" />
         <icon key="new-project" file="main_menu/new-project-button.png" />
         <icon key="open-project" file="main_menu/open-project-button.png" />
         <icon key="delete-file" file="main_menu/delete-file-button.png" />

@@ -12,7 +12,7 @@
 # --------------------------------------------------------------------------
 
 import pytest
-from PyQt6.QtWidgets import QTabWidget
+from PyQt6.QtWidgets import QTabWidget, QToolButton
 
 # --------------------------------------------------------------------------
 # Project specific imports
@@ -31,7 +31,7 @@ from proteus.tests.end2end.fixtures import app, load_project
 INITIAL_WIDTH: int = 500
 
 
-def open_dialog_with_long_tab_names(main_window: MainWindow, mocker, qtbot) -> PropertyDialog:
+def open_dialog_with_long_tab_names(main_window: MainWindow, mocker, qtbot, category_prefix="Long category name") -> PropertyDialog:
     """
     Open the property dialog of the first document of the test project,
     translating its category names into long texts so that its tabs do not
@@ -47,7 +47,7 @@ def open_dialog_with_long_tab_names(main_window: MainWindow, mocker, qtbot) -> P
         if key.startswith("archetype.prop_category."):
             # Long enough to exceed the initial width with a few tabs, short
             # enough not to reach the limit of the dialog width
-            return f"Long category name {key.rsplit('.', 1)[-1]}"
+            return f"{category_prefix} {key.rsplit('.', 1)[-1]}"
         return translate(key, *args, **kwargs)
 
     mocker.patch.object(property_dialog, "_", side_effect=long_category_names)
@@ -99,3 +99,18 @@ def test_dialog_width_is_limited(app, mocker, qtbot, fraction):
         dialog.width() <= expected
     ), f"Dialog width {dialog.width()} exceeds the limit {expected}"
     assert dialog.width() >= INITIAL_WIDTH, "The dialog was narrowed"
+
+
+
+def test_dialog_keeps_scroll_buttons_when_tabs_exceed_width_limit(app, mocker, qtbot):
+    screen_width = app.screen().availableGeometry().width()
+    mocker.patch.object(property_dialog, "MAX_SCREEN_WIDTH_FRACTION", INITIAL_WIDTH / screen_width)
+    dialog = open_dialog_with_long_tab_names(
+        app, mocker, qtbot,
+        category_prefix="Very long property category that requires horizontal scrolling",
+    )
+    tab_bar = dialog.findChild(QTabWidget).tabBar()
+    qtbot.waitUntil(lambda: any(button.isVisible() for button in tab_bar.findChildren(QToolButton)))
+    assert dialog.width() == INITIAL_WIDTH
+    assert tab_bar.width() < tab_bar.sizeHint().width()
+    assert tab_bar.usesScrollButtons()

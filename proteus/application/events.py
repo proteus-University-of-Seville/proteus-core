@@ -927,3 +927,16 @@ class ThemeChangedEvent(ProteusEvent):
         :param method: The method to connect to the event.
         """
         self.signal.connect(method)
+
+
+class GitChangesEvent(ProteusEvent):
+    """Current project's saved Git changes; independent of document dirty state."""
+    signal = pyqtSignal(dict)
+    changes: dict[str, str] = {}
+
+    def notify(self, changes: dict[str, str]) -> None:
+        self.changes = dict(changes)
+        self.signal.emit(self.changes)
+
+    def connect(self, method: Callable) -> None:
+        self.signal.connect(method)

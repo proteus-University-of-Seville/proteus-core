@@ -41,6 +41,16 @@ def proteus_action(func):
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
+        owner = args[0] if args else None
+        if getattr(owner, "_git_operation_active", False) is True:
+            raise RuntimeError("A Git operation is updating the project. Try again when it finishes.")
+        if func.__name__ == "save_project":
+            validator = getattr(owner, "_git_validate_save", None)
+            if callable(validator):
+                validator()
+        if (getattr(owner, "_git_write_blocked", False) is True
+                and func.__name__ not in {"load_project", "create_project"}):
+            raise RuntimeError("Reload or resolve the project in Source Control before modifying it.")
         try:
             # Set cursor to wait shape
             QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
